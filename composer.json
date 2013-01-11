@@ -1,0 +1,26 @@
+{
+    "name": "bcen/silex-dispatcher",
+    "description": "A Silex plugin",
+    "keywords": ["RESTful", "Controller"],
+    "license": "MIT",
+    "homepage": "git@github.com:bcen/silex-dispatcher.git",
+    "authors": [
+        {
+            "name": "Bocai Cen",
+            "email": "bocai.cen@gmail.com"
+        }
+    ],
+    "require": {
+        "silex/silex": "1.0.*@dev",
+        "symfony/http-kernel": ">=2.1,<2.3-dev",
+        "symfony/http-foundation": ">=2.1,<2.3-dev",
+        "twig/twig": ">=1.8.0,<2.0-dev"
+    },
+    "require-dev": {
+        "phpunit/phpunit": "3.7.*",
+        "mustache/mustache": "2.0.*"
+    },
+    "autoload": {
+        "psr-0": { "SDispatcher": "src/" }
+    }
+}
