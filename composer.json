@@ -3,7 +3,7 @@
     "description": "A Silex plugin",
     "keywords": ["RESTful", "Controller"],
     "license": "MIT",
-    "homepage": "git@github.com:bcen/silex-dispatcher.git",
+    "homepage": "https://github.com/bcen/silex-dispatcher",
     "authors": [
         {
             "name": "Bocai Cen",
