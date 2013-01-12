@@ -27,6 +27,12 @@ final class DeclarativeResourceOption extends AbstractResourceOption
     private $prefix = '';
 
     /**
+     * Used to cache the options.
+     * @var array
+     */
+    private $cache = array();
+
+    /**
      * @param $object
      * @param string $prefix
      */
@@ -45,12 +51,19 @@ final class DeclarativeResourceOption extends AbstractResourceOption
         $success = false;
         $name = $this->prefix . $name;
         $out = $default;
-        if ($this->objectReflector->hasProperty($name)) {
+        if (isset($this->cache[$name])
+            || array_key_exists($name, $this->cache)
+        ) {
+            $out = $this->cache[$name];
+            $success = true;
+        } elseif ($this->objectReflector->hasProperty($name)) {
             $out = $this->readFromProperty($name);
             $success = true;
+            $this->cache[$name] = $out;
         } elseif ($this->objectReflector->hasMethod($name)) {
             $out = $this->readFromMethod($name);
             $success = true;
+            $this->cache[$name] = $out;
         }
         return $success;
     }
@@ -61,11 +74,7 @@ final class DeclarativeResourceOption extends AbstractResourceOption
     protected function tryWriteOption($name, $value)
     {
         $name = $this->prefix . $name;
-        if ($this->objectReflector->hasProperty($name)) {
-            $prop = $this->objectReflector->getProperty($name);
-            $prop->setAccessible(true);
-            $prop->setValue($this->object, $value);
-        }
+        $this->cache[$name] = $value;
     }
 
     private function readFromProperty($name)
