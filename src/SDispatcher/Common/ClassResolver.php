@@ -70,8 +70,18 @@ class ClassResolver
             }
 
             if ($notFound) {
+                foreach ($this->containers as $container) {
+                    if (isset($container[$param->getClass()->getName()])) {
+                        $deps[] = $container[$param->getClass()->getName()];
+                        $notFound = false;
+                        break;
+                    }
+                }
+            }
+
+            if ($notFound) {
                 throw new NoDependencyFoundException(
-                    "No \"$depName\" found in Pimple container."
+                    "No \"$depName\" found in containers."
                 );
             }
         }

@@ -82,6 +82,32 @@ class ClassResolverTest extends \PHPUnit_Framework_TestCase
         ));
         $object = $resolver->create('SDispatcher\\Tests\\Common\\InjectMePlease');
     }
+
+    /**
+     * @test
+     */
+    public function create_should_able_lookup_from_type_hint()
+    {
+        $resolver = new ClassResolver(array(), array(
+            'stdClass' => new \stdClass()
+        ));
+        $object = $resolver->create('SDispatcher\\Tests\\Common\\InjectMePlease');
+    }
+
+    /**
+     * @test
+     */
+    public function create_should_prioritize_name_over_type_hint()
+    {
+        $cookie = new \stdClass();
+        $cookie->name = 'hey';
+        $resolver = new ClassResolver(
+            array('stdClass' => new \stdClass()),
+            array('cookie' => $cookie)
+        );
+        $object = $resolver->create('SDispatcher\\Tests\\Common\\InjectMePlease');
+        $this->assertEquals('hey', $object->cookie->name);
+    }
 }
 
 class InjectMePlease
