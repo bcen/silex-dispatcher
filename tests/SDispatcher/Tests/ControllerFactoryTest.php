@@ -81,4 +81,22 @@ class ControllerFactoryTest extends \PHPUnit_Framework_TestCase
         $func = $controller('SDispatcher\\Whatever');
         $func($this->silexMock, Request::create('/'));
     }
+
+    /**
+     * @test
+     */
+    public function makeRoute_should_match_route_pattern_to_controller_class_with_4_default_methods()
+    {
+        $routeMock = $this->getMock('Silex\\Route');
+        $routeMock->expects($this->once())
+            ->method('method')
+            ->with($this->equalTo('GET|POST|PUT|DELETE'));
+        $this->silexMock->expects($this->once())
+            ->method('match')
+            ->with($this->equalTo('/r'), $this->equalTo('Arcphss\\Delivery\\Controller\\RootController'))
+            ->will($this->returnValue($routeMock));
+        $controller = $this->getMock('SDispatcher\\ControllerFactory', array('some'), array($this->resolverMock));
+
+        $controller->makeRoute($this->silexMock, '/r', 'Arcphss\\Delivery\\Controller\\RootController');
+    }
 }

@@ -52,6 +52,28 @@ class ControllerFactory
     }
 
     /**
+     * Make route for $delegate with given $pattern and $controllerClass.
+     * @param \Silex\Application|\Silex\ControllerCollection $delegate
+     * @param string $pattern
+     * @param string $controllerClass
+     * @param string $method
+     * @return mixed
+     * @throws \LogicException When $delegate does not implement "match"
+     */
+    public function makeRoute($delegate,
+                              $pattern,
+                              $controllerClass,
+                              $method = 'GET|POST|PUT|DELETE')
+    {
+        if (!method_exists($delegate, 'match')) {
+            throw new \LogicException(
+                '$delegate must implement "match" method.'
+            );
+        }
+        return $delegate->match($pattern, $controllerClass)->method($method);
+    }
+
+    /**
      * Used to create a closure controller for Silex route with the specified
      * $controllerClass and the $routeSegmentName.
      * @param string $controllerClass The controller class to instantiate
