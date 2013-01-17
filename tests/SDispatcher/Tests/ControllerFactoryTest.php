@@ -70,20 +70,6 @@ class ControllerFactoryTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @test
-     * @expectedException \Symfony\Component\HttpKernel\Exception\HttpException
-     */
-    public function anonymous_function_should_convert_all_DispatchingErrorException_to_HttpException()
-    {
-        $this->controllerMock->expects($this->once())
-            ->method('doDispatch')
-            ->will($this->throwException(new DispatchingErrorException()));
-        $controller = new ControllerFactory($this->resolverMock);
-        $func = $controller('SDispatcher\\Whatever');
-        $func($this->silexMock, Request::create('/'));
-    }
-
-    /**
-     * @test
      */
     public function makeRoute_should_match_route_pattern_to_controller_class_with_4_default_methods()
     {

@@ -1,5 +1,5 @@
 {
-    "hash": "016e9928acdb40f14d8cb08460e0027e",
+    "hash": "a05b5c4bad7cf1c204c57c61eab459c8",
     "packages": [
         {
             "name": "pimple/pimple",
@@ -54,12 +54,12 @@
             "source": {
                 "type": "git",
                 "url": "git://github.com/fabpot/Silex.git",
-                "reference": "605f8262b6757e7721dcd8a0073a917e900f6862"
+                "reference": "3d5d39ea73ef1fa8366957e96fa9204805d7cac6"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://github.com/fabpot/Silex/archive/605f8262b6757e7721dcd8a0073a917e900f6862.zip",
-                "reference": "605f8262b6757e7721dcd8a0073a917e900f6862",
+                "url": "https://github.com/fabpot/Silex/archive/3d5d39ea73ef1fa8366957e96fa9204805d7cac6.zip",
+                "reference": "3d5d39ea73ef1fa8366957e96fa9204805d7cac6",
                 "shasum": ""
             },
             "require": {
@@ -94,7 +94,7 @@
                 "symfony/css-selector": ">=2.1,<2.3-dev",
                 "symfony/dom-crawler": ">=2.1,<2.3-dev"
             },
-            "time": "2013-01-11 06:54:36",
+            "time": "2013-01-15 13:27:32",
             "type": "library",
             "extra": {
                 "branch-alias": {
@@ -107,7 +107,7 @@
                     "Silex": "src/"
                 }
             },
-            "notification-url": "https://packagist.org/downloads/",
+            "notification-url": "http://packagist.org/downloads/",
             "license": [
                 "MIT"
             ],
@@ -341,22 +341,22 @@
         },
         {
             "name": "twig/twig",
-            "version": "v1.12.0",
+            "version": "v1.12.1",
             "source": {
                 "type": "git",
                 "url": "git://github.com/fabpot/Twig.git",
-                "reference": "v1.12.0"
+                "reference": "v1.12.1"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://github.com/fabpot/Twig/archive/v1.12.0.zip",
-                "reference": "v1.12.0",
+                "url": "https://github.com/fabpot/Twig/archive/v1.12.1.zip",
+                "reference": "v1.12.1",
                 "shasum": ""
             },
             "require": {
                 "php": ">=5.2.4"
             },
-            "time": "2013-01-08 13:42:43",
+            "time": "2013-01-15 20:03:52",
             "type": "library",
             "extra": {
                 "branch-alias": {
@@ -369,7 +369,7 @@
                     "Twig_": "lib/"
                 }
             },
-            "notification-url": "https://packagist.org/downloads/",
+            "notification-url": "http://packagist.org/downloads/",
             "license": [
                 "BSD-3"
             ],
@@ -672,16 +672,16 @@
         },
         {
             "name": "phpunit/phpunit",
-            "version": "3.7.12",
+            "version": "3.7.13",
             "source": {
                 "type": "git",
                 "url": "git://github.com/sebastianbergmann/phpunit.git",
-                "reference": "3.7.12"
+                "reference": "3.7.13"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://github.com/sebastianbergmann/phpunit/archive/3.7.12.zip",
-                "reference": "3.7.12",
+                "url": "https://github.com/sebastianbergmann/phpunit/archive/3.7.13.zip",
+                "reference": "3.7.13",
                 "shasum": ""
             },
             "require": {
@@ -703,7 +703,7 @@
                 "ext-simplexml": "*",
                 "ext-tokenizer": "*"
             },
-            "time": "2013-01-09 22:41:02",
+            "time": "2013-01-13 10:21:19",
             "bin": [
                 "composer/bin/phpunit"
             ],
@@ -719,7 +719,7 @@
                     "PHPUnit/"
                 ]
             },
-            "notification-url": "https://packagist.org/downloads/",
+            "notification-url": "http://packagist.org/downloads/",
             "include-path": [
                 "",
                 "../../symfony/yaml/"
@@ -744,16 +744,16 @@
         },
         {
             "name": "phpunit/phpunit-mock-objects",
-            "version": "1.2.2",
+            "version": "1.2.3",
             "source": {
                 "type": "git",
                 "url": "git://github.com/sebastianbergmann/phpunit-mock-objects.git",
-                "reference": "1.2.2"
+                "reference": "1.2.3"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://github.com/sebastianbergmann/phpunit-mock-objects/archive/1.2.2.zip",
-                "reference": "1.2.2",
+                "url": "https://github.com/sebastianbergmann/phpunit-mock-objects/archive/1.2.3.zip",
+                "reference": "1.2.3",
                 "shasum": ""
             },
             "require": {
@@ -763,7 +763,7 @@
             "suggest": {
                 "ext-soap": "*"
             },
-            "time": "2012-11-05 10:39:13",
+            "time": "2013-01-13 10:24:48",
             "type": "library",
             "installation-source": "dist",
             "autoload": {
@@ -771,7 +771,7 @@
                     "PHPUnit/"
                 ]
             },
-            "notification-url": "https://packagist.org/downloads/",
+            "notification-url": "http://packagist.org/downloads/",
             "include-path": [
                 ""
             ],

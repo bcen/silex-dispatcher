@@ -6,8 +6,9 @@ use SDispatcher\DispatchableInterface;
 use SDispatcher\TemplateEngine\TemplateRendererAwareInterface;
 use SDispatcher\Common\ClassResolver;
 use SDispatcher\Exception\DispatchingErrorException;
+
 use Silex\Application;
-use Symfony\Component\HttpKernel\Exception\HttpException;
+
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
@@ -87,7 +88,7 @@ class ControllerFactory
      * $controllerClass and the $routeSegmentName.
      * @param string $controllerClass The controller class to instantiate
      * @param array $routeSegmentName The available dynamic route variable names
-     * @throws \Symfony\Component\HttpKernel\Exception\HttpException
+     * @throws \SDispatcher\Exception\DispatchingErrorException
      * @return \Symfony\Component\HttpFoundation\Response $response
      */
     public function createClosure($controllerClass,
@@ -105,6 +106,7 @@ class ControllerFactory
             }
 
             $response = null;
+            $exception = null;
 
             try {
                 $controller = $resolver->create($controllerClass);
@@ -123,7 +125,15 @@ class ControllerFactory
                     );
                 }
             } catch (DispatchingErrorException $ex) {
-                throw new HttpException(500, $ex->getMessage(), $ex);
+                $exception = $ex;
+            }
+
+            if ($exception) {
+                if ($app['debug']) {
+                    throw $exception;
+                } else {
+                    $app->abort(500, $exception->getMessage());
+                }
             }
 
             return $response;
