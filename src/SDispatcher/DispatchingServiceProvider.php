@@ -39,11 +39,6 @@ class DispatchingServiceProvider implements ServiceProviderInterface
             }
         );
 
-        // alias of DispatchingServiceProvider::CLASS_RESOLVER
-        $app['SDispatcher\Common\ClassResolver'] = function($c) {
-            return $c[DispatchingServiceProvider::CLASS_RESOLVER];
-        };
-
         $app[DispatchingServiceProvider::CONTROLLER_FACTORY] = $app->share(
             function($container) {
                 return new ControllerFactory(
@@ -51,11 +46,6 @@ class DispatchingServiceProvider implements ServiceProviderInterface
                 );
             }
         );
-
-        // alias of DispatchingServiceProvider::CONTROLLER_FACTORY
-        $app['SDispatcher\\ControllerFactory'] = function($c) {
-            return $c[DispatchingServiceProvider::CONTROLLER_FACTORY];
-        };
     }
 
     /**
@@ -69,11 +59,6 @@ class DispatchingServiceProvider implements ServiceProviderInterface
                     return new TwigRendererAdapter($container['twig']);
                 }
             );
-
-            $app['SDispatcher\\TemplateEngine\\TwigRendererAdapter'] =
-                function($c) {
-                    return $c[DispatchingServiceProvider::TEMPLATE_RENDERER];
-                };
         }
     }
 }
