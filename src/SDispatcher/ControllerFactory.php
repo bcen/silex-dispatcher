@@ -70,7 +70,16 @@ class ControllerFactory
                 '$delegate must implement "match" method.'
             );
         }
-        return $delegate->match($pattern, $controllerClass)->method($method);
+
+        preg_match_all('/{(.*?)}/', $pattern, $matches);
+
+        return $delegate->match(
+            $pattern,
+            $this->createClosure(
+                $controllerClass,
+                isset($matches[1]) ? $matches[1] : array()
+            )
+        )->method($method);
     }
 
     /**

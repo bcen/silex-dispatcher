@@ -93,10 +93,13 @@ class ControllerFactoryTest extends \PHPUnit_Framework_TestCase
             ->with($this->equalTo('GET|POST|PUT|DELETE'));
         $this->silexMock->expects($this->once())
             ->method('match')
-            ->with($this->equalTo('/r'), $this->equalTo('Arcphss\\Delivery\\Controller\\RootController'))
+            ->with($this->equalTo('/r/{id}/{id2}'))
             ->will($this->returnValue($routeMock));
-        $controller = $this->getMock('SDispatcher\\ControllerFactory', array('some'), array($this->resolverMock));
+        $controller = $this->getMock('SDispatcher\\ControllerFactory', array('createClosure'), array($this->resolverMock));
+        $controller->expects($this->once())
+            ->method('createClosure')
+            ->with($this->equalTo('Arcphss\\Delivery\\Controller\\RootController'), $this->equalTo(array('id', 'id2')));
 
-        $controller->makeRoute($this->silexMock, '/r', 'Arcphss\\Delivery\\Controller\\RootController');
+        $controller->makeRoute($this->silexMock, '/r/{id}/{id2}', 'Arcphss\\Delivery\\Controller\\RootController');
     }
 }
