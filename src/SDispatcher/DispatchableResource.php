@@ -84,7 +84,7 @@ abstract class DispatchableResource implements DispatchableInterface
                     array($this, 'readList'),
                     $args
                 );
-                $list = is_array($list) ? $list : array();
+//                $list = is_array($list) ? $list : array();
                 $bundle->setData(array('objects' => $list));
                 $this->doSorting($bundle);
                 $this->doPagination($bundle);
