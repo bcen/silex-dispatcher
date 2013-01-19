@@ -28,6 +28,9 @@ class DispatchableResourceTest extends \PHPUnit_Framework_TestCase
         $request = Request::create('http://localhost/?format=application/json');
 
         $controller = $this->getMock('SDispatcher\\DispatchableResource', array('readList'));
+        $controller->expects($this->once())
+            ->method('readList')
+            ->will($this->returnValue(array()));
 
         $response = $controller->doDispatch($request);
 
@@ -43,6 +46,9 @@ class DispatchableResourceTest extends \PHPUnit_Framework_TestCase
         $request->headers->set('Accept', 'application/json');
 
         $controller = $this->getMock('SDispatcher\\DispatchableResource', array('readList'));
+        $controller->expects($this->once())
+            ->method('readList')
+            ->will($this->returnValue(array()));
 
         $response = $controller->doDispatch($request);
 
@@ -58,6 +64,9 @@ class DispatchableResourceTest extends \PHPUnit_Framework_TestCase
         $request->headers->set('Accept', '*/*');
 
         $controller = $this->getMock('SDispatcher\\DispatchableResource', array('readList'));
+        $controller->expects($this->once())
+            ->method('readList')
+            ->will($this->returnValue(array()));
 
         $response = $controller->doDispatch($request);
 
@@ -88,7 +97,9 @@ class DispatchableResourceTest extends \PHPUnit_Framework_TestCase
 
         $controller = $this->getMock('SDispatcher\\DispatchableResource', array('readList'));
         $controller->expects($this->once())
-            ->method('readList');
+            ->method('readList')
+            ->will($this->returnValue(array()));
+
         $controller->doDispatch($request);
     }
 
