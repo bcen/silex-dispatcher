@@ -12,14 +12,11 @@ class InMemoryPaginator implements PaginatorInterface
     private $limit;
 
     /**
-     * Constructs with paginator instance with $offset and $limit.
-     * @param int $offset
-     * @param int $limit
+     * {@inheritdoc}
      */
-    public function __construct($offset = 0, $limit = 20)
+    public function getCount()
     {
-        $this->setOffset($offset)
-             ->setLimit($limit);
+        return count($this->getQueryset());
     }
 
     /**
@@ -35,16 +32,11 @@ class InMemoryPaginator implements PaginatorInterface
      */
     public function setQueryset($queryset)
     {
+        if (!is_array($queryset)) {
+            throw new \InvalidArgumentException('$queryset must be an array.');
+        }
         $this->queryset = $queryset;
         return $this;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getCount()
-    {
-        return count($this->queryset);
     }
 
     /**
@@ -60,7 +52,7 @@ class InMemoryPaginator implements PaginatorInterface
 
         $data['meta']['offset'] = (int)$this->getOffset();
         $data['meta']['limit'] = (int)$this->getLimit();
-        $data['meta']['total'] = (int)$this->getCount();
+        $data['meta']['total'] = (int)count($this->getQueryset());
         $data['objects'] = $objects;
 
         return $data;

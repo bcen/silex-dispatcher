@@ -102,12 +102,12 @@ abstract class AbstractResourceOption implements ResourceOptionInterface
     /**
      * {@inheritdoc}
      */
-    public function getPaginator()
+    public function getPaginatorClass()
     {
         $this->tryReadOption(
-            'paginator',
+            'paginatorClass',
             $out,
-            new InMemoryPaginator()
+            'SDispatcher\\Common\\InMemoryPaginator'
         );
         return $out;
     }
@@ -115,8 +115,16 @@ abstract class AbstractResourceOption implements ResourceOptionInterface
     /**
      * {@inheritdoc}
      */
-    public function setPaginator(PaginatorInterface $paginator)
+    public function setPaginatorClass($paginatorClass)
     {
-        $this->tryWriteOption('paginator', $paginator);
+        if (!is_subclass_of($paginatorClass,
+            'SDispatcher\\Common\\PaginatorInterface')
+        ) {
+            throw new \InvalidArgumentException(
+                '$paginatorClass must implement ' .
+                'SDispatcher\\Common\\PaginatorInterface'
+            );
+        }
+        $this->tryWriteOption('paginatorClass', $paginatorClass);
     }
 }

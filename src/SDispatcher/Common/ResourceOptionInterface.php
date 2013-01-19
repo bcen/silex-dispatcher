@@ -13,9 +13,6 @@ interface ResourceOptionInterface
     public function getAllowedMethods();
     public function setAllowedMethods(array $methods);
 
-    /**
-     * @return \SDispatcher\Common\PaginatorInterface
-     */
-    public function getPaginator();
-    public function setPaginator(PaginatorInterface $paginator);
+    public function getPaginatorClass();
+    public function setPaginatorClass($class);
 }
