@@ -258,14 +258,14 @@ abstract class DispatchableResource implements DispatchableInterface
         $limit = (int)$request->query->get(
             'limit',
             $request->headers->get(
-                'X-Page-Limit',
+                'X-Pagination-Limit',
                 $this->getResourceOption()->getPageLimit()
             )
         );
         $offset = (int)$request->query->get(
             'offset',
             $request->headers->get(
-                'X-Page-Offset',
+                'X-Pagination-Offset',
                 0
             )
         );

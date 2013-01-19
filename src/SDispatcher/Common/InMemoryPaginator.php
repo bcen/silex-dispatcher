@@ -33,7 +33,7 @@ class InMemoryPaginator implements PaginatorInterface
     public function setQueryset($queryset)
     {
         if (!is_array($queryset)) {
-            throw new \LogicException('$queryset must be an array.');
+            throw new \InvalidArgumentException('$queryset must be an array.');
         }
         $this->queryset = $queryset;
         return $this;

@@ -120,7 +120,7 @@ abstract class AbstractResourceOption implements ResourceOptionInterface
         if (!is_subclass_of($paginatorClass,
             'SDispatcher\\Common\\PaginatorInterface')
         ) {
-            throw new \LogicException(
+            throw new \InvalidArgumentException(
                 '$paginatorClass must implement ' .
                 'SDispatcher\\Common\\PaginatorInterface'
             );
