@@ -272,7 +272,7 @@ abstract class DispatchableResource implements DispatchableInterface
 
         $paginatorClass = $this->getResourceOption()->getPaginatorClass();
         $paginator = new $paginatorClass();
-        $paginator->setQueryset($bunlde->getData('objects', array()))
+        $paginator->setQueryset($bunlde->getData('objects'))
             ->setOffset($offset)
             ->setLimit($limit);
         $bunlde->setData($paginator->getPage());
