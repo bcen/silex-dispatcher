@@ -175,11 +175,9 @@ class DispatchableResourceTest extends \PHPUnit_Framework_TestCase
      */
     public function doDispatch_for_PUT_request_without_routeSegments_should_invoke_updateList()
     {
-        $request = Request::create('/', 'PUT');
-        $request->headers->set('Accept', '*/*');
-
-        $controller = $this->getMock('SDispatcher\\DispatchableResource', array('updateList'));
-        $controller->getResourceOption()->setAllowedMethods(array('PUT'));
+        $request = $this->createRequest();
+        $request->setMethod('PUT');
+        $controller = $this->createDispatchableResourceMock(array('put'), array('updateList'));
         $controller->expects($this->once())
             ->method('updateList');
         $controller->doDispatch($request);
@@ -190,14 +188,12 @@ class DispatchableResourceTest extends \PHPUnit_Framework_TestCase
      */
     public function doDispatch_for_PUT_request_with_routeSegments_should_invoke_updateDetail()
     {
-        $request = Request::create('/', 'PUT');
-        $request->headers->set('Accept', '*/*');
-
-        $controller = $this->getMock('SDispatcher\\DispatchableResource', array('updateDetail'));
-        $controller->getResourceOption()->setAllowedMethods(array('PUT'));
+        $request = $this->createRequest();
+        $request->setMethod('PUT');
+        $controller = $this->createDispatchableResourceMock(array('put'), array('updateDetail'));
         $controller->expects($this->once())
             ->method('updateDetail');
-        $controller->doDispatch($request, array('10010'));
+        $controller->doDispatch($request, array('1'));
     }
 
     /**
@@ -205,11 +201,9 @@ class DispatchableResourceTest extends \PHPUnit_Framework_TestCase
      */
     public function doDispatch_for_DELETE_request_without_routeSegments_should_invoke_deleteList()
     {
-        $request = Request::create('/', 'DELETE');
-        $request->headers->set('Accept', '*/*');
-
-        $controller = $this->getMock('SDispatcher\\DispatchableResource', array('deleteList'));
-        $controller->getResourceOption()->setAllowedMethods(array('DELETE'));
+        $request = $this->createRequest();
+        $request->setMethod('DELETE');
+        $controller = $this->createDispatchableResourceMock(array('delete'), array('deleteList'));
         $controller->expects($this->once())
             ->method('deleteList');
         $controller->doDispatch($request);
@@ -220,14 +214,12 @@ class DispatchableResourceTest extends \PHPUnit_Framework_TestCase
      */
     public function doDispatch_for_DELETE_request_with_routeSegments_should_invoke_deleteDetail()
     {
-        $request = Request::create('/', 'DELETE');
-        $request->headers->set('Accept', '*/*');
-
-        $controller = $this->getMock('SDispatcher\\DispatchableResource', array('deleteDetail'));
-        $controller->getResourceOption()->setAllowedMethods(array('DELETE'));
+        $request = $this->createRequest();
+        $request->setMethod('DELETE');
+        $controller = $this->createDispatchableResourceMock(array('delete'), array('deleteDetail'));
         $controller->expects($this->once())
             ->method('deleteDetail');
-        $controller->doDispatch($request, array(1, 2));
+        $controller->doDispatch($request, array(1));
     }
 
     /**
