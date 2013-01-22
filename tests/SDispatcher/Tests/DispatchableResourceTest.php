@@ -25,6 +25,7 @@ class DispatchableResourceTest extends \PHPUnit_Framework_TestCase
     protected function createDispatchableResourceMock(array $excludes = array(), array $includes = array())
     {
         $mockedMethods = array(
+            'doResourceOptionInitialization',
             'doContentNegotiationCheck',
             'doMethodAccessCheck',
             'doAuthenticationCheck',
@@ -43,6 +44,18 @@ class DispatchableResourceTest extends \PHPUnit_Framework_TestCase
         $mockedMethods = array_merge($mockedMethods, $includes);
         $controller = $this->getMock('SDispatcher\\DispatchableResource', $mockedMethods);
         return $controller;
+    }
+
+    /**
+     * @test
+     */
+    public function doDispatch_should_invoke_doResourceOptionInitialization()
+    {
+        $request = $this->createRequest();
+        $controller = $this->createDispatchableResourceMock();
+        $controller->expects($this->once())
+            ->method('doResourceOptionInitialization');
+        $controller->doDispatch($request);
     }
 
     /**

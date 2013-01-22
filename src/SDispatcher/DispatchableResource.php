@@ -26,6 +26,7 @@ abstract class DispatchableResource implements DispatchableInterface
         $response = new Response('Sumting Wrong', 404);
 
         try {
+            $this->doResourceOptionInitialization();
             $this->doContentNegotiationCheck($request);
             $this->doMethodAccessCheck($request, $routeSegments);
             $this->doAuthenticationCheck($request);
@@ -38,6 +39,14 @@ abstract class DispatchableResource implements DispatchableInterface
         }
 
         return $response;
+    }
+
+    /**
+     * Hook point for initializing resource option. This will be called
+     * at the begining of {@see doDispatch()}.
+     */
+    protected function doResourceOptionInitialization()
+    {
     }
 
     /**
@@ -272,9 +281,9 @@ abstract class DispatchableResource implements DispatchableInterface
 
         $paginatorClass = $this->getResourceOption()->getPaginatorClass();
         $paginator = new $paginatorClass();
-        $paginator->setQueryset($bunlde->getData('objects'))
-            ->setOffset($offset)
-            ->setLimit($limit);
+        $paginator->setQueryset($bunlde->getData('objects'));
+        $paginator->setOffset($offset);
+        $paginator->setLimit($limit);
         $bunlde->setData($paginator->getPage());
 
         $bunlde->getResponse()->headers->add(array(
