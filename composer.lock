@@ -54,12 +54,12 @@
             "source": {
                 "type": "git",
                 "url": "git://github.com/fabpot/Silex.git",
-                "reference": "3d5d39ea73ef1fa8366957e96fa9204805d7cac6"
+                "reference": "b42bc6873ce21d8517d6bbeed988acf69ddecde5"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://github.com/fabpot/Silex/archive/3d5d39ea73ef1fa8366957e96fa9204805d7cac6.zip",
-                "reference": "3d5d39ea73ef1fa8366957e96fa9204805d7cac6",
+                "url": "https://github.com/fabpot/Silex/archive/b42bc6873ce21d8517d6bbeed988acf69ddecde5.zip",
+                "reference": "b42bc6873ce21d8517d6bbeed988acf69ddecde5",
                 "shasum": ""
             },
             "require": {
@@ -94,7 +94,7 @@
                 "symfony/css-selector": ">=2.1,<2.3-dev",
                 "symfony/dom-crawler": ">=2.1,<2.3-dev"
             },
-            "time": "2013-01-15 13:27:32",
+            "time": "2013-01-22 18:44:50",
             "type": "library",
             "extra": {
                 "branch-alias": {
@@ -130,17 +130,17 @@
         },
         {
             "name": "symfony/event-dispatcher",
-            "version": "v2.1.6",
+            "version": "v2.1.7",
             "target-dir": "Symfony/Component/EventDispatcher",
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/EventDispatcher",
-                "reference": "v2.1.6"
+                "reference": "v2.1.7"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://github.com/symfony/EventDispatcher/archive/v2.1.6.zip",
-                "reference": "v2.1.6",
+                "url": "https://github.com/symfony/EventDispatcher/archive/v2.1.7.zip",
+                "reference": "v2.1.7",
                 "shasum": ""
             },
             "require": {
@@ -153,7 +153,7 @@
                 "symfony/dependency-injection": "2.1.*",
                 "symfony/http-kernel": "2.1.*"
             },
-            "time": "2012-12-06 10:00:55",
+            "time": "2013-01-11 00:31:43",
             "type": "library",
             "installation-source": "dist",
             "autoload": {
@@ -161,7 +161,7 @@
                     "Symfony\\Component\\EventDispatcher": ""
                 }
             },
-            "notification-url": "https://packagist.org/downloads/",
+            "notification-url": "http://packagist.org/downloads/",
             "license": [
                 "MIT"
             ],
@@ -180,23 +180,23 @@
         },
         {
             "name": "symfony/http-foundation",
-            "version": "v2.1.6",
+            "version": "v2.1.7",
             "target-dir": "Symfony/Component/HttpFoundation",
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/HttpFoundation",
-                "reference": "v2.1.6"
+                "reference": "v2.1.7"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://github.com/symfony/HttpFoundation/archive/v2.1.6.zip",
-                "reference": "v2.1.6",
+                "url": "https://github.com/symfony/HttpFoundation/archive/v2.1.7.zip",
+                "reference": "v2.1.7",
                 "shasum": ""
             },
             "require": {
                 "php": ">=5.3.3"
             },
-            "time": "2012-12-14 21:03:29",
+            "time": "2013-01-11 00:31:43",
             "type": "library",
             "installation-source": "dist",
             "autoload": {
@@ -205,7 +205,7 @@
                     "SessionHandlerInterface": "Symfony/Component/HttpFoundation/Resources/stubs"
                 }
             },
-            "notification-url": "https://packagist.org/downloads/",
+            "notification-url": "http://packagist.org/downloads/",
             "license": [
                 "MIT"
             ],
@@ -287,17 +287,17 @@
         },
         {
             "name": "symfony/routing",
-            "version": "v2.1.6",
+            "version": "v2.1.7",
             "target-dir": "Symfony/Component/Routing",
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/Routing",
-                "reference": "v2.1.6"
+                "reference": "v2.1.7"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://github.com/symfony/Routing/archive/v2.1.6.zip",
-                "reference": "v2.1.6",
+                "url": "https://github.com/symfony/Routing/archive/v2.1.7.zip",
+                "reference": "v2.1.7",
                 "shasum": ""
             },
             "require": {
@@ -314,7 +314,7 @@
                 "symfony/yaml": "2.1.*",
                 "doctrine/common": ">=2.2,<2.4-dev"
             },
-            "time": "2012-12-11 10:40:22",
+            "time": "2013-01-09 08:51:07",
             "type": "library",
             "installation-source": "dist",
             "autoload": {
@@ -322,7 +322,7 @@
                     "Symfony\\Component\\Routing": ""
                 }
             },
-            "notification-url": "https://packagist.org/downloads/",
+            "notification-url": "http://packagist.org/downloads/",
             "license": [
                 "MIT"
             ],
@@ -794,23 +794,23 @@
         },
         {
             "name": "symfony/yaml",
-            "version": "v2.1.6",
+            "version": "v2.1.7",
             "target-dir": "Symfony/Component/Yaml",
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/Yaml",
-                "reference": "v2.1.6"
+                "reference": "v2.1.7"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://github.com/symfony/Yaml/archive/v2.1.6.zip",
-                "reference": "v2.1.6",
+                "url": "https://github.com/symfony/Yaml/archive/v2.1.7.zip",
+                "reference": "v2.1.7",
                 "shasum": ""
             },
             "require": {
                 "php": ">=5.3.3"
             },
-            "time": "2012-12-06 10:00:55",
+            "time": "2013-01-17 21:21:51",
             "type": "library",
             "installation-source": "dist",
             "autoload": {
@@ -818,7 +818,7 @@
                     "Symfony\\Component\\Yaml": ""
                 }
             },
-            "notification-url": "https://packagist.org/downloads/",
+            "notification-url": "http://packagist.org/downloads/",
             "license": [
                 "MIT"
             ],
