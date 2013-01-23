@@ -214,11 +214,9 @@ abstract class DispatchableResource implements DispatchableInterface
     /**
      * Checks whether the request method is allowed.
      * @param \Symfony\Component\HttpFoundation\Request $request
-     * @param array $routeSegments Used to determine whether list or detail resource
      * @throws \SDispatcher\Exception\DispatchingHttpException
      */
-    protected function doMethodAccessCheck(Request $request,
-                                           array $routeSegments = array())
+    protected function doMethodAccessCheck(Request $request)
     {
         $allowedMethods = $this->getResourceOption()->getAllowedMethods();
         $method = $request->getMethod();
