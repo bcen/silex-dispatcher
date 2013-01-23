@@ -93,8 +93,7 @@ abstract class DispatchableResource implements DispatchableInterface
                     array($this, 'readList'),
                     $args
                 );
-//                $list = is_array($list) ? $list : array();
-                $bundle->setData(array('objects' => $list));
+                $bundle->setData($list);
                 $this->doSorting($bundle);
                 $this->doPagination($bundle);
 
@@ -281,7 +280,7 @@ abstract class DispatchableResource implements DispatchableInterface
 
         $paginatorClass = $this->getResourceOption()->getPaginatorClass();
         $paginator = new $paginatorClass();
-        $paginator->setQueryset($bunlde->getData('objects'));
+        $paginator->setQueryset($bunlde->getData());
         $paginator->setOffset($offset);
         $paginator->setLimit($limit);
         $bunlde->setData($paginator->getPage());
