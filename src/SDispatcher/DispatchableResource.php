@@ -387,18 +387,30 @@ abstract class DispatchableResource implements DispatchableInterface
         $supportedFormats = $this->getResourceOption()->getSupportedFormats();
         $contentType = null;
 
-        // Look for content type in query string
-        // e.g. /?format=application/json
-        if (in_array($request->get('format'), $supportedFormats)) {
-            $contentType = $request->get('format');
-        }
 
-        // Suppress the query string from Accept header
+        // Look for content type in Accept header
         // e.g. Accept: text/html,application/json,*/*
         foreach ($request->getAcceptableContentTypes() as $format) {
             if (in_array($format, $supportedFormats)) {
                 $contentType = $format;
                 break;
+            }
+        }
+
+        // Supress Accept header if query string "format" presents
+        // e.g. /?format=application/json
+        if (in_array($request->get('format'), $supportedFormats)) {
+            $contentType = $request->get('format');
+        } else {
+            // allows query string format to have short hand notation
+            // e.g. /?format=json
+            foreach ($supportedFormats as $mimeType) {
+                if (strtolower($request->getFormat($mimeType))
+                    === strtolower($request->get('format'))
+                ) {
+                    $contentType = $mimeType;
+                    break;
+                }
             }
         }
 
