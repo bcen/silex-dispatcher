@@ -129,4 +129,66 @@ class DispatchableResourceTest extends \PHPUnit_Framework_TestCase
         } catch (DispatchingHttpException $ex) {
         }
     }
+
+    /**
+     * @test
+     */
+    public function doMethodAccessCheck_should_throw_DispatchingHttpException_if_method_is_not_allowed()
+    {
+        $request = Request::create('/');
+        $resource = new DispatchableResourceProxy();
+        $resource->getResourceOption()->setAllowedMethods(array('DELETE'));
+
+        try {
+            $resource->doMethodAccessCheck($request);
+            $this->fail('Expected DispatchingHttpException exception');
+        } catch (DispatchingHttpException $ex) {
+        }
+    }
+
+    /**
+     * @test
+     */
+    public function doSerialization_can_serialize_to_json()
+    {
+        $request = Request::create('/');
+        $resource = new DispatchableResourceProxy();
+        $bundle = $resource->createBundle($request);
+        $bundle->setData(array(
+            'message' => 'Hello World'
+        ));
+
+        $resource->doSerialization($bundle, 'application/json');
+        $actual = '{"message":"Hello World"}';
+        $expected = $bundle->getData();
+
+        $this->assertEquals($actual, $expected);
+        $this->assertEquals($actual, $bundle->getResponse()->getContent());
+    }
+
+    /**
+     * @test
+     */
+    public function doSerialization_can_serialize_to_xml()
+    {
+        $request = Request::create('/');
+        $resource = new DispatchableResourceProxy();
+        $bundle = $resource->createBundle($request);
+        $bundle->setData(array(
+            'message' => 'Hello World'
+        ));
+
+        $resource->doSerialization($bundle, 'application/xml');
+        $actual = preg_replace('/\s+/', '', '
+            <?xml version="1.0" encoding="utf-8"?>
+            <response>
+                <message>Hello World</message>
+            </response>
+        ');
+        $expected = preg_replace('/\s+/', '', $bundle->getData());
+        $this->assertEquals($actual, $expected);
+
+        $expected = preg_replace('/\s+/', '', $bundle->getResponse()->getContent());
+        $this->assertEquals($actual, $expected);
+    }
 }

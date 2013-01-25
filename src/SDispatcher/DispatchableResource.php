@@ -358,6 +358,7 @@ abstract class DispatchableResource implements DispatchableInterface
                 $response->headers->all()
             );
             $bundle->setResponse($jsonResponse);
+            $bundle->setData($bundle->getResponse()->getContent());
         }
     }
 
