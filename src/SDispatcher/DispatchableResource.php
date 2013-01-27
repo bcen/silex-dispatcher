@@ -384,6 +384,54 @@ abstract class DispatchableResource implements DispatchableInterface
      */
     protected function doDehydration(ResourceBundle $bundle)
     {
+        $request = $bundle->getRequest();
+        $data = $bundle->getData();
+
+        $addSelfLink = function (array &$objects, $link, $attr) {
+            $link = rtrim($link, '/') . '/';
+            foreach ($objects as $key => $val) {
+                if (is_array($val) && isset($val[$attr])) {
+                    $val['selfLink'] = $link . $val[$attr];
+                    $objects[$key] = $val;
+                }
+            }
+        };
+
+        $self = $this;
+        $dehydrateField = function (array &$objects) use ($self) {
+            foreach ($objects as $index => $obj) {
+                foreach ($obj as $key => $val) {
+                    $method = 'dehydrate' . ucfirst($key);
+                    if (method_exists($self, $method)) {
+                        $val = call_user_func(array($self, $method), $val);
+                        $obj[$key] = $val;
+                        $objects[$index] = $obj;
+                    }
+                }
+            }
+        };
+
+        $link = $request->getSchemeAndHttpHost() .
+                $request->getBaseUrl() .
+                $request->getPathInfo();
+
+        $resourceIdentifier = $this
+            ->getResourceOption()
+            ->getResourceIdentifier();
+
+        if (is_array($data) && isset($data['objects'])) {
+            $objects = $data['objects'];
+            $addSelfLink($objects, $link, $resourceIdentifier);
+            $dehydrateField($objects);
+            $data['objects'] = $objects;
+        } elseif (is_array($data)) {
+            $objects = array($data);
+            $addSelfLink($objects, $link, $resourceIdentifier);
+            $dehydrateField($objects);
+            $data = array_shift($objects);
+        }
+
+        $bundle->setData($data);
     }
 
     /**

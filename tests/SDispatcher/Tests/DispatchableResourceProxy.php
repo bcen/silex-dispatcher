@@ -82,6 +82,11 @@ class DispatchableResourceProxy extends \SDispatcher\DispatchableResource
         parent::doHydration($bundle);
     }
 
+    public function doDehydration(ResourceBundle $bundle)
+    {
+        parent::doDehydration($bundle);
+    }
+
     public function detectSupportedContentType(Request $request)
     {
         return parent::detectSupportedContentType($request);
@@ -120,5 +125,10 @@ class DispatchableResourceProxy extends \SDispatcher\DispatchableResource
     public function setResourceOption(ResourceOptionInterface $option)
     {
         parent::setResourceOption($option);
+    }
+
+    public function dehydrateEmployee_id($id)
+    {
+        return 'confidential';
     }
 }
