@@ -379,6 +379,14 @@ abstract class DispatchableResource implements DispatchableInterface
     }
 
     /**
+     * Dehydrates the data in the bundle.
+     * @param \SDispatcher\Common\ResourceBundle $bundle
+     */
+    protected function doDehydration(ResourceBundle $bundle)
+    {
+    }
+
+    /**
      * Determines the supported Content-Type from request.
      * @param \Symfony\Component\HttpFoundation\Request $request
      * @return string|null The supported Content-Type if found; otherwise, null
@@ -462,9 +470,7 @@ abstract class DispatchableResource implements DispatchableInterface
      */
     protected function finalizeResponse(ResourceBundle $bundle)
     {
-        // TODO
-        // $this->doDehydration($bundle);
-
+        $this->doDehydration($bundle);
         $contentType = $this->detectSupportedContentType($bundle->getRequest());
         $this->doSerialization($bundle, $contentType);
         $response = $bundle->getResponse();
