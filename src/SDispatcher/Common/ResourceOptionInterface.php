@@ -15,4 +15,7 @@ interface ResourceOptionInterface
 
     public function getPaginatorClass();
     public function setPaginatorClass($class);
+
+    public function getResourceIdentifier();
+    public function setResourceIdentifier($id);
 }

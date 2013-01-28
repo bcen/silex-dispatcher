@@ -127,4 +127,25 @@ abstract class AbstractResourceOption implements ResourceOptionInterface
         }
         $this->tryWriteOption('paginatorClass', $paginatorClass);
     }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getResourceIdentifier()
+    {
+        $this->tryReadOption(
+            'resourceIdentifier',
+            $out,
+            'id'
+        );
+        return $out;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function setResourceIdentifier($id)
+    {
+        $this->tryWriteOption('resourceIdentifier', $id);
+    }
 }

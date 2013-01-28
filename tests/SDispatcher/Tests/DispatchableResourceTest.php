@@ -191,4 +191,104 @@ class DispatchableResourceTest extends \PHPUnit_Framework_TestCase
         $expected = preg_replace('/\s+/', '', $bundle->getResponse()->getContent());
         $this->assertEquals($actual, $expected);
     }
+
+    /**
+     * @test
+     */
+    public function doDehydration_should_add_selfLink_to_bundle_data()
+    {
+        $request = Request::create('http://domain.com/r');
+        $resource = new DispatchableResourceProxy();
+        $bundle = $resource->createBundle($request);
+
+        // paginated data
+        $bundle->setData(array(
+            'objects' => array(
+                array(
+                    'id' => 1,
+                    'name' => 'r1'
+                ),
+                array(
+                    'id' => 2,
+                    'name' => 'r2'
+                )
+            )
+        ));
+        $resource->doDehydration($bundle);
+        $this->assertEquals(array(
+            'objects' => array(
+                array(
+                    'id' => 1,
+                    'name' => 'r1',
+                    'selfLink' => 'http://domain.com/r/1'
+                ),
+                array(
+                    'id' => 2,
+                    'name' => 'r2',
+                    'selfLink' => 'http://domain.com/r/2'
+                )
+            )
+        ), $bundle->getData());
+
+        // non-paginated data
+        $bundle->setData(array(
+                'id' => 1,
+                'name' => 'r1'
+            ));
+        $resource->doDehydration($bundle);
+        $this->assertEquals(array(
+                'id' => 1,
+                'name' => 'r1',
+                'selfLink' => 'http://domain.com/r/1'
+        ), $bundle->getData());
+    }
+
+    /**
+     * @test
+     */
+    public function doDehydration_should_add_selfLink_to_bundle_data_with_resource_identifier()
+    {
+        $request = Request::create('http://domain.com/r');
+        $resource = new DispatchableResourceProxy();
+        $resource->getResourceOption()->setResourceIdentifier('name');
+        $bundle = $resource->createBundle($request);
+        $bundle->setData(array(
+            'objects' => array(
+                array(
+                    'name' => 'name1'
+                ),
+                array(
+                    'name' => 'name2'
+                )
+            )
+        ));
+        $resource->doDehydration($bundle);
+        $this->assertEquals(array(
+            'objects' => array(
+                array(
+                    'name' => 'name1',
+                    'selfLink' => 'http://domain.com/r/name1'
+                ),
+                array(
+                    'name' => 'name2',
+                    'selfLink' => 'http://domain.com/r/name2'
+                )
+            )
+        ), $bundle->getData());
+    }
+
+    /**
+     * @test
+     */
+    public function doDehydration_should_dehydrate_field()
+    {
+        $request = Request::create('http://domain.com/r');
+        $resource = new DispatchableResourceProxy();
+        $bundle = $resource->createBundle($request);
+        $bundle->setData(array(
+            'employee_id' => '1001'
+        ));
+        $resource->doDehydration($bundle);
+        $this->assertEquals(array('employee_id' => 'confidential'), $bundle->getData());
+    }
 }
