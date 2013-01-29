@@ -36,7 +36,21 @@ abstract class AbstractPaginator implements PaginatorInterface
      * @param int $limit
      * @return string mixed
      */
-    abstract protected function createPrevLink(Request $request, $offset, $limit);
+    protected function createPrevLink(Request $request, $offset, $limit)
+    {
+        $prevLink = null;
+        $baseUri = $request->getSchemeAndHttpHost() .
+            $request->getBaseUrl() .
+            $request->getPathInfo();
+        if ($offset - $limit >= 0) {
+            parse_str($request->getQueryString(), $qsArray);
+            $qsArray['limit'] = $limit;
+            $qsArray['offset'] = $offset - $limit;
+            $qs = Request::normalizeQueryString(http_build_query($qsArray));
+            $prevLink = $baseUri . '?' . $qs;
+        }
+        return $prevLink;
+    }
 
     /**
      * Creates a previous page link if avialiable.
@@ -44,9 +58,23 @@ abstract class AbstractPaginator implements PaginatorInterface
      * @param int $offset
      * @param int $limit
      * @param int $total
-     * @return string mixed
+     * @return \Symfony\Component\HttpFoundation\Request mixed
      */
-    abstract protected function createNextLink(Request $request, $offset, $limit, $total);
+    protected function createNextLink(Request $request, $offset, $limit, $total)
+    {
+        $nextLink = null;
+        $baseUri = $request->getSchemeAndHttpHost() .
+            $request->getBaseUrl() .
+            $request->getPathInfo();
+        if ($offset + $limit < $total) {
+            parse_str($request->getQueryString(), $qsArray);
+            $qsArray['limit'] = $limit;
+            $qsArray['offset'] = $limit + $offset;
+            $qs = Request::normalizeQueryString(http_build_query($qsArray));
+            $nextLink = $baseUri . '?' . $qs;
+        }
+        return $nextLink;
+    }
 
     /**
      * {@inheritdoc}
