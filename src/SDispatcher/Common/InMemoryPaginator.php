@@ -7,45 +7,43 @@ use Symfony\Component\HttpFoundation\Request;
  * Paginates data in memory.
  * <i>Note: queryset will be the actual data in memory.</i>
  */
-class InMemoryPaginator implements PaginatorInterface
+class InMemoryPaginator extends AbstractPaginator
 {
     /**
      * {@inheritdoc}
      */
-    public function paginate(Request $request,
-                             $queryset,
-                             $defaultOffset = 0,
-                             $defaultLimit = 20,
-                             $metaContainerName = 'meta',
-                             $objectContainerName = 'objects')
+    protected function validateQueryset($queryset)
     {
         if (!is_array($queryset)) {
-            throw new \LogicException('$queryset must be an array');
+            throw new \LogicException('$queryset must be an array.');
         }
+    }
 
-        $offset = (int)$request->query->get(
-            'offset',
-            $request->headers->get('X-Pagination-Offset', $defaultOffset)
-        );
-        $limit = (int)$request->query->get(
-            'limit',
-            $request->headers->get('X-Pagination-Offset', $defaultLimit)
-        );
+    /**
+     * {@inheritdoc}
+     */
+    protected function slice($queryset, $offset, $limit)
+    {
+        return array_slice($queryset, $offset, $limit);
+    }
 
-        $objects = array_slice(
-            $queryset,
-            $offset,
-            $limit
-        );
+    /**
+     * {@inheritdoc}
+     */
+    protected function countTotal($queryset)
+    {
+        return count($queryset);
+    }
 
-        $total = count($queryset);
-
+    /**
+     * {@inheritdoc}
+     */
+    protected function createPrevLink(Request $request, $offset, $limit)
+    {
         $prevLink = null;
-        $nextLink = null;
         $baseUri = $request->getSchemeAndHttpHost() .
                    $request->getBaseUrl() .
                    $request->getPathInfo();
-
         if ($offset - $limit >= 0) {
             parse_str($request->getQueryString(), $qsArray);
             $qsArray['limit'] = $limit;
@@ -53,7 +51,18 @@ class InMemoryPaginator implements PaginatorInterface
             $qs = Request::normalizeQueryString(http_build_query($qsArray));
             $prevLink = $baseUri . '?' . $qs;
         }
+        return $prevLink;
+    }
 
+    /**
+     * {@inheritdoc}
+     */
+    protected function createNextLink(Request $request, $offset, $limit, $total)
+    {
+        $nextLink = null;
+        $baseUri = $request->getSchemeAndHttpHost() .
+                   $request->getBaseUrl() .
+                   $request->getPathInfo();
         if ($offset + $limit < $total) {
             parse_str($request->getQueryString(), $qsArray);
             $qsArray['limit'] = $limit;
@@ -61,35 +70,6 @@ class InMemoryPaginator implements PaginatorInterface
             $qs = Request::normalizeQueryString(http_build_query($qsArray));
             $nextLink = $baseUri . '?' . $qs;
         }
-
-        // top level container
-        $data = array();
-
-        // meta data container
-        $metaContainer = array();
-        $metaContainer['offset'] = $offset;
-        $metaContainer['limit'] = $limit;
-        $metaContainer['total'] = $total;
-        $metaContainer['prevLink'] = $prevLink;
-        $metaContainer['nextLink'] = $nextLink;
-
-        if ($metaContainerName !== '' && is_string($metaContainerName)) {
-            $data[$metaContainerName] = $metaContainer;
-        } else {
-            $data = $metaContainer;
-        }
-
-        // result objects container
-        $data[$objectContainerName] = $objects;
-
-        $headers = array(
-            'X-Pagination-Offset' => $offset,
-            'X-Pagination-Limit' => $limit,
-            'X-Pagination-Total' => $total,
-            'X-Pagination-PrevLink' => $prevLink,
-            'X-Pagination-NextLink' => $nextLink
-        );
-
-        return array($headers, $data);
+        return $nextLink;
     }
 }
