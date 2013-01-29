@@ -148,4 +148,46 @@ abstract class AbstractResourceOption implements ResourceOptionInterface
     {
         $this->tryWriteOption('resourceIdentifier', $id);
     }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getPaginatedDataContainerName()
+    {
+        $this->tryReadOption(
+            'paginatedDataContainerName',
+            $out,
+            'objects'
+        );
+        return $out;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function setPaginatedDataContainerName($name)
+    {
+        $this->tryWriteOption('paginatedDataContainerName', $name);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getPaginatedMetaContainerName()
+    {
+        $this->tryReadOption(
+            'paginatedMetaContainerName',
+            $out,
+            'meta'
+        );
+        return $out;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function setPaginatedMetaContainerName($name)
+    {
+        $this->tryWriteOption('paginatedMetaContainerName', $name);
+    }
 }

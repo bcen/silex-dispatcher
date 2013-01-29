@@ -18,4 +18,10 @@ interface ResourceOptionInterface
 
     public function getResourceIdentifier();
     public function setResourceIdentifier($id);
+
+    public function getPaginatedDataContainerName();
+    public function setPaginatedDataContainerName($name);
+
+    public function getPaginatedMetaContainerName();
+    public function setPaginatedMetaContainerName($name);
 }
