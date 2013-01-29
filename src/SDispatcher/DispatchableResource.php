@@ -261,33 +261,18 @@ abstract class DispatchableResource implements DispatchableInterface
     protected function doPagination(ResourceBundle $bunlde)
     {
         $request = $bunlde->getRequest();
-        $limit = (int)$request->query->get(
-            'limit',
-            $request->headers->get(
-                'X-Pagination-Limit',
-                $this->getResourceOption()->getPageLimit()
-            )
-        );
-        $offset = (int)$request->query->get(
-            'offset',
-            $request->headers->get(
-                'X-Pagination-Offset',
-                0
-            )
-        );
-
         $paginatorClass = $this->getResourceOption()->getPaginatorClass();
         $paginator = new $paginatorClass();
-        $paginator->setQueryset($bunlde->getData());
-        $paginator->setOffset($offset);
-        $paginator->setLimit($limit);
-        $bunlde->setData($paginator->getPage());
-
-        $bunlde->getResponse()->headers->add(array(
-            'X-Pagination-Offset' =>$offset,
-            'X-Pagination-Limit' => $limit,
-            'X-Pagination-Count' => $paginator->getCount()
-        ));
+        list($headers, $data) = $paginator->paginate(
+            $request,
+            $bunlde->getData(),
+            0,
+            $this->getResourceOption()->getPageLimit(),
+            $this->getResourceOption()->getPaginatedMetaContainerName(),
+            $this->getResourceOption()->getPaginatedDataContainerName()
+        );
+        $bunlde->setData($data);
+        $bunlde->getResponse()->headers->add($headers);
     }
 
     /**
@@ -419,14 +404,16 @@ abstract class DispatchableResource implements DispatchableInterface
             ->getResourceOption()
             ->getResourceIdentifier();
 
-        if (is_array($data) && isset($data['objects'])) {
-            $objects = $data['objects'];
+        $containerName = $this
+            ->getResourceOption()
+            ->getPaginatedDataContainerName();
+        if (is_array($data) && isset($data[$containerName])) {
+            $objects = $data[$containerName];
             $addSelfLink($objects, $link, $resourceIdentifier);
             $dehydrateField($objects);
-            $data['objects'] = $objects;
+            $data[$containerName] = $objects;
         } elseif (is_array($data)) {
             $objects = array($data);
-            $addSelfLink($objects, $link, $resourceIdentifier);
             $dehydrateField($objects);
             $data = array_shift($objects);
         }

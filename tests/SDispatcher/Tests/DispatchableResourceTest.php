@@ -229,18 +229,6 @@ class DispatchableResourceTest extends \PHPUnit_Framework_TestCase
                 )
             )
         ), $bundle->getData());
-
-        // non-paginated data
-        $bundle->setData(array(
-                'id' => 1,
-                'name' => 'r1'
-            ));
-        $resource->doDehydration($bundle);
-        $this->assertEquals(array(
-                'id' => 1,
-                'name' => 'r1',
-                'selfLink' => 'http://domain.com/r/1'
-        ), $bundle->getData());
     }
 
     /**
@@ -282,13 +270,13 @@ class DispatchableResourceTest extends \PHPUnit_Framework_TestCase
      */
     public function doDehydration_should_dehydrate_field()
     {
-        $request = Request::create('http://domain.com/r');
+        $request = Request::create('http://domain.com/r/');
         $resource = new DispatchableResourceProxy();
         $bundle = $resource->createBundle($request);
         $bundle->setData(array(
             'employee_id' => '1001'
         ));
         $resource->doDehydration($bundle);
-        $this->assertEquals(array('employee_id' => 'confidential'), $bundle->getData());
+        $this->assertEquals('confidential', $bundle->getData('employee_id'));
     }
 }
