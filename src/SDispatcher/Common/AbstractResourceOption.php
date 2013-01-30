@@ -1,6 +1,8 @@
 <?php
 namespace SDispatcher\Common;
 
+use SDispatcher\Common\PaginatorInterface;
+
 abstract class AbstractResourceOption implements ResourceOptionInterface
 {
     /**
@@ -76,6 +78,7 @@ abstract class AbstractResourceOption implements ResourceOptionInterface
     public function setPageLimit($limit)
     {
         $this->tryWriteOption('pageLimit', $limit);
+        return $this;
     }
 
     /**
@@ -97,17 +100,18 @@ abstract class AbstractResourceOption implements ResourceOptionInterface
     public function setAllowedMethods(array $methods)
     {
         $this->tryWriteOption('allowedMethods', $methods);
+        return $this;
     }
 
     /**
      * {@inheritdoc}
      */
-    public function getPaginatorClass()
+    public function getPaginator()
     {
         $this->tryReadOption(
-            'paginatorClass',
+            'paginator',
             $out,
-            'SDispatcher\\Common\\InMemoryPaginator'
+            new InMemoryPaginator()
         );
         return $out;
     }
@@ -115,17 +119,10 @@ abstract class AbstractResourceOption implements ResourceOptionInterface
     /**
      * {@inheritdoc}
      */
-    public function setPaginatorClass($paginatorClass)
+    public function setPaginator(PaginatorInterface $paginator)
     {
-        if (!is_subclass_of($paginatorClass,
-            'SDispatcher\\Common\\PaginatorInterface')
-        ) {
-            throw new \InvalidArgumentException(
-                '$paginatorClass must implement ' .
-                'SDispatcher\\Common\\PaginatorInterface'
-            );
-        }
-        $this->tryWriteOption('paginatorClass', $paginatorClass);
+        $this->tryWriteOption('paginator', $paginator);
+        return $this;
     }
 
     /**
@@ -147,6 +144,7 @@ abstract class AbstractResourceOption implements ResourceOptionInterface
     public function setResourceIdentifier($id)
     {
         $this->tryWriteOption('resourceIdentifier', $id);
+        return $this;
     }
 
     /**
@@ -168,6 +166,7 @@ abstract class AbstractResourceOption implements ResourceOptionInterface
     public function setPaginatedDataContainerName($name)
     {
         $this->tryWriteOption('paginatedDataContainerName', $name);
+        return $this;
     }
 
     /**
@@ -189,5 +188,6 @@ abstract class AbstractResourceOption implements ResourceOptionInterface
     public function setPaginatedMetaContainerName($name)
     {
         $this->tryWriteOption('paginatedMetaContainerName', $name);
+        return $this;
     }
 }

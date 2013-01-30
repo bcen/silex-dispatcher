@@ -261,8 +261,7 @@ abstract class DispatchableResource implements DispatchableInterface
     protected function doPagination(ResourceBundle $bunlde)
     {
         $request = $bunlde->getRequest();
-        $paginatorClass = $this->getResourceOption()->getPaginatorClass();
-        $paginator = new $paginatorClass();
+        $paginator = $this->getResourceOption()->getPaginator();
         list($headers, $data) = $paginator->paginate(
             $request,
             $bunlde->getData(),
