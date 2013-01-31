@@ -26,7 +26,7 @@ abstract class DispatchableResource implements DispatchableInterface
         $response = new Response('Sumting Wrong', 404);
 
         try {
-            $this->doResourceOptionInitialization();
+            $this->doResourceOptionInitialization($this->getResourceOption());
             $this->doContentNegotiationCheck($request);
             $this->doMethodAccessCheck($request, $routeSegments);
             $this->doAuthenticationCheck($request);
@@ -45,7 +45,8 @@ abstract class DispatchableResource implements DispatchableInterface
      * Hook point for initializing resource option. This will be called
      * at the begining of {@see doDispatch()}.
      */
-    protected function doResourceOptionInitialization()
+    protected function doResourceOptionInitialization(
+        ResourceOptionInterface $option)
     {
     }
 
