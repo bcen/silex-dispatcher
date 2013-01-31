@@ -308,4 +308,43 @@ class DispatchableResourceTest extends \PHPUnit_Framework_TestCase
         $data = $bundle->getData();
         $this->assertEquals(4, count($data['objects']));
     }
+
+    /**
+     * @test
+     */
+    public function doDeserialization_can_deserialize_application_json()
+    {
+        $request = Request::create('/', 'GET', array(), array(), array(), array(), '{"message":"json"}');
+        $request->headers->set('Content-Type', 'application/json');
+        $resource = new DispatchableResourceProxy();
+        $bundle = $resource->createBundle($request);
+        $resource->doDeserialization($bundle);
+        $data = $bundle->getData();
+        $this->assertEquals(
+            array(
+                'message' => 'json'
+            ),
+            $data
+        );
+    }
+
+    /**
+     * @test
+     */
+    public function doDeserialization_can_deserialize_application_xml()
+    {
+        $request = Request::create('/', 'GET', array(), array(), array(), array(),
+            '<?xml version="1.0"?><request><message>xml</message></request>');
+        $request->headers->set('Content-Type', 'application/xml');
+        $resource = new DispatchableResourceProxy();
+        $bundle = $resource->createBundle($request);
+        $resource->doDeserialization($bundle);
+        $data = $bundle->getData();
+        $this->assertEquals(
+            array(
+                'message' => 'xml'
+            ),
+            $data
+        );
+    }
 }

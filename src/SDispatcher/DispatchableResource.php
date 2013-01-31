@@ -352,6 +352,18 @@ abstract class DispatchableResource implements DispatchableInterface
      */
     protected function doDeserialization(ResourceBundle $bundle)
     {
+        $contentType = $bundle
+            ->getRequest()->headers->get('Content-Type', null, true);
+        $content = $bundle->getRequest()->getContent();
+
+        if ($contentType === 'application/json') {
+            $data = @json_decode($content, true);
+            $bundle->setData($data);
+        } elseif ($contentType === 'application/xml') {
+            $data = $content ? (array)@simplexml_load_string(
+                $content, 'SimpleXMLElement', LIBXML_NOCDATA) : null;
+            $bundle->setData($data);
+        }
     }
 
     /**
