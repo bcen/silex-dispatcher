@@ -94,7 +94,7 @@ abstract class AbstractPaginator implements PaginatorInterface
         );
         $limit = (int)$request->query->get(
             'limit',
-            $request->headers->get('X-Pagination-Offset', $defaultLimit)
+            $request->headers->get('X-Pagination-Limit', $defaultLimit)
         );
 
         $objects = $this->slice($queryset, $offset, $limit);

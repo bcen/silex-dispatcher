@@ -279,4 +279,33 @@ class DispatchableResourceTest extends \PHPUnit_Framework_TestCase
         $resource->doDehydration($bundle);
         $this->assertEquals('confidential', $bundle->getData('employee_id'));
     }
+
+    /**
+     * @test
+     */
+    public function doPagination_can_paginate_by_query_string()
+    {
+        $request = Request::create('http://domain.com/r/?limit=4');
+        $resource = new DispatchableResourceProxy();
+        $bundle = $resource->createBundle($request);
+        $bundle->setData(array(1, 2, 3, 4, 5, 6, 7, 8, 9, 10));
+        $resource->doPagination($bundle);
+        $data = $bundle->getData();
+        $this->assertEquals(4, count($data['objects']));
+    }
+
+    /**
+     * @test
+     */
+    public function doPagination_can_paginate_by_header()
+    {
+        $request = Request::create('/');
+        $request->headers->set('X-Pagination-Limit', 4);
+        $resource = new DispatchableResourceProxy();
+        $bundle = $resource->createBundle($request);
+        $bundle->setData(array(1, 2, 3, 4, 5, 6, 7, 8, 9, 10));
+        $resource->doPagination($bundle);
+        $data = $bundle->getData();
+        $this->assertEquals(4, count($data['objects']));
+    }
 }
