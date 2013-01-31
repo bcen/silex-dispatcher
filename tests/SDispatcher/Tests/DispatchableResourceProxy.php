@@ -12,9 +12,9 @@ class DispatchableResourceProxy extends \SDispatcher\DispatchableResource
         return parent::doDispatch($request, $routeSegments);
     }
 
-    public function doResourceOptionInitialization()
+    public function doResourceOptionInitialization(ResourceOptionInterface $option)
     {
-        parent::doResourceOptionInitialization();
+        parent::doResourceOptionInitialization($option);
     }
 
     public function get(Request $request, array $routeSegments = array())
