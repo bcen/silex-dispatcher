@@ -2,329 +2,369 @@
 namespace SDispatcher\Tests;
 
 use Symfony\Component\HttpFoundation\Request;
+use SDispatcher\Tests\DispatchableResourceProxy;
+use SDispatcher\Exception\DispatchingHttpException;
 
 class DispatchableResourceTest extends \PHPUnit_Framework_TestCase
 {
     /**
      * @test
      */
-    public function doDispatch_should_return_406_response_when_content_type_is_not_acceptable()
+    public function detectSupportedContentType_can_detect_from_query_string()
     {
-        $request = Request::create('http://localhost/');
-        $request->headers->set('Accept', 'application/vnd-some-format');
+        $request = Request::create('/?format=application/whatever2');
 
-        $controller = $this->getMock('SDispatcher\\DispatchableResource', array('readList'));
+        $resource = new DispatchableResourceProxy();
+        $resource->getResourceOption()->setSupportedFormats(array('application/whatever2'));
 
-        $response = $controller->doDispatch($request);
-
-        $this->assertEquals(406, $response->getStatusCode());
+        $contentType = $resource->detectSupportedContentType($request);
+        $this->assertEquals('application/whatever2', $contentType);
     }
 
     /**
      * @test
      */
-    public function doDispatch_should_return_200_response_for_acceptable_content_type_from_query_string()
+    public function detectSupportedContentType_can_detect_from_query_string_with_short_hand_format()
     {
-        $request = Request::create('http://localhost/?format=application/json');
+        // json
+        $request = Request::create('/?format=json');
+        $request->headers->set('Accept', '');
 
-        $controller = $this->getMock('SDispatcher\\DispatchableResource', array('readList'));
+        $resource = new DispatchableResourceProxy();
+        $resource->getResourceOption()->setSupportedFormats(array('application/json'));
 
-        $response = $controller->doDispatch($request);
+        $contentType = $resource->detectSupportedContentType($request);
+        $this->assertEquals('application/json', $contentType);
 
-        $this->assertEquals(200, $response->getStatusCode());
+        // xml
+        $request = Request::create('/?format=xml');
+        $request->headers->set('Accept', '');
+
+        $resource = new DispatchableResourceProxy();
+        $resource->getResourceOption()->setSupportedFormats(array('application/xml'));
+
+        $contentType = $resource->detectSupportedContentType($request);
+        $this->assertEquals('application/xml', $contentType);
+
+        // html
+        $request = Request::create('/?format=html');
+        $request->headers->set('Accept', '');
+
+        $resource = new DispatchableResourceProxy();
+        $resource->getResourceOption()->setSupportedFormats(array('text/html'));
+
+        $contentType = $resource->detectSupportedContentType($request);
+        $this->assertEquals('text/html', $contentType);
     }
 
     /**
      * @test
      */
-    public function doDispatch_should_return_200_response_for_acceptable_content_type_from_accept_header()
+    public function detectSupportedContentType_can_detect_from_accept_header()
     {
-        $request = Request::create('http://localhost/');
-        $request->headers->set('Accept', 'application/json');
+        $request = Request::create('/');
+        $request->headers->set('Accept', 'application/whatever2');
 
-        $controller = $this->getMock('SDispatcher\\DispatchableResource', array('readList'));
+        $resource = new DispatchableResourceProxy();
+        $resource->getResourceOption()->setSupportedFormats(array('application/whatever2'));
 
-        $response = $controller->doDispatch($request);
-
-        $this->assertEquals(200, $response->getStatusCode());
+        $contentType = $resource->detectSupportedContentType($request);
+        $this->assertEquals('application/whatever2', $contentType);
     }
 
     /**
      * @test
      */
-    public function doDispatch_should_return_200_response_for_acceptable_content_type_from_asterisk_accept_header()
+    public function detectSupportedContentType_should_prioritize_query_string_over_accept_header()
     {
-        $request = Request::create('http://localhost/');
-        $request->headers->set('Accept', '*/*');
+        $request = Request::create('/?format=application/format2');
+        $request->headers->set('Accept', 'application/format1');
 
-        $controller = $this->getMock('SDispatcher\\DispatchableResource', array('readList'));
+        $resource = new DispatchableResourceProxy();
+        $resource->getResourceOption()->setSupportedFormats(array(
+            'application/format1', 'application/format2'
+        ));
 
-        $response = $controller->doDispatch($request);
-
-        $this->assertEquals(200, $response->getStatusCode());
+        $contentType = $resource->detectSupportedContentType($request);
+        $this->assertEquals('application/format2', $contentType);
     }
 
     /**
      * @test
      */
-    public function doDispatch_should_return_405_for_not_allowed_method()
+    public function detectSupportedContentType_should_return_null_if_no_content_type_detected_in_request()
     {
-        $request = Request::create('http://localhost/', 'POST');
-        $request->headers->set('Accept', '*/*');
-
-        $controller = $this->getMock('SDispatcher\\DispatchableResource', array('some'));
-        $response = $controller->doDispatch($request);
-
-        $this->assertEquals(405, $response->getStatusCode());
+        $request = Request::create('/');
+        $request->headers->set('Accept', 'application/invalid');
+        $resource = new DispatchableResourceProxy();
+        $contentType = $resource->detectSupportedContentType($request);
+        $this->assertNull($contentType);
     }
 
     /**
      * @test
      */
-    public function doDispatch_for_GET_request_and_no_routeSegments_should_invoke_readList()
+    public function detectSupportedContentType_should_use_default_format_if_asterisk_found_in_accept_header()
     {
-        $request = Request::create('/', 'GET');
-        $request->headers->set('Accept', '*/*');
+        $request = Request::create('/');
+        $request->headers->set('Accept', 'text/html,*/*');
 
-        $controller = $this->getMock('SDispatcher\\DispatchableResource', array('readList'));
-        $controller->expects($this->once())
-            ->method('readList');
-        $controller->doDispatch($request);
+        $resource = new DispatchableResourceProxy();
+        $contentType = $resource->detectSupportedContentType($request);
+        $this->assertEquals($resource->getResourceOption()->getDefaultFormat(), $contentType);
     }
 
     /**
      * @test
      */
-    public function doDispatch_for_GET_request_with_routeSegments_should_invoke_readDetail()
+    public function doContentNegotiationCheck_should_throw_DispatchingHttpException_if_no_acceptable_content_type_found()
     {
-        $request = Request::create('/', 'GET');
-        $request->headers->set('Accept', '*/*');
+        $request = Request::create('/');
+        $request->headers->set('Accept', 'application/invalid');
+        $resource = new DispatchableResourceProxy();
 
-        $controller = $this->getMock('SDispatcher\\DispatchableResource', array('readDetail'));
-        $controller->expects($this->once())
-            ->method('readDetail');
-        $controller->doDispatch($request, array('0010'));
+        try {
+            $resource->doContentNegotiationCheck($request);
+            $this->fail('Expected DispatchingHttpException exception');
+        } catch (DispatchingHttpException $ex) {
+        }
     }
 
     /**
      * @test
      */
-    public function doDispatch_for_GET_request_with_schema_as_first_routeSegments_should_invoke_readSchema()
+    public function doMethodAccessCheck_should_throw_DispatchingHttpException_if_method_is_not_allowed()
     {
-        $request = Request::create('/', 'GET');
-        $request->headers->set('Accept', '*/*');
+        $request = Request::create('/');
+        $resource = new DispatchableResourceProxy();
+        $resource->getResourceOption()->setAllowedMethods(array('DELETE'));
 
-        $controller = $this->getMock('SDispatcher\\DispatchableResource', array('readSchema'));
-        $controller->expects($this->once())
-            ->method('readSchema');
-        $controller->doDispatch($request, array('schema'));
+        try {
+            $resource->doMethodAccessCheck($request);
+            $this->fail('Expected DispatchingHttpException exception');
+        } catch (DispatchingHttpException $ex) {
+        }
     }
 
     /**
      * @test
      */
-    public function doDispatch_for_PUT_request_without_routeSegments_should_invoke_updateList()
+    public function doSerialization_can_serialize_to_json()
     {
-        $request = Request::create('/', 'PUT');
-        $request->headers->set('Accept', '*/*');
+        $request = Request::create('/');
+        $resource = new DispatchableResourceProxy();
+        $bundle = $resource->createBundle($request);
+        $bundle->setData(array(
+            'message' => 'Hello World'
+        ));
 
-        $controller = $this->getMock('SDispatcher\\DispatchableResource', array('updateList'));
-        $controller->getResourceOption()->setAllowedMethods(array('PUT'));
-        $controller->expects($this->once())
-            ->method('updateList');
-        $controller->doDispatch($request);
+        $resource->doSerialization($bundle, 'application/json');
+        $actual = '{"message":"Hello World"}';
+        $expected = $bundle->getData();
+
+        $this->assertEquals($actual, $expected);
+        $this->assertEquals($actual, $bundle->getResponse()->getContent());
     }
 
     /**
      * @test
      */
-    public function doDispatch_for_PUT_request_with_routeSegments_should_invoke_updateDetail()
+    public function doSerialization_can_serialize_to_xml()
     {
-        $request = Request::create('/', 'PUT');
-        $request->headers->set('Accept', '*/*');
+        $request = Request::create('/');
+        $resource = new DispatchableResourceProxy();
+        $bundle = $resource->createBundle($request);
+        $bundle->setData(array(
+            'message' => 'Hello World'
+        ));
 
-        $controller = $this->getMock('SDispatcher\\DispatchableResource', array('updateDetail'));
-        $controller->getResourceOption()->setAllowedMethods(array('PUT'));
-        $controller->expects($this->once())
-            ->method('updateDetail');
-        $controller->doDispatch($request, array('10010'));
+        $resource->doSerialization($bundle, 'application/xml');
+        $actual = preg_replace('/\s+/', '', '
+            <?xml version="1.0" encoding="utf-8"?>
+            <response>
+                <message>Hello World</message>
+            </response>
+        ');
+        $expected = preg_replace('/\s+/', '', $bundle->getData());
+        $this->assertEquals($actual, $expected);
+
+        $expected = preg_replace('/\s+/', '', $bundle->getResponse()->getContent());
+        $this->assertEquals($actual, $expected);
     }
 
     /**
      * @test
      */
-    public function doDispatch_for_DELETE_request_without_routeSegments_should_invoke_deleteList()
+    public function doDehydration_should_add_selfLink_to_bundle_data()
     {
-        $request = Request::create('/', 'DELETE');
-        $request->headers->set('Accept', '*/*');
+        $request = Request::create('http://domain.com/r');
+        $resource = new DispatchableResourceProxy();
+        $bundle = $resource->createBundle($request);
 
-        $controller = $this->getMock('SDispatcher\\DispatchableResource', array('deleteList'));
-        $controller->getResourceOption()->setAllowedMethods(array('DELETE'));
-        $controller->expects($this->once())
-            ->method('deleteList');
-        $controller->doDispatch($request);
+        // paginated data
+        $bundle->setData(array(
+            'objects' => array(
+                array(
+                    'id' => 1,
+                    'name' => 'r1'
+                ),
+                array(
+                    'id' => 2,
+                    'name' => 'r2'
+                )
+            )
+        ));
+        $resource->doDehydration($bundle);
+        $this->assertEquals(array(
+            'objects' => array(
+                array(
+                    'id' => 1,
+                    'name' => 'r1',
+                    'selfLink' => 'http://domain.com/r/1'
+                ),
+                array(
+                    'id' => 2,
+                    'name' => 'r2',
+                    'selfLink' => 'http://domain.com/r/2'
+                )
+            )
+        ), $bundle->getData());
     }
 
     /**
      * @test
      */
-    public function doDispatch_for_DELETE_request_with_routeSegments_should_invoke_deleteDetail()
+    public function doDehydration_should_add_selfLink_to_bundle_data_with_resource_identifier()
     {
-        $request = Request::create('/', 'DELETE');
-        $request->headers->set('Accept', '*/*');
-
-        $controller = $this->getMock('SDispatcher\\DispatchableResource', array('deleteDetail'));
-        $controller->getResourceOption()->setAllowedMethods(array('DELETE'));
-        $controller->expects($this->once())
-            ->method('deleteDetail');
-        $controller->doDispatch($request, array(1, 2));
+        $request = Request::create('http://domain.com/r');
+        $resource = new DispatchableResourceProxy();
+        $resource->getResourceOption()->setResourceIdentifier('name');
+        $bundle = $resource->createBundle($request);
+        $bundle->setData(array(
+            'objects' => array(
+                array(
+                    'name' => 'name1'
+                ),
+                array(
+                    'name' => 'name2'
+                )
+            )
+        ));
+        $resource->doDehydration($bundle);
+        $this->assertEquals(array(
+            'objects' => array(
+                array(
+                    'name' => 'name1',
+                    'selfLink' => 'http://domain.com/r/name1'
+                ),
+                array(
+                    'name' => 'name2',
+                    'selfLink' => 'http://domain.com/r/name2'
+                )
+            )
+        ), $bundle->getData());
     }
 
     /**
      * @test
      */
-    public function doDispatch_for_readSchema_should_return_json_response_by_default()
+    public function doDehydration_should_dehydrate_field()
     {
-        $request = Request::create('/', 'GET');
-        $request->headers->set('Accept', '*/*');
-
-        $controller = $this->getMock('SDispatcher\\DispatchableResource', array('readSchema'));
-        $controller->expects($this->once())
-            ->method('readSchema')
-            ->will($this->returnValue(array(
-                'contentType' => 'application/json',
-                'pageLimit' => 20
-            )));
-        $response = $controller->doDispatch($request, array('schema'));
-
-        $expected = '
-            {
-                "contentType": "application\/json",
-                "pageLimit": 20
-            }
-        ';
-        $expected = preg_replace('/\s+/', '', $expected);
-        $this->assertEquals('application/json', $response->headers->get('Content-Type'));
-        $this->assertEquals($expected, $response->getContent());
+        $request = Request::create('http://domain.com/r/');
+        $resource = new DispatchableResourceProxy();
+        $bundle = $resource->createBundle($request);
+        $bundle->setData(array(
+            'employee_id' => '1001'
+        ));
+        $resource->doDehydration($bundle);
+        $this->assertEquals('confidential', $bundle->getData('employee_id'));
     }
 
     /**
      * @test
      */
-    public function doDispatch_for_readSchema_should_can_return_xml_response_if_configured()
+    public function doPagination_can_paginate_by_query_string()
     {
-        $request = Request::create('/', 'GET');
-        $request->headers->set('Accept', 'application/xml');
-
-        $controller = $this->getMock('SDispatcher\\DispatchableResource', array('readSchema'));
-        $controller->getResourceOption()->setSupportedFormats(array('application/xml'));
-        $controller->expects($this->once())
-            ->method('readSchema')
-            ->will($this->returnValue(array(
-            'contentType' => 'application/json',
-            'pageLimit' => 20
-        )));
-        $response = $controller->doDispatch($request, array('schema'));
-
-        $expected =
-            '<?xml version="1.0" encoding="utf-8"?>' .
-            '<response>' .
-                '<contentType>application/json</contentType>' .
-                '<pageLimit>20</pageLimit>' .
-            '</response>';
-        $expected = str_replace("\n", '', $expected);
-        $actual = str_replace("\n", '', $response->getContent());
-
-        $this->assertEquals('application/xml', $response->headers->get('Content-Type'));
-        $this->assertEquals($expected, $actual);
+        $request = Request::create('http://domain.com/r/?limit=4');
+        $resource = new DispatchableResourceProxy();
+        $bundle = $resource->createBundle($request);
+        $bundle->setData(array(1, 2, 3, 4, 5, 6, 7, 8, 9, 10));
+        $resource->doPagination($bundle);
+        $data = $bundle->getData();
+        $this->assertEquals(4, count($data['objects']));
     }
 
     /**
      * @test
      */
-    public function doDispatch_for_readList_should_be_paginated()
+    public function doPagination_can_paginate_by_header()
     {
-        $request = Request::create('/', 'GET');
-        $request->headers->set('Accept', '*/*');
-
-        $controller = $this->getMock('SDispatcher\\DispatchableResource', array('readList'));
-        $controller->expects($this->once())
-            ->method('readList')
-            ->will($this->returnValue(array(
-                1, 2, 3
-            )));
-        $response = $controller->doDispatch($request);
-
-        $expected = '
-            {
-                "meta": {
-                    "offset": 0,
-                    "limit": 20,
-                    "total": 3
-                },
-                "objects": [1,2,3]
-            }
-        ';
-        $expected = preg_replace('/\s+/', '', $expected);
-
-        $this->assertEquals(0, $response->headers->get('X-Pagination-Offset'));
-        $this->assertEquals(20, $response->headers->get('X-Pagination-Limit'));
-        $this->assertEquals(3, $response->headers->get('X-Pagination-Count'));
-        $this->assertEquals($expected, $response->getContent());
+        $request = Request::create('/');
+        $request->headers->set('X-Pagination-Limit', 4);
+        $resource = new DispatchableResourceProxy();
+        $bundle = $resource->createBundle($request);
+        $bundle->setData(array(1, 2, 3, 4, 5, 6, 7, 8, 9, 10));
+        $resource->doPagination($bundle);
+        $data = $bundle->getData();
+        $this->assertEquals(4, count($data['objects']));
     }
 
     /**
      * @test
      */
-    public function doDispatch_for_readDetail_with_null_return_should_return_404_response_with_correct_error_message()
+    public function doDeserialization_can_deserialize_application_json()
     {
-        $request = Request::create('/', 'GET');
-        $request->headers->set('Accept', '*/*');
+        $request = Request::create('/', 'GET', array(), array(), array(), array(), '{"message":"json"}');
+        $request->headers->set('Content-Type', 'application/json');
+        $resource = new DispatchableResourceProxy();
+        $bundle = $resource->createBundle($request);
 
-        $controller = $this->getMock('SDispatcher\\DispatchableResource', array('readDetail'));
-        $controller->expects($this->once())
-            ->method('readDetail')
-            ->will($this->returnValue(null));
-        $response = $controller->doDispatch($request, array('1101'));
-
-        $expected = '
-            {
-                "errorMessage": "Not Found"
-            }
-        ';
-        $expected = preg_replace('/\s+/', '', $expected);
-        $actual = preg_replace('/\s+/', '', $response->getContent());
-
-        $this->assertEquals($expected, $actual);
-        $this->assertEquals(404, $response->getStatusCode());
-    }
-
-    /**
-     * @test
-     */
-    public function doDispatch_for_createResource_should_return_response_with_location_header_if_success()
-    {
-        $number = '2';
-        $request = Request::create(
-            'http://api.domain.com/numbers/?offset=100&',
-            'POST'
-        );
-        $request->headers->set('Accept', '*/*');
-
-        $controller = $this->getMock('SDispatcher\\DispatchableResource', array('createResource'));
-        $controller->getResourceOption()->setAllowedMethods(array('GET', 'POST'));
-        $controller->expects($this->once())
-            ->method('createResource')
-            ->will($this->returnValue(array(
-                'id' => $number
-            )));
-
-        $response = $controller->doDispatch($request);
-
-        $this->assertEquals(201, $response->getStatusCode());
+        $data = $bundle->getData();
         $this->assertEquals(
-            'http://api.domain.com/numbers/' . $number,
-            $response->headers->get('Location')
+            array(
+                'message' => 'json'
+            ),
+            $data
         );
+    }
+
+    /**
+     * @test
+     */
+    public function doDeserialization_can_deserialize_application_xml()
+    {
+        $request = Request::create('/', 'GET', array(), array(), array(), array(),
+            '<?xml version="1.0"?><request><message>xml</message></request>');
+        $request->headers->set('Content-Type', 'application/xml');
+        $resource = new DispatchableResourceProxy();
+        $bundle = $resource->createBundle($request);
+
+        $data = $bundle->getData();
+        $this->assertEquals(
+            array(
+                'message' => 'xml'
+            ),
+            $data
+        );
+    }
+
+    /**
+     * @test
+     */
+    public function doDeserialization_should_not_throw_any_error_if_failed()
+    {
+        $request = Request::create('/', 'GET', array(), array(), array(), array(), 'message=json');
+        $request->headers->set('Content-Type', 'application/json');
+        $resource = new DispatchableResourceProxy();
+        $bundle = $resource->createBundle($request);
+
+        $data = $bundle->getData();
+
+        $request = Request::create('/', 'GET', array(), array(), array(), array(), 'message=json');
+        $request->headers->set('Content-Type', 'application/xml');
+        $resource = new DispatchableResourceProxy();
+        $bundle = $resource->createBundle($request);
+
+        $data = $bundle->getData();
     }
 }

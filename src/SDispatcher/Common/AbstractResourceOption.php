@@ -1,6 +1,8 @@
 <?php
 namespace SDispatcher\Common;
 
+use SDispatcher\Common\PaginatorInterface;
+
 abstract class AbstractResourceOption implements ResourceOptionInterface
 {
     /**
@@ -76,6 +78,7 @@ abstract class AbstractResourceOption implements ResourceOptionInterface
     public function setPageLimit($limit)
     {
         $this->tryWriteOption('pageLimit', $limit);
+        return $this;
     }
 
     /**
@@ -97,6 +100,7 @@ abstract class AbstractResourceOption implements ResourceOptionInterface
     public function setAllowedMethods(array $methods)
     {
         $this->tryWriteOption('allowedMethods', $methods);
+        return $this;
     }
 
     /**
@@ -118,5 +122,72 @@ abstract class AbstractResourceOption implements ResourceOptionInterface
     public function setPaginator(PaginatorInterface $paginator)
     {
         $this->tryWriteOption('paginator', $paginator);
+        return $this;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getResourceIdentifier()
+    {
+        $this->tryReadOption(
+            'resourceIdentifier',
+            $out,
+            'id'
+        );
+        return $out;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function setResourceIdentifier($id)
+    {
+        $this->tryWriteOption('resourceIdentifier', $id);
+        return $this;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getPaginatedDataContainerName()
+    {
+        $this->tryReadOption(
+            'paginatedDataContainerName',
+            $out,
+            'objects'
+        );
+        return $out;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function setPaginatedDataContainerName($name)
+    {
+        $this->tryWriteOption('paginatedDataContainerName', $name);
+        return $this;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getPaginatedMetaContainerName()
+    {
+        $this->tryReadOption(
+            'paginatedMetaContainerName',
+            $out,
+            'meta'
+        );
+        return $out;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function setPaginatedMetaContainerName($name)
+    {
+        $this->tryWriteOption('paginatedMetaContainerName', $name);
+        return $this;
     }
 }

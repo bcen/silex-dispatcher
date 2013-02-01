@@ -6,8 +6,9 @@ use SDispatcher\DispatchableInterface;
 use SDispatcher\TemplateEngine\TemplateRendererAwareInterface;
 use SDispatcher\Common\ClassResolver;
 use SDispatcher\Exception\DispatchingErrorException;
+
 use Silex\Application;
-use Symfony\Component\HttpKernel\Exception\HttpException;
+
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
@@ -52,11 +53,42 @@ class ControllerFactory
     }
 
     /**
+     * Make route for $delegate with given $pattern and $controllerClass.
+     * @param \Silex\Application|\Silex\ControllerCollection $delegate
+     * @param string $pattern
+     * @param string $controllerClass
+     * @param string $method
+     * @return mixed
+     * @throws \LogicException When $delegate does not implement "match"
+     */
+    public function makeRoute($delegate,
+                              $pattern,
+                              $controllerClass,
+                              $method = 'GET|POST|PUT|DELETE')
+    {
+        if (!method_exists($delegate, 'match')) {
+            throw new \LogicException(
+                '$delegate must implement "match" method.'
+            );
+        }
+
+        preg_match_all('/{(.*?)}/', $pattern, $matches);
+
+        return $delegate->match(
+            $pattern,
+            $this->createClosure(
+                $controllerClass,
+                isset($matches[1]) ? $matches[1] : array()
+            )
+        )->method($method);
+    }
+
+    /**
      * Used to create a closure controller for Silex route with the specified
      * $controllerClass and the $routeSegmentName.
      * @param string $controllerClass The controller class to instantiate
      * @param array $routeSegmentName The available dynamic route variable names
-     * @throws \Symfony\Component\HttpKernel\Exception\HttpException
+     * @throws \SDispatcher\Exception\DispatchingErrorException
      * @return \Symfony\Component\HttpFoundation\Response $response
      */
     public function createClosure($controllerClass,
@@ -74,6 +106,7 @@ class ControllerFactory
             }
 
             $response = null;
+            $exception = null;
 
             try {
                 $controller = $resolver->create($controllerClass);
@@ -92,7 +125,15 @@ class ControllerFactory
                     );
                 }
             } catch (DispatchingErrorException $ex) {
-                throw new HttpException(500, $ex->getMessage(), $ex);
+                $exception = $ex;
+            }
+
+            if ($exception) {
+                if ($app['debug']) {
+                    throw $exception;
+                } else {
+                    $app->abort(500, $exception->getMessage());
+                }
             }
 
             return $response;

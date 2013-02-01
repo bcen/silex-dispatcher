@@ -103,14 +103,22 @@ class DeclarativeResourceOptionTest extends \PHPUnit_Framework_TestCase
     /**
      * @test
      */
-    public function set_option_to_method_should_do_nothing()
+    public function should_able_to_set_option_and_get()
     {
-        $option = new DeclarativeResourceOption(new Options());
-        $option->setPageLimit(300);
-        $this->assertEquals(
-            15,
-            $option->getPageLimit()
-        );
+        $option = new DeclarativeResourceOption(new StaticOptions());
+        $option->setAllowedMethods(array('DO'));
+        $this->assertEquals(array('DO'), $option->getAllowedMethods());
+    }
+
+    /**
+     * @test
+     */
+    public function cache_should_have_priority()
+    {
+        $option = new DeclarativeResourceOption(new StaticOptions());
+        $this->assertEquals(1100, $option->getPageLimit());
+        $option->setPageLimit(110);
+        $this->assertEquals(110, $option->getPageLimit());
     }
 }
 

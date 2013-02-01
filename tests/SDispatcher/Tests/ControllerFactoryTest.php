@@ -70,15 +70,22 @@ class ControllerFactoryTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @test
-     * @expectedException \Symfony\Component\HttpKernel\Exception\HttpException
      */
-    public function anonymous_function_should_convert_all_DispatchingErrorException_to_HttpException()
+    public function makeRoute_should_match_route_pattern_to_controller_class_with_4_default_methods()
     {
-        $this->controllerMock->expects($this->once())
-            ->method('doDispatch')
-            ->will($this->throwException(new DispatchingErrorException()));
-        $controller = new ControllerFactory($this->resolverMock);
-        $func = $controller('SDispatcher\\Whatever');
-        $func($this->silexMock, Request::create('/'));
+        $routeMock = $this->getMock('Silex\\Route');
+        $routeMock->expects($this->once())
+            ->method('method')
+            ->with($this->equalTo('GET|POST|PUT|DELETE'));
+        $this->silexMock->expects($this->once())
+            ->method('match')
+            ->with($this->equalTo('/r/{id}/{id2}'))
+            ->will($this->returnValue($routeMock));
+        $controller = $this->getMock('SDispatcher\\ControllerFactory', array('createClosure'), array($this->resolverMock));
+        $controller->expects($this->once())
+            ->method('createClosure')
+            ->with($this->equalTo('Arcphss\\Delivery\\Controller\\RootController'), $this->equalTo(array('id', 'id2')));
+
+        $controller->makeRoute($this->silexMock, '/r/{id}/{id2}', 'Arcphss\\Delivery\\Controller\\RootController');
     }
 }

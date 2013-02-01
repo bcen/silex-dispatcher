@@ -1,21 +1,104 @@
 <?php
 namespace SDispatcher\Common;
 
+use SDispatcher\Common\PaginatorInterface;
+
 interface ResourceOptionInterface
 {
+    /**
+     * Returns the default supported mime format.
+     * @return string
+     */
     public function getDefaultFormat();
+
+    /**
+     * Returns the supported formats.
+     * @return array
+     */
     public function getSupportedFormats();
+
+    /**
+     * Sets the supported mime formats.
+     * @param array $formats
+     * @return \SDispatcher\Common\ResourceOptionInterface
+     */
     public function setSupportedFormats(array $formats);
 
+    /**
+     * Returns the the page limit.
+     * @return int
+     */
     public function getPageLimit();
+
+    /**
+     * Sets the page limit.
+     * @param $limit
+     * @return \SDispatcher\Common\ResourceOptionInterface
+     */
     public function setPageLimit($limit);
 
+    /**
+     * Returns the supported request method.
+     * @return array
+     */
     public function getAllowedMethods();
+
+    /**
+     * Sets the supported request method.
+     * @param array $methods
+     * @return \SDispatcher\Common\ResourceOptionInterface
+     */
     public function setAllowedMethods(array $methods);
 
     /**
+     * Returns the paginator instance.
      * @return \SDispatcher\Common\PaginatorInterface
      */
     public function getPaginator();
+
+    /**
+     * Sets the paginator instance.
+     * @param PaginatorInterface $paginator
+     * @return \SDispatcher\Common\ResourceOptionInterface
+     */
     public function setPaginator(PaginatorInterface $paginator);
+
+    /**
+     * Returns the identifier name for dehydration.
+     * @return string
+     */
+    public function getResourceIdentifier();
+
+    /**
+     * Sets the identifier name for dehydration.
+     * @param string $id
+     * @return \SDispatcher\Common\ResourceOptionInterface
+     */
+    public function setResourceIdentifier($id);
+
+    /**
+     * Returns the paginated data container name.
+     * @return string
+     */
+    public function getPaginatedDataContainerName();
+
+    /**
+     * Sets the paginated data container name.
+     * @param string $name
+     * @return \SDispatcher\Common\ResourceOptionInterface
+     */
+    public function setPaginatedDataContainerName($name);
+
+    /**
+     * Returns the paginated meta data container name.
+     * @return string
+     */
+    public function getPaginatedMetaContainerName();
+
+    /**
+     * Sets the paginated meta data container name.
+     * @param string $name
+     * @return \SDispatcher\Common\ResourceOptionInterface
+     */
+    public function setPaginatedMetaContainerName($name);
 }

@@ -26,6 +26,7 @@ abstract class DispatchableResource implements DispatchableInterface
         $response = new Response('Sumting Wrong', 404);
 
         try {
+            $this->doResourceOptionInitialization($this->getResourceOption());
             $this->doContentNegotiationCheck($request);
             $this->doMethodAccessCheck($request, $routeSegments);
             $this->doAuthenticationCheck($request);
@@ -38,6 +39,15 @@ abstract class DispatchableResource implements DispatchableInterface
         }
 
         return $response;
+    }
+
+    /**
+     * Hook point for initializing resource option. This will be called
+     * at the begining of {@see doDispatch()}.
+     */
+    protected function doResourceOptionInitialization(
+        ResourceOptionInterface $option)
+    {
     }
 
     /**
@@ -84,8 +94,7 @@ abstract class DispatchableResource implements DispatchableInterface
                     array($this, 'readList'),
                     $args
                 );
-                $list = is_array($list) ? $list : array();
-                $bundle->setData(array('objects' => $list));
+                $bundle->setData($list);
                 $this->doSorting($bundle);
                 $this->doPagination($bundle);
 
@@ -206,11 +215,9 @@ abstract class DispatchableResource implements DispatchableInterface
     /**
      * Checks whether the request method is allowed.
      * @param \Symfony\Component\HttpFoundation\Request $request
-     * @param array $routeSegments Used to determine whether list or detail resource
      * @throws \SDispatcher\Exception\DispatchingHttpException
      */
-    protected function doMethodAccessCheck(Request $request,
-                                           array $routeSegments = array())
+    protected function doMethodAccessCheck(Request $request)
     {
         $allowedMethods = $this->getResourceOption()->getAllowedMethods();
         $method = $request->getMethod();
@@ -255,32 +262,17 @@ abstract class DispatchableResource implements DispatchableInterface
     protected function doPagination(ResourceBundle $bunlde)
     {
         $request = $bunlde->getRequest();
-        $limit = (int)$request->query->get(
-            'limit',
-            $request->headers->get(
-                'X-Page-Limit',
-                $this->getResourceOption()->getPageLimit()
-            )
-        );
-        $offset = (int)$request->query->get(
-            'offset',
-            $request->headers->get(
-                'X-Page-Offset',
-                0
-            )
-        );
-
         $paginator = $this->getResourceOption()->getPaginator();
-        $paginator->setQueryset($bunlde->getData('objects', array()))
-             ->setOffset($offset)
-             ->setLimit($limit);
-        $bunlde->setData($paginator->getPage());
-
-        $bunlde->getResponse()->headers->add(array(
-            'X-Pagination-Offset' =>$offset,
-            'X-Pagination-Limit' => $limit,
-            'X-Pagination-Count' => $paginator->getCount()
-        ));
+        list($headers, $data) = $paginator->paginate(
+            $request,
+            $bunlde->getData(),
+            0,
+            $this->getResourceOption()->getPageLimit(),
+            $this->getResourceOption()->getPaginatedMetaContainerName(),
+            $this->getResourceOption()->getPaginatedDataContainerName()
+        );
+        $bunlde->setData($data);
+        $bunlde->getResponse()->headers->add($headers);
     }
 
     /**
@@ -351,6 +343,7 @@ abstract class DispatchableResource implements DispatchableInterface
                 $response->headers->all()
             );
             $bundle->setResponse($jsonResponse);
+            $bundle->setData($bundle->getResponse()->getContent());
         }
     }
 
@@ -360,6 +353,18 @@ abstract class DispatchableResource implements DispatchableInterface
      */
     protected function doDeserialization(ResourceBundle $bundle)
     {
+        $contentType = $bundle
+            ->getRequest()->headers->get('Content-Type', null, true);
+        $content = $bundle->getRequest()->getContent();
+
+        if ($contentType === 'application/json') {
+            $data = @json_decode($content, true);
+            $bundle->setData($data);
+        } elseif ($contentType === 'application/xml') {
+            $data = $content ? (array)@simplexml_load_string(
+                $content, 'SimpleXMLElement', LIBXML_NOCDATA) : null;
+            $bundle->setData($data);
+        }
     }
 
     /**
@@ -368,6 +373,64 @@ abstract class DispatchableResource implements DispatchableInterface
      */
     protected function doHydration(ResourceBundle $bundle)
     {
+    }
+
+    /**
+     * Dehydrates the data in the bundle.
+     * @param \SDispatcher\Common\ResourceBundle $bundle
+     */
+    protected function doDehydration(ResourceBundle $bundle)
+    {
+        $request = $bundle->getRequest();
+        $data = $bundle->getData();
+
+        $addSelfLink = function (array &$objects, $link, $attr) {
+            $link = rtrim($link, '/') . '/';
+            foreach ($objects as $key => $val) {
+                if (is_array($val) && isset($val[$attr])) {
+                    $val['selfLink'] = $link . $val[$attr];
+                    $objects[$key] = $val;
+                }
+            }
+        };
+
+        $self = $this;
+        $dehydrateField = function (array &$objects) use ($self) {
+            foreach ($objects as $index => $obj) {
+                foreach ($obj as $key => $val) {
+                    $method = 'dehydrate' . ucfirst($key);
+                    if (method_exists($self, $method)) {
+                        $val = call_user_func(array($self, $method), $val);
+                        $obj[$key] = $val;
+                        $objects[$index] = $obj;
+                    }
+                }
+            }
+        };
+
+        $link = $request->getSchemeAndHttpHost() .
+                $request->getBaseUrl() .
+                $request->getPathInfo();
+
+        $resourceIdentifier = $this
+            ->getResourceOption()
+            ->getResourceIdentifier();
+
+        $containerName = $this
+            ->getResourceOption()
+            ->getPaginatedDataContainerName();
+        if (is_array($data) && isset($data[$containerName])) {
+            $objects = $data[$containerName];
+            $addSelfLink($objects, $link, $resourceIdentifier);
+            $dehydrateField($objects);
+            $data[$containerName] = $objects;
+        } elseif (is_array($data)) {
+            $objects = array($data);
+            $dehydrateField($objects);
+            $data = array_shift($objects);
+        }
+
+        $bundle->setData($data);
     }
 
     /**
@@ -380,18 +443,30 @@ abstract class DispatchableResource implements DispatchableInterface
         $supportedFormats = $this->getResourceOption()->getSupportedFormats();
         $contentType = null;
 
-        // Look for content type in query string
-        // e.g. /?format=application/json
-        if (in_array($request->get('format'), $supportedFormats)) {
-            $contentType = $request->get('format');
-        }
 
-        // Suppress the query string from Accept header
+        // Look for content type in Accept header
         // e.g. Accept: text/html,application/json,*/*
         foreach ($request->getAcceptableContentTypes() as $format) {
             if (in_array($format, $supportedFormats)) {
                 $contentType = $format;
                 break;
+            }
+        }
+
+        // Supress Accept header if query string "format" presents
+        // e.g. /?format=application/json
+        if (in_array($request->get('format'), $supportedFormats)) {
+            $contentType = $request->get('format');
+        } else {
+            // allows query string format to have short hand notation
+            // e.g. /?format=json
+            foreach ($supportedFormats as $mimeType) {
+                if (strtolower($request->getFormat($mimeType))
+                    === strtolower($request->get('format'))
+                ) {
+                    $contentType = $mimeType;
+                    break;
+                }
             }
         }
 
@@ -442,9 +517,7 @@ abstract class DispatchableResource implements DispatchableInterface
      */
     protected function finalizeResponse(ResourceBundle $bundle)
     {
-        // TODO
-        // $this->doDehydration($bundle);
-
+        $this->doDehydration($bundle);
         $contentType = $this->detectSupportedContentType($bundle->getRequest());
         $this->doSerialization($bundle, $contentType);
         $response = $bundle->getResponse();
