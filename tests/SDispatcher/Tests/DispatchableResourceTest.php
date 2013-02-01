@@ -318,7 +318,7 @@ class DispatchableResourceTest extends \PHPUnit_Framework_TestCase
         $request->headers->set('Content-Type', 'application/json');
         $resource = new DispatchableResourceProxy();
         $bundle = $resource->createBundle($request);
-        $resource->doDeserialization($bundle);
+
         $data = $bundle->getData();
         $this->assertEquals(
             array(
@@ -338,7 +338,7 @@ class DispatchableResourceTest extends \PHPUnit_Framework_TestCase
         $request->headers->set('Content-Type', 'application/xml');
         $resource = new DispatchableResourceProxy();
         $bundle = $resource->createBundle($request);
-        $resource->doDeserialization($bundle);
+
         $data = $bundle->getData();
         $this->assertEquals(
             array(
@@ -346,5 +346,25 @@ class DispatchableResourceTest extends \PHPUnit_Framework_TestCase
             ),
             $data
         );
+    }
+
+    /**
+     * @test
+     */
+    public function doDeserialization_should_not_throw_any_error_if_failed()
+    {
+        $request = Request::create('/', 'GET', array(), array(), array(), array(), 'message=json');
+        $request->headers->set('Content-Type', 'application/json');
+        $resource = new DispatchableResourceProxy();
+        $bundle = $resource->createBundle($request);
+
+        $data = $bundle->getData();
+
+        $request = Request::create('/', 'GET', array(), array(), array(), array(), 'message=json');
+        $request->headers->set('Content-Type', 'application/xml');
+        $resource = new DispatchableResourceProxy();
+        $bundle = $resource->createBundle($request);
+
+        $data = $bundle->getData();
     }
 }

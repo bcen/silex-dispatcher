@@ -44,6 +44,9 @@ class ResourceBundle
      */
     public function getResponse()
     {
+        if (!$this->response) {
+            $this->response = new Response();
+        }
         return $this->response;
     }
 
