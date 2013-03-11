@@ -49,6 +49,47 @@ class ControllerResolverTest extends \PHPUnit_Framework_TestCase
     /**
      * @test
      */
+    public function it_should_resolve_default_value()
+    {
+        $app = new \Silex\Application();
+
+        $controller = function ($arcphssFlag = 'flag') { };
+
+        $controllerResolver = new ControllerResolver($app);
+        $args = $controllerResolver->getArguments(
+            Request::create('/'),
+            $controller);
+
+        $this->assertTrue(is_array($args) && !empty($args));
+        $this->assertEquals('flag', $args[0]);
+    }
+
+    /**
+     * @test
+     */
+    public function it_should_resolve_by_name_over_by_class_name()
+    {
+        $app = new \Silex\Application();
+
+        $app['SDispatcher\\Tests\\Fixture\\ResolveMePlease'] = $app->share(function () {
+            return new ResolveMePlease();
+        });
+        $app['obj'] = new \stdClass();
+
+        $controller = function (ResolveMePlease $obj) { };
+
+        $controllerResolver = new ControllerResolver($app);
+        $args = $controllerResolver->getArguments(
+            Request::create('/'),
+            $controller);
+
+        $this->assertTrue(is_array($args) && !empty($args));
+        $this->assertInstanceOf('stdClass', $args[0]);
+    }
+
+    /**
+     * @test
+     */
     public function functional_test()
     {
         $app = new \Silex\Application();
