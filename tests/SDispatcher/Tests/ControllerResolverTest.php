@@ -192,6 +192,45 @@ class ControllerResolverTest extends \PHPUnit_Framework_TestCase
     /**
      * @test
      */
+    public function it_should_resolve_to_default_values_if_no_annotation_at_all()
+    {
+        $request = Request::create('/a/wow');
+        $app = new \Silex\Application();
+        $app['resolver'] = new ControllerResolver($app);
+        $app->get('/a/wow', 'SDispatcher\\Tests\\Fixture\\ResolveMePlease::method1');
+        $app->handle($request);
+        $routeName = $request->attributes->get('_route');
+        $route = $app['routes']->get($routeName);
+        $this->assertEquals(
+            array(
+                array('application/json'),
+                'id',
+                20,
+                false
+            ),
+            array(
+                $route->getOption('sdispatcher.route.supported_formats'),
+                $route->getOption('sdispatcher.route.resource_identifier'),
+                $route->getOption('sdispatcher.route.page_limit'),
+                $route->getOption('sdispatcher.route.will_paginate')
+            ));
+    }
+
+    /**
+     * @test
+     */
+    public function it_should_not_fail_if_controller_is_other_than_class()
+    {
+        $request = Request::create('/a/wow');
+        $app = new \Silex\Application();
+        $app['resolver'] = new ControllerResolver($app);
+        $app->get('/a/wow', function() { return 'hi'; });
+        $app->handle($request);
+    }
+
+    /**
+     * @test
+     */
     public function functional_test()
     {
         $app = new \Silex\Application();
