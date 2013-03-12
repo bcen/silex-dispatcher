@@ -90,7 +90,7 @@ class ControllerResolverTest extends \PHPUnit_Framework_TestCase
     /**
      * @test
      */
-    public function wip()
+    public function it_should_resolve_class_annotation_to_route_options()
     {
         $request = Request::create('/a/wow');
         $app = new \Silex\Application();
