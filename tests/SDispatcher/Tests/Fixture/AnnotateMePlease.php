@@ -4,7 +4,7 @@ namespace SDispatcher\Tests\Fixture;
 use SDispatcher\Common\Annotation\SupportedFormats;
 
 /**
- * @SupportedFormats("application/json")
+ * @SupportedFormats({"application/json", "application/xml"})
  */
 class AnnotateMePlease
 {
@@ -13,6 +13,9 @@ class AnnotateMePlease
         return 'method1';
     }
 
+    /**
+     * @SupportedFormats("application/xml")
+     */
     public function method2()
     {
         return 'method2';

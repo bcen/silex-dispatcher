@@ -100,8 +100,25 @@ class ControllerResolverTest extends \PHPUnit_Framework_TestCase
         $routeName = $request->attributes->get('_route');
         $route = $app['routes']->get($routeName);
         $this->assertEquals(
-            array('application/json'),
-            $route->getOption('sdispatcher.controller.supportedFormats'));
+            array('application/json', 'application/xml'),
+            $route->getOption('sdispatcher.route.supportedFormats'));
+    }
+
+    /**
+     * @test
+     */
+    public function it_should_resolve_method_annotation_over_class_annotation_to_route_options()
+    {
+        $request = Request::create('/a/wow');
+        $app = new \Silex\Application();
+        $app['resolver'] = new ControllerResolver($app);
+        $app->get('/a/wow', 'SDispatcher\\Tests\\Fixture\\AnnotateMePlease::method2');
+        $app->handle($request);
+        $routeName = $request->attributes->get('_route');
+        $route = $app['routes']->get($routeName);
+        $this->assertEquals(
+            array('application/xml'),
+            $route->getOption('sdispatcher.route.supportedFormats'));
     }
 
     /**
