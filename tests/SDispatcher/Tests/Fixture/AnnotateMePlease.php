@@ -1,8 +1,10 @@
 <?php
 namespace SDispatcher\Tests\Fixture;
 
+use SDispatcher\Common\Annotation\SupportedFormats;
+
 /**
- * @SupportedFormats({"application/json"})
+ * @SupportedFormats("application/json")
  */
 class AnnotateMePlease
 {
