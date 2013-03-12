@@ -36,6 +36,16 @@ class AnnotationResourceOption extends AbstractResourceOption
         $this->annotationReader = new AnnotationReader();
     }
 
+    public function willPaginate()
+    {
+        $this->tryReadOption(
+            'willPaginate',
+            $out,
+            false
+        );
+        return $out;
+    }
+
     /**
      * {@inheritdoc}
      */

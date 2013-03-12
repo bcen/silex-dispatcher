@@ -46,7 +46,10 @@ class ControllerResolver extends SilexControllerResolver
     {
         $resourceOption = new AnnotationResourceOption($controller, $method);
         $options = array(
-            'sdispatcher.route.supportedFormats' => $resourceOption->getSupportedFormats()
+            'sdispatcher.route.supported_formats' => $resourceOption->getSupportedFormats(),
+            'sdispatcher.route.resource_identifier' => $resourceOption->getResourceIdentifier(),
+            'sdispatcher.route.page_limit' => $resourceOption->getPageLimit(),
+            'sdispatcher.route.will_paginate' => $resourceOption->willPaginate()
         );
         return $options;
     }
