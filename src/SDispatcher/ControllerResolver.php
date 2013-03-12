@@ -3,6 +3,7 @@ namespace SDispatcher;
 
 use Symfony\Component\HttpFoundation\Request;
 use Silex\ControllerResolver as SilexControllerResolver;
+use Silex\Application;
 
 /**
  * Extends the base resolver to include resovling dependency from container by
@@ -12,6 +13,19 @@ class ControllerResolver extends SilexControllerResolver
 {
     protected function doGetArguments(Request $request, $controller, array $parameters)
     {
+        if (is_array($controller)
+            && count($controller) >= 2
+            && $routeName = $request->attributes->get('_route')
+        ) {
+            $options = $this->resolveControllerOptions(
+                $controller[0],
+                $controller[1]);
+            $route = $this->app['routes']->get($routeName);
+            foreach ((array)$options as $key => $value) {
+                $route->setOption($key, $value);
+            }
+        }
+
         foreach ($parameters as $p) {
             $name = $p->getName();
             if (isset($this->app[$name])) {
@@ -25,5 +39,10 @@ class ControllerResolver extends SilexControllerResolver
         }
 
         return parent::doGetArguments($request, $controller, $parameters);
+    }
+
+    protected function resolveControllerOptions($controller, $method)
+    {
+        return array('sdispatcher.controller.supportedFormats' => array('application/json'));
     }
 }
