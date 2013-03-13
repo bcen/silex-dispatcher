@@ -23,14 +23,20 @@ class AnnotateMePlease
 
     /**
      * @SupportedFormats("application/xml")
+     * @return string
      */
     public function method2()
     {
         return 'method2';
     }
 
+    /**
+     * @return string
+     * @PageLimit(10)
+     */
     public function method3()
     {
+        return 'method3';
     }
 
     /**
@@ -38,5 +44,6 @@ class AnnotateMePlease
      */
     public function method4()
     {
+        return 'method4';
     }
 }

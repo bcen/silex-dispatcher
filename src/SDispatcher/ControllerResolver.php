@@ -1,7 +1,6 @@
 <?php
 namespace SDispatcher;
 
-use SDispatcher\Common\AnnotationResourceOption;
 use Symfony\Component\HttpFoundation\Request;
 use Silex\ControllerResolver as SilexControllerResolver;
 use Silex\Application;
@@ -14,19 +13,6 @@ class ControllerResolver extends SilexControllerResolver
 {
     protected function doGetArguments(Request $request, $controller, array $parameters)
     {
-        if (is_array($controller)
-            && count($controller) >= 2
-            && $routeName = $request->attributes->get('_route')
-        ) {
-            $options = $this->resolveControllerOptions(
-                $controller[0],
-                $controller[1]);
-            $route = $this->app['routes']->get($routeName);
-            foreach ((array)$options as $key => $value) {
-                $route->setOption($key, $value);
-            }
-        }
-
         foreach ($parameters as $p) {
             $name = $p->getName();
             if (isset($this->app[$name])) {
@@ -40,17 +26,5 @@ class ControllerResolver extends SilexControllerResolver
         }
 
         return parent::doGetArguments($request, $controller, $parameters);
-    }
-
-    protected function resolveControllerOptions($controller, $method)
-    {
-        $resourceOption = new AnnotationResourceOption($controller, $method);
-        $options = array(
-            'sdispatcher.route.supported_formats' => $resourceOption->getSupportedFormats(),
-            'sdispatcher.route.resource_identifier' => $resourceOption->getResourceIdentifier(),
-            'sdispatcher.route.page_limit' => $resourceOption->getPageLimit(),
-            'sdispatcher.route.will_paginate' => $resourceOption->willPaginate()
-        );
-        return $options;
     }
 }
