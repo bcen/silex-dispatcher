@@ -1,5 +1,5 @@
 {
-    "hash": "fea24bd0707cd8b6d1892ef322a226de",
+    "hash": "296ba73b9edd0a745c31485188b6d528",
     "packages": [
         {
             "name": "doctrine/common",
@@ -967,5 +967,11 @@
     "minimum-stability": "stable",
     "stability-flags": {
         "silex/silex": 20
-    }
+    },
+    "platform": [
+
+    ],
+    "platform-dev": [
+
+    ]
 }

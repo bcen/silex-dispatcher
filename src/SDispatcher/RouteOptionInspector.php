@@ -1,8 +1,8 @@
 <?php
 namespace SDispatcher;
 
-use Silex\Application;
 use SDispatcher\Common\AnnotationResourceOption;
+use Silex\Application;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\KernelEvents;
 use Symfony\Component\HttpKernel\Event\GetResponseEvent;
@@ -65,10 +65,10 @@ class RouteOptionInspector implements EventSubscriberInterface
     {
         $resourceOption = new AnnotationResourceOption($controller, $method);
         $options = array(
-            'sdispatcher.route.supported_formats' => $resourceOption->getSupportedFormats(),
-            'sdispatcher.route.resource_identifier' => $resourceOption->getResourceIdentifier(),
-            'sdispatcher.route.page_limit' => $resourceOption->getPageLimit(),
-            'sdispatcher.route.will_paginate' => $resourceOption->willPaginate()
+            RouteOptions::SUPPORTED_FORMATS => $resourceOption->getSupportedFormats(),
+            RouteOptions::RESOURCE_ID       => $resourceOption->getResourceIdentifier(),
+            RouteOptions::PAGE_LIMIT        => $resourceOption->getPageLimit(),
+            RouteOptions::WILL_PAGINGATE    => $resourceOption->willPaginate()
         );
         return $options;
     }
