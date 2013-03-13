@@ -41,6 +41,7 @@ class AnnotateMePlease
 
     /**
      * @WillPaginate
+     * @SupportedFormats("application/json")
      */
     public function method4()
     {
