@@ -5,6 +5,7 @@ use SDispatcher\Common\Annotation\SupportedFormats;
 use SDispatcher\Common\Annotation\ResourceIdentifier;
 use SDispatcher\Common\Annotation\PageLimit;
 use SDispatcher\Common\Annotation\WillPaginate;
+use SDispatcher\DataResponse;
 
 /**
  * @SupportedFormats({"application/json", "application/xml"})
@@ -46,5 +47,27 @@ class AnnotateMePlease
     public function method4()
     {
         return 'method4';
+    }
+
+    /**
+     * @WillPaginate
+     * @SupportedFormats("application/json")
+     */
+    public function method5()
+    {
+        return new DataResponse(array(
+            'name' => 'method5'
+        ));
+    }
+
+    /**
+     * @WillPaginate
+     * @SupportedFormats("application/xml")
+     */
+    public function method6()
+    {
+        return new DataResponse(array(
+            'name' => 'method6'
+        ));
     }
 }
