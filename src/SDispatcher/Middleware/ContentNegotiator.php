@@ -1,45 +1,42 @@
 <?php
 namespace SDispatcher\Middleware;
 
-use Silex\Application;
+use SDispatcher\Common\RouteOptions;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\HttpKernel\Event\GetResponseEvent;
-use Symfony\Component\HttpKernel\KernelEvents;
-use Symfony\Component\EventDispatcher\EventSubscriberInterface;
+use Symfony\Component\Routing\RouteCollection;
 
-class ContentNegotiator implements EventSubscriberInterface
+/**
+ * Inspects the request to see `Accept` or `format` query string is supported or not.
+ */
+class ContentNegotiator extends AbstractKernelRequestEventListener
 {
     /**
-     * @var \Silex\Application
+     * @var \Symfony\Component\Routing\RouteCollection
      */
-    protected $app;
+    protected $routes;
 
-    public function __construct(Application $app)
+    /**
+     * @param \Symfony\Component\Routing\RouteCollection $routes
+     */
+    public function __construct(RouteCollection $routes)
     {
-        $this->app = $app;
+        $this->routes = $routes;
     }
 
-    public function onKernelRequest(GetResponseEvent $e)
-    {
-        return $this->doKernelRequest($e->getRequest());
-    }
-
-    public function __invoke(Request $request)
-    {
-        return $this->doKernelRequest($request);
-    }
-
+    /**
+     * {@inheritdoc}
+     */
     protected function doKernelRequest(Request $request)
     {
         $routeName = $request->attributes->get('_route');
-        $route = $this->app['routes']->get($routeName);
+        $route = $this->routes->get($routeName);
         if (!$route) {
             return new Response('', 406);
         }
 
         $supportedFormats = (array)$route->getOption(
-            'sdispatcher.route.supported_formats');
+            RouteOptions::SUPPORTED_FORMATS);
         $contentType = null;
 
         // Look for content type in Accept header
@@ -82,19 +79,9 @@ class ContentNegotiator implements EventSubscriberInterface
         if (!$contentType) {
             return new Response('', 406);
         } else {
-            $route->setOption(
-                'sdispatcher.route.accepted_format',
-                $contentType);
+            $route->setOption(RouteOptions::ACCEPTED_FORMAT, $contentType);
         }
 
         return null;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public static function getSubscribedEvents()
-    {
-        return array(KernelEvents::REQUEST => 'onKernelRequest');
     }
 }
