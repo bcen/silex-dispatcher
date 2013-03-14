@@ -4,11 +4,8 @@ namespace SDispatcher\Middleware;
 use SDispatcher\Common\AnnotationResourceOption;
 use SDispatcher\Common\RouteOptions;
 use Silex\Application;
-use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\HttpKernel\Event\GetResponseEvent;
-use Symfony\Component\HttpKernel\KernelEvents;
 use Symfony\Component\Routing\RouteCollection;
 
 /**
@@ -28,7 +25,7 @@ use Symfony\Component\Routing\RouteCollection;
  *
  * @see \SDispatcher\Common\RouteOptions
  */
-class RouteOptionInspector implements EventSubscriberInterface
+class RouteOptionInspector extends AbstractKernelRequestEventListener
 {
     /**
      * @var \Symfony\Component\Routing\RouteCollection
@@ -44,41 +41,9 @@ class RouteOptionInspector implements EventSubscriberInterface
     }
 
     /**
-     * Inspects the class-based controller for routing option. (i.e @PageLimit)
-     * @param \Symfony\Component\HttpKernel\Event\GetResponseEvent $e
+     * {@inheritdoc}
      */
-    public function onKernelRequest(GetResponseEvent $e)
-    {
-        $ret = $this->doOnKernelRequest($e->getRequest());
-        if ($ret instanceof Response) {
-            $e->setResponse($ret);
-        }
-    }
-
-    /**
-     * Same as {@see onKernelRequest}. But it will be used as a callback.
-     * <code>
-     * $app->before(new RouteOptionInspector($routes));
-     * // or standalone
-     * $inspector = new RouteOptionInspector($routes);
-     * $inspector($request);
-     * call_user_func($inspector, $request); // valid also
-     * </code>
-     * @param \Symfony\Component\HttpFoundation\Request $request
-     * @return null|\Symfony\Component\HttpFoundation\Response
-     */
-    public function __invoke(Request $request)
-    {
-        return $this->doOnKernelRequest($request);
-    }
-
-    /**
-     * Does the actual work for {@link __invoke()}
-     * and {@link onKernelRequest()}.
-     * @param \Symfony\Component\HttpFoundation\Request $request
-     * @return null
-     */
-    protected function doOnKernelRequest(Request $request)
+    protected function doKernelRequest(Request $request)
     {
         $controllerStr = $request->attributes->get('_controller');
         if (!is_string($controllerStr)) {
@@ -112,13 +77,5 @@ class RouteOptionInspector implements EventSubscriberInterface
             RouteOptions::WILL_PAGINGATE    => $resourceOption->willPaginate()
         );
         return $options;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public static function getSubscribedEvents()
-    {
-        return array(KernelEvents::REQUEST => 'onKernelRequest');
     }
 }
