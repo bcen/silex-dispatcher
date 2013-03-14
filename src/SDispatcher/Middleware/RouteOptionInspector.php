@@ -1,8 +1,8 @@
 <?php
-namespace SDispatcher;
+namespace SDispatcher\Middleware;
 
+use SDispatcher\Common\RouteOptions;
 use SDispatcher\Common\AnnotationResourceOption;
-use SDispatcher\Tests\Fixture\ResolveMePlease;
 use Silex\Application;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\KernelEvents;
@@ -54,6 +54,9 @@ class RouteOptionInspector implements EventSubscriberInterface
 
     /**
      * Same as {@see onKernelRequest}. But it will be used as a callback.
+     * <code>
+     * $app->before(new RouteOptionInspector($routes));
+     * </code>
      * @param \Symfony\Component\HttpFoundation\Request $request
      * @return null
      */

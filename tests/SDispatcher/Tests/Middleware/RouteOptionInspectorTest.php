@@ -1,8 +1,8 @@
 <?php
-namespace SDispatcher\Tests;
+namespace SDispatcher\Tests\Middleware;
 
-use SDispatcher\RouteOptions;
-use SDispatcher\RouteOptionInspector;
+use SDispatcher\Common\RouteOptions;
+use SDispatcher\Middleware\RouteOptionInspector;
 use Symfony\Component\HttpFoundation\Request;
 use Silex\Application;
 

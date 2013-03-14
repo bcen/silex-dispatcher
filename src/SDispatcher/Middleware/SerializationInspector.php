@@ -1,8 +1,8 @@
 <?php
-namespace SDispatcher;
+namespace SDispatcher\Middleware;
 
 use SDispatcher\DataResponse;
-use SDispatcher\RouteOptions;
+use SDispatcher\Common\RouteOptions;
 use Silex\Application;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;

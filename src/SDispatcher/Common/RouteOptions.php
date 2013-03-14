@@ -1,5 +1,5 @@
 <?php
-namespace SDispatcher;
+namespace SDispatcher\Common;
 
 class RouteOptions
 {

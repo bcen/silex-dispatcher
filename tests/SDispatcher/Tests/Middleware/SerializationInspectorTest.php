@@ -1,10 +1,10 @@
 <?php
-namespace SDispatcher\Tests;
+namespace SDispatcher\Tests\Middleware;
 
-use SDispatcher\RouteOptions;
-use SDispatcher\RouteOptionInspector;
-use SDispatcher\ContentNegotiator;
-use SDispatcher\SerializationInspector;
+use SDispatcher\Common\RouteOptions;
+use SDispatcher\Middleware\RouteOptionInspector;
+use SDispatcher\Middleware\ContentNegotiator;
+use SDispatcher\Middleware\SerializationInspector;
 use Symfony\Component\HttpFoundation\Request;
 use Silex\Application;
 

@@ -1,8 +1,8 @@
 <?php
-namespace SDispatcher\Tests;
+namespace SDispatcher\Tests\Middleware;
 
-use SDispatcher\ContentNegotiator;
-use SDispatcher\RouteOptionInspector;
+use SDispatcher\Middleware\ContentNegotiator;
+use SDispatcher\Middleware\RouteOptionInspector;
 use Silex\Application;
 use Symfony\Component\HttpFoundation\Request;
 

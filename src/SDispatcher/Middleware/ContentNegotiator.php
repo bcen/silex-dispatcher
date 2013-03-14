@@ -1,5 +1,5 @@
 <?php
-namespace SDispatcher;
+namespace SDispatcher\Middleware;
 
 use Silex\Application;
 use Symfony\Component\HttpFoundation\Request;
