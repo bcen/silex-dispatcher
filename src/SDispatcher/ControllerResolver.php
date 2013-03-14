@@ -1,9 +1,9 @@
 <?php
 namespace SDispatcher;
 
-use Symfony\Component\HttpFoundation\Request;
-use Silex\ControllerResolver as SilexControllerResolver;
 use Silex\Application;
+use Silex\ControllerResolver as SilexControllerResolver;
+use Symfony\Component\HttpFoundation\Request;
 
 /**
  * Extends the base resolver to include resovling dependency from container by
@@ -11,14 +11,20 @@ use Silex\Application;
  */
 class ControllerResolver extends SilexControllerResolver
 {
+    /**
+     * {@inheritdoc}
+     */
     protected function doGetArguments(Request $request, $controller, array $parameters)
     {
+        /* @var \ReflectionClass|\ReflectionParameter $p */
         foreach ($parameters as $p) {
             $name = $p->getName();
             if (isset($this->app[$name])) {
                 $request->attributes->set($name, $this->app[$name]);
             } elseif ($p->getClass()) {
-                $className = $p->getClass()->getName();
+                /* @var \ReflectionClass $reflectedClass */
+                $reflectedClass = $p->getClass();
+                $className = $reflectedClass->getName();
                 if (isset($this->app[$className])) {
                     $request->attributes->set($name, $this->app[$className]);
                 }
