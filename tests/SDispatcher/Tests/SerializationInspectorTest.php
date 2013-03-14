@@ -18,7 +18,7 @@ class SerializationInspectorTest extends \PHPUnit_Framework_TestCase
         $request = Request::create('/r');
         $request->headers->set('Accept', 'application/json');
         $app = new Application();
-        $app->before(new RouteOptionInspector($app));
+        $app->before(new RouteOptionInspector($app['routes']));
         $app->before(new ContentNegotiator($app));
         $app->after(new SerializationInspector($app));
         $app->get('/r', 'SDispatcher\\Tests\\Fixture\\AnnotateMePlease::method5');
@@ -43,7 +43,7 @@ class SerializationInspectorTest extends \PHPUnit_Framework_TestCase
         $request = Request::create('/r');
         $request->headers->set('Accept', 'application/xml');
         $app = new Application();
-        $app->before(new RouteOptionInspector($app));
+        $app->before(new RouteOptionInspector($app['routes']));
         $app->before(new ContentNegotiator($app));
         $app->after(new SerializationInspector($app));
         $app->get('/r', 'SDispatcher\\Tests\\Fixture\\AnnotateMePlease::method6');
