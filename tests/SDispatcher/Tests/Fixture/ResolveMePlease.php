@@ -5,5 +5,6 @@ class ResolveMePlease
 {
     public function method1()
     {
+        return 'method1';
     }
 }

@@ -51,32 +51,39 @@ class AnnotationResourceOption extends AbstractResourceOption
      */
     protected function tryReadOption($name, &$out, $default = null)
     {
-        $out = $default;
-        $annotationName = static::ANNOTATION_NAMESPACE . ucfirst($name);
+        try {
+            $out = $default;
+            $annotationName = static::ANNOTATION_NAMESPACE . ucfirst($name);
 
-        // Inspects method first, since method has priority over class
-        $methodAnnotation = $this->annotationReader->getMethodAnnotation(
-            $this->reflectionMethod,
-            $annotationName);
+            // Inspects method first, since method has priority over class
+            $methodAnnotation = $this->annotationReader->getMethodAnnotation(
+                $this->reflectionMethod,
+                $annotationName);
 
-        if ($methodAnnotation
-            && $methodAnnotation instanceof AbstractAnnotation
-        ) {
-            $out = $methodAnnotation->values();
-            return true;
-        }
+            if ($methodAnnotation
+                && $methodAnnotation instanceof AbstractAnnotation
+            ) {
+                $out = $methodAnnotation->values();
+                return true;
+            }
 
-        // If we do not have method annotation,
-        // then look at the class annotation
-        $classAnnotation = $this->annotationReader->getClassAnnotation(
-            $this->reflectionClass,
-            $annotationName);
+            // If we do not have method annotation,
+            // then look at the class annotation
+            $classAnnotation = $this->annotationReader->getClassAnnotation(
+                $this->reflectionClass,
+                $annotationName);
 
-        if ($classAnnotation
-            && $classAnnotation instanceof AbstractAnnotation
-        ) {
-            $out = $classAnnotation->values();
-            return true;
+            if ($classAnnotation
+                && $classAnnotation instanceof AbstractAnnotation
+            ) {
+                $out = $classAnnotation->values();
+                return true;
+            }
+        } catch (\Exception $ex) {
+            // Lazily catch any exception and return false, and set
+            // $out to default value
+            $out = $default;
+            return false;
         }
 
         // sad, no method nor class annotation?
