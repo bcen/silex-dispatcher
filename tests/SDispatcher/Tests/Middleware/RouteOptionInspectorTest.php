@@ -3,8 +3,8 @@ namespace SDispatcher\Tests\Middleware;
 
 use SDispatcher\Common\RouteOptions;
 use SDispatcher\Middleware\RouteOptionInspector;
-use Symfony\Component\HttpFoundation\Request;
 use Silex\Application;
+use Symfony\Component\HttpFoundation\Request;
 
 class RouteOptionInspectorTest extends \PHPUnit_Framework_TestCase
 {
@@ -16,7 +16,9 @@ class RouteOptionInspectorTest extends \PHPUnit_Framework_TestCase
      */
     protected function getCurrentRoute(Application $app, Request $request)
     {
-        return $app['routes']->get($request->attributes->get('_route'));
+        /* @var \Symfony\Component\Routing\RouteCollection $routes */
+        $routes = $app['routes'];
+        return $routes->get($request->attributes->get('_route'));
     }
 
     /**
