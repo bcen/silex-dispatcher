@@ -1,9 +1,9 @@
 <?php
 namespace SDispatcher\Common;
 
-use SDispatcher\Common\Annotation\AbstractAnnotation;
-use Doctrine\Common\Annotations\AnnotationRegistry;
 use Doctrine\Common\Annotations\AnnotationReader;
+use Doctrine\Common\Annotations\AnnotationRegistry;
+use SDispatcher\Common\Annotation\AbstractAnnotation;
 
 class AnnotationResourceOption extends AbstractResourceOption
 {
@@ -41,8 +41,16 @@ class AnnotationResourceOption extends AbstractResourceOption
         $this->tryReadOption(
             'willPaginate',
             $out,
-            false
-        );
+            false);
+        return $out;
+    }
+
+    public function getPaginatorClass()
+    {
+        $this->tryReadOption(
+            'paginatorClass',
+            $out,
+            'SDispatcher\\Common\\InMemoryPaginator');
         return $out;
     }
 

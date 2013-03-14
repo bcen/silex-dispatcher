@@ -71,10 +71,13 @@ class RouteOptionInspector extends AbstractKernelRequestEventListener
     {
         $resourceOption = new AnnotationResourceOption($controller, $method);
         $options = array(
-            RouteOptions::SUPPORTED_FORMATS => $resourceOption->getSupportedFormats(),
-            RouteOptions::RESOURCE_ID       => $resourceOption->getResourceIdentifier(),
-            RouteOptions::PAGE_LIMIT        => $resourceOption->getPageLimit(),
-            RouteOptions::WILL_PAGINGATE    => $resourceOption->willPaginate()
+            RouteOptions::SUPPORTED_FORMATS             => $resourceOption->getSupportedFormats(),
+            RouteOptions::RESOURCE_ID                   => $resourceOption->getResourceIdentifier(),
+            RouteOptions::PAGE_LIMIT                    => $resourceOption->getPageLimit(),
+            RouteOptions::WILL_PAGINGATE                => $resourceOption->willPaginate(),
+            RouteOptions::PAGINATOR_CLASS               => $resourceOption->getPaginatorClass(),
+            RouteOptions::PAGINATED_DATA_CONTAINER_NAME => $resourceOption->getPaginatedDataContainerName(),
+            RouteOptions::PAGINATED_META_CONTAINER_NAME => $resourceOption->getPaginatedMetaContainerName(),
         );
         return $options;
     }

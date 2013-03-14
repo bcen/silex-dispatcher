@@ -58,13 +58,19 @@ class RouteOptionInspectorTest extends AbstractMiddlewareTestCaseHelper
                 array('application/json'),
                 'id',
                 20,
-                false
+                false,
+                'SDispatcher\\Common\\InMemoryPaginator',
+                'objects',
+                'meta'
             ),
             array(
                 $route->getOption(RouteOptions::SUPPORTED_FORMATS),
                 $route->getOption(RouteOptions::RESOURCE_ID),
                 $route->getOption(RouteOptions::PAGE_LIMIT),
-                $route->getOption(RouteOptions::WILL_PAGINGATE)
+                $route->getOption(RouteOptions::WILL_PAGINGATE),
+                $route->getOption(RouteOptions::PAGINATOR_CLASS),
+                $route->getOption(RouteOptions::PAGINATED_DATA_CONTAINER_NAME),
+                $route->getOption(RouteOptions::PAGINATED_META_CONTAINER_NAME)
             ));
     }
 }
