@@ -1,45 +1,66 @@
 <?php
 namespace SDispatcher\Middleware;
 
-use SDispatcher\DataResponse;
 use SDispatcher\Common\RouteOptions;
+use SDispatcher\DataResponse;
 use Silex\Application;
+use Symfony\Component\EventDispatcher\EventSubscriberInterface;
+use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpKernel\Event\FilterResponseEvent;
-use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpKernel\KernelEvents;
+use Symfony\Component\Routing\RouteCollection;
 
+/**
+ * Serializes the DataResponse into either `xml` or `json`.
+ */
 class SerializationInspector implements EventSubscriberInterface
 {
     /**
-     * @var \Silex\Application
+     * @var \Symfony\Component\Routing\RouteCollection
      */
-    protected $app;
+    protected $routes;
 
-    public function __construct(Application $app)
+    /**
+     * @param \Symfony\Component\Routing\RouteCollection $routes
+     */
+    public function __construct(RouteCollection $routes)
     {
-        $this->app = $app;
+        $this->routes = $routes;
     }
 
+    /**
+     * @see doKernelView()
+     * @param \Symfony\Component\HttpKernel\Event\FilterResponseEvent $e
+     */
     public function onKernelView(FilterResponseEvent $e)
     {
-        $this->doOnKernelView($e->getRequest(), $e->getResponse());
+        $this->doKernelView($e->getRequest(), $e->getResponse());
     }
 
+    /**
+     * @see doKernelView()
+     * @param Request $request
+     * @param Response $response
+     */
     public function __invoke(Request $request, Response $response)
     {
-        $this->doOnKernelView($request, $response);
+        $this->doKernelView($request, $response);
     }
 
-    protected function doOnKernelView(Request $request, Response $response)
+    /**
+     * Does the actual work when `KernelEvents::RESPONSE` is dispatched.
+     * @param \Symfony\Component\HttpFoundation\Request $request
+     * @param \Symfony\Component\HttpFoundation\Response $response
+     */
+    protected function doKernelView(Request $request, Response $response)
     {
         if (!$response instanceof DataResponse) {
             return;
         }
         $routeName = $request->attributes->get('_route');
-        $route = $this->app['routes']->get($routeName);
+        $route = $this->routes->get($routeName);
         $acceptedFormat = $route->getOption(RouteOptions::ACCEPTED_FORMAT);
         if (!$acceptedFormat) {
             $response->setContent('');
@@ -55,6 +76,13 @@ class SerializationInspector implements EventSubscriberInterface
         }
     }
 
+    /**
+     * Crappy serialization, only serialize `xml` and `json`.
+     * TODO: Uses a proper serializer.
+     * @param mixed $data
+     * @param string $contentType
+     * @return null|string
+     */
     protected function serializeDataResponse($data, $contentType)
     {
         if ($contentType === 'application/xml') {

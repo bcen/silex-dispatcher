@@ -1,29 +1,27 @@
 <?php
 namespace SDispatcher\Tests\Middleware;
 
-use SDispatcher\Common\RouteOptions;
-use SDispatcher\Middleware\RouteOptionInspector;
 use SDispatcher\Middleware\ContentNegotiator;
+use SDispatcher\Middleware\RouteOptionInspector;
 use SDispatcher\Middleware\SerializationInspector;
-use Symfony\Component\HttpFoundation\Request;
 use Silex\Application;
+use Symfony\Component\HttpFoundation\Request;
 
 class SerializationInspectorTest extends \PHPUnit_Framework_TestCase
 {
     /**
      * @test
      */
-    public function should_serialize_to_json_response()
+    public function it_should_serialize_to_json_response()
     {
         $request = Request::create('/r');
         $request->headers->set('Accept', 'application/json');
         $app = new Application();
         $app->before(new RouteOptionInspector($app['routes']));
-        $app->before(new ContentNegotiator($app));
-        $app->after(new SerializationInspector($app));
+        $app->before(new ContentNegotiator($app['routes']));
+        $app->after(new SerializationInspector($app['routes']));
         $app->get('/r', 'SDispatcher\\Tests\\Fixture\\AnnotateMePlease::method5');
         $response = $app->handle($request);
-        $app->terminate($request, $response);
         $actual = $response->getContent();
         $expected = preg_replace('/\s/', '', '
             {
@@ -38,17 +36,16 @@ class SerializationInspectorTest extends \PHPUnit_Framework_TestCase
     /**
      * @test
      */
-    public function should_serialize_to_xml_response()
+    public function it_should_serialize_to_xml_response()
     {
         $request = Request::create('/r');
         $request->headers->set('Accept', 'application/xml');
         $app = new Application();
         $app->before(new RouteOptionInspector($app['routes']));
-        $app->before(new ContentNegotiator($app));
-        $app->after(new SerializationInspector($app));
+        $app->before(new ContentNegotiator($app['routes']));
+        $app->after(new SerializationInspector($app['routes']));
         $app->get('/r', 'SDispatcher\\Tests\\Fixture\\AnnotateMePlease::method6');
         $response = $app->handle($request);
-        $app->terminate($request, $response);
         $actual = preg_replace('/\s/', '', $response->getContent());
         $expected = preg_replace('/\s/', '',
             '<?xml version="1.0" encoding="utf-8"?>' .
