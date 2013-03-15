@@ -65,6 +65,18 @@ class ContentNegotiator extends AbstractKernelRequestEventListener
             }
         }
 
+        // Supress "format" query string if extension presents
+        // e.g. /resource.{_format}
+        foreach ($supportedFormats as $mimeType) {
+            if (strtolower($request->getFormat($mimeType)
+                === strtolower($request->getRequestFormat()))
+            ) {
+                $contentType = $mimeType;
+                break;
+            }
+        }
+
+
         // if nothing found in query string and Accept header,
         // then use default format if */* present
         if (!$contentType

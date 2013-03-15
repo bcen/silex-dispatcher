@@ -36,6 +36,31 @@ class SerializationInspectorTest extends \PHPUnit_Framework_TestCase
     /**
      * @test
      */
+    public function it_should_serialize_to_json_response_from_ext()
+    {
+        $request = Request::create('/r.json');
+        $request->headers->set('Accept', '');
+        $app = new Application();
+        $app->before(new RouteOptionInspector($app['routes']));
+        $app->before(new ContentNegotiator($app['routes']));
+        $app->after(new SerializationInspector($app['routes']));
+        $app->get('/r.{_format}', 'SDispatcher\\Tests\\Fixture\\AnnotateMePlease::method5');
+        $response = $app->handle($request);
+        $actual = $response->getContent();
+        $expected = preg_replace('/\s/', '', '
+            {
+                "name": "method5"
+            }');
+        $this->assertEquals($expected, $actual);
+        $this->assertEquals(
+            'application/json',
+            $response->headers->get('Content-Type'));
+    }
+
+
+    /**
+     * @test
+     */
     public function it_should_serialize_to_xml_response()
     {
         $request = Request::create('/r');
