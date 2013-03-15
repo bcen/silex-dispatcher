@@ -70,4 +70,11 @@ class AnnotateMePlease
             'name' => 'method6'
         ));
     }
+
+    public function method7()
+    {
+        return array(
+            'name' => 'method7'
+        );
+    }
 }
