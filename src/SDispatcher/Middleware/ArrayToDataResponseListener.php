@@ -3,6 +3,7 @@ namespace SDispatcher\Middleware;
 
 use SDispatcher\DataResponse;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Event\GetResponseForControllerResultEvent;
 use Symfony\Component\HttpKernel\KernelEvents;
 
@@ -13,10 +14,10 @@ class ArrayToDataResponseListener implements EventSubscriberInterface
      */
     public function onKernelView(GetResponseForControllerResultEvent $e)
     {
-        $response = $e->getControllerResult();
+        $data = $e->getControllerResult();
 
-        if (is_array($response)) {
-            $e->setResponse(new DataResponse($response));
+        if (is_array($data)) {
+            $e->setResponse(new DataResponse($data));
         }
     }
 

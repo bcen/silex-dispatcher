@@ -77,4 +77,14 @@ class AnnotateMePlease
             'name' => 'method7'
         );
     }
+
+    /**
+     * @WillPaginate
+     * @PageLimit(5)
+     * @return array
+     */
+    public function method8()
+    {
+        return array(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11);
+    }
 }
