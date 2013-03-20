@@ -27,9 +27,6 @@ class PaginationListener implements EventSubscriberInterface
     public function onKernelView(GetResponseForControllerResultEvent $e)
     {
         $queryset = $e->getControllerResult();
-        if (!is_array($queryset)) {
-            return;
-        }
 
         $routeName = $e->getRequest()->attributes->get('_route');
         $route = $this->routes->get($routeName);
@@ -43,19 +40,23 @@ class PaginationListener implements EventSubscriberInterface
             return;
         }
 
-        /* @var \SDispatcher\Common\PaginatorInterface $paginator */
-        $paginator = new $paginatorClass();
-        list($headers, $data) = $paginator->paginate(
-            $e->getRequest(),
-            $queryset,
-            0,
-            $route->getOption(RouteOptions::PAGE_LIMIT),
-            $route->getOption(RouteOptions::PAGINATED_META_CONTAINER_NAME),
-            $route->getOption(RouteOptions::PAGINATED_DATA_CONTAINER_NAME));
+        try {
+            /* @var \SDispatcher\Common\PaginatorInterface $paginator */
+            $paginator = new $paginatorClass();
+            list($headers, $data) = $paginator->paginate(
+                $e->getRequest(),
+                $queryset,
+                0,
+                $route->getOption(RouteOptions::PAGE_LIMIT),
+                $route->getOption(RouteOptions::PAGINATED_META_CONTAINER_NAME),
+                $route->getOption(RouteOptions::PAGINATED_DATA_CONTAINER_NAME));
+        } catch (\InvalidArgumentException $ex) {
+            list($headers, $data) = array(array(), array());
+        }
 
-        $e->setControllerResult($data);
         $response = new DataResponse($data);
         $response->headers->add($headers);
+        $e->setResponse($response);
     }
 
     /**
