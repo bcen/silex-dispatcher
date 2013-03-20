@@ -43,6 +43,22 @@ class RouteOptionInspectorTest extends AbstractMiddlewareTestCaseHelper
     /**
      * @test
      */
+    public function it_should_resolve_option_from_parent_class()
+    {
+        $request = Request::create('/r');
+        $app = new Application();
+        $app->before(new RouteOptionInspector($app['routes']));
+        $app->get('/r', 'SDispatcher\\Tests\\Fixture\\SubclassAnnotation::method1');
+        $app->handle($request);
+        $route = $this->getCurrentRoute($app, $request);
+        $this->assertEquals(
+            'my_resource_identifier',
+            $route->getOption(RouteOptions::RESOURCE_ID));
+    }
+
+    /**
+     * @test
+     */
     public function it_should_resolve_to_default_values_if_no_annotation_at_all()
     {
         $request = Request::create('/a/wow');

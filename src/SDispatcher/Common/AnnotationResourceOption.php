@@ -77,15 +77,19 @@ class AnnotationResourceOption extends AbstractResourceOption
 
             // If we do not have method annotation,
             // then look at the class annotation
-            $classAnnotation = $this->annotationReader->getClassAnnotation(
-                $this->reflectionClass,
-                $annotationName);
-
-            if ($classAnnotation
-                && $classAnnotation instanceof AbstractAnnotation
-            ) {
-                $out = $classAnnotation->values();
-                return true;
+            $class = $this->reflectionClass;
+            while ($class) {
+                $classAnnotation = $this->annotationReader->getClassAnnotation(
+                    $class,
+                    $annotationName);
+                if ($classAnnotation
+                    && $classAnnotation instanceof AbstractAnnotation
+                ) {
+                    $out = $classAnnotation->values();
+                    return true;
+                } else {
+                    $class = $class->getParentClass();
+                }
             }
         } catch (\Exception $ex) {
             // Lazily catch any exception and return false, and set
