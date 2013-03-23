@@ -3,6 +3,9 @@ namespace SDispatcher;
 
 use Symfony\Component\HttpFoundation\Request;
 
+/**
+ * @deprecated
+ */
 interface DispatchableInterface
 {
     /**

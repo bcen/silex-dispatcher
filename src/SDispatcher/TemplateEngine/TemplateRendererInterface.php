@@ -1,6 +1,9 @@
 <?php
 namespace SDispatcher\TemplateEngine;
 
+/**
+ * @deprecated
+ */
 interface TemplateRendererInterface
 {
     /**

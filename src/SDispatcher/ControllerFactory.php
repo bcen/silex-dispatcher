@@ -14,6 +14,7 @@ use Symfony\Component\HttpFoundation\Response;
 
 /**
  * Used to create a closure controller for {@link \Silex\Application} route.
+ * @deprecated
  */
 class ControllerFactory
 {

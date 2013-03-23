@@ -3,6 +3,9 @@ namespace SDispatcher\TemplateEngine;
 
 use Mustache_Engine;
 
+/**
+ * @deprecated
+ */
 class MustacheRendererAdapter implements TemplateRendererInterface
 {
     /**
