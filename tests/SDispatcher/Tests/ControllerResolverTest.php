@@ -1,8 +1,9 @@
 <?php
 namespace SDispatcher\Tests;
 
-use SDispatcher\Tests\Fixture\ResolveMePlease;
 use SDispatcher\ControllerResolver;
+use SDispatcher\Tests\Fixture\ResolveMePlease;
+use Silex\Application;
 use Symfony\Component\HttpFoundation\Request;
 
 class ControllerResolverTest extends \PHPUnit_Framework_TestCase
@@ -12,7 +13,7 @@ class ControllerResolverTest extends \PHPUnit_Framework_TestCase
      */
     public function it_should_resolve_by_class_name_from_container()
     {
-        $app = new \Silex\Application();
+        $app = new Application();
         $app['SDispatcher\\Tests\\Fixture\\ResolveMePlease'] = $app->share(function () {
             return new ResolveMePlease();
         });
@@ -32,7 +33,7 @@ class ControllerResolverTest extends \PHPUnit_Framework_TestCase
      */
     public function it_should_resolve_by_name_from_container()
     {
-        $app = new \Silex\Application();
+        $app = new Application();
         $app['arcphssFlag'] = true;
 
         $controller = function ($arcphssFlag) { };
@@ -51,7 +52,7 @@ class ControllerResolverTest extends \PHPUnit_Framework_TestCase
      */
     public function it_should_resolve_default_value()
     {
-        $app = new \Silex\Application();
+        $app = new Application();
 
         $controller = function ($arcphssFlag = 'flag') { };
 
@@ -69,7 +70,7 @@ class ControllerResolverTest extends \PHPUnit_Framework_TestCase
      */
     public function it_should_resolve_by_name_over_by_class_name()
     {
-        $app = new \Silex\Application();
+        $app = new Application();
 
         $app['SDispatcher\\Tests\\Fixture\\ResolveMePlease'] = $app->share(function () {
             return new ResolveMePlease();
@@ -92,13 +93,13 @@ class ControllerResolverTest extends \PHPUnit_Framework_TestCase
      */
     public function functional_test()
     {
-        $app = new \Silex\Application();
+        $app = new Application();
         $app['resolver'] = new ControllerResolver($app);
         $app['SDispatcher\\Tests\\Fixture\\ResolveMePlease'] = function () {
             return new ResolveMePlease();
         };
         $app->get('/', function (ResolveMePlease $obj) {
-            return '';
+            return $obj->method1();
         });
         $response = $app->handle(Request::create('/'));
         $this->assertEquals(200, $response->getStatusCode());
