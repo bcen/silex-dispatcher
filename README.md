@@ -4,11 +4,6 @@ Silex-Dispatcher
 Master: [![Build Status](https://secure.travis-ci.org/bcen/silex-dispatcher.png?branch=master)](http://travis-ci.org/bcen/silex-dispatcher)
 Develop: [![Build Status](https://secure.travis-ci.org/bcen/silex-dispatcher.png?branch=develop)](http://travis-ci.org/bcen/silex-dispatcher)
 
-Silex-Dispatcher pretends to be a RESTful framework that built on top of
-[Silex](http://silex.sensiolabs.org/).
-It is inspired by [django-tastypie](https://github.com/toastdriven/django-tastypie)
-(No, not really, no inspiration, I copied django-tastypie line by line).
-
 
 ## Installation
 
@@ -17,7 +12,7 @@ Via [Composer](http://getcomposer.org/):
 
     {
         "require": {
-            "bcen/silex-dispatcher": "0.1.*"
+            "bcen/silex-dispatcher": "0.2.*"
         }
     }
 
@@ -25,84 +20,123 @@ Then run ```$ composer.phar install```
 
 ## Usage
 
-
-`index.php`
-
 ```php
-<?php
 
-use SDispatcher\Common\ResourceBundle;
+$app->register(new \SDispatcher\SDispatcherServiceProvider());
 
-require __DIR__ . '/vendor/autoload.php';
+// or registers the middlewares into global scope
 
-$app = new \Silex\Application();
-$app->register(new \SDispatcher\DispatchingServiceProvider());
-
-class NumbersResource extends \SDispatcher\DispatchableResource
-{
-    public function readList(ResourceBundle $bundle)
-    {
-        return array(1, 2, 3, 4);
-    }
-}
-
-$app['sdispatcher.controller_factory']->makeRoute($app, '/numbers', 'NumbersResource');
-
-$app['debug'] = true;
-$app->run();
+$app->register(new \SDispatcher\SDispatcherServiceProvider(), array(
+    'sdispatcher.middleware.global' => true
+));
 
 ```
 
-```
-$ curl http://domain.com/numbers
-{"meta":{"offset":0,"limit":20,"total":4,"prevLink":null,"nextLink":null},"objects":[1,2,3,4]}
+## Features
 
-$ curl http://domain.com/numbers?limit=1
-{
-    "meta": {
-        "offset": 0,
-        "limit": 1,
-        "total": 4,
-        "prevLink": null,
-        "nextLink": "http://domain.com/numbers?limit=1&offset=1"
-    },
-    "objects": [
-        1
-    ]
-}
-````
+- `\SDispatcher\ControllerResolver`
 
-Note: You need URL rewrite to have a pretty URL; otherwise, http://domain.com/index.php/numbers.
-
-## Internal
-
-- ###### `\SDispatcher\ControllerFactory`
-    It is reponsible for generating an anonymous function
-    for a Silex route from a fqcn (Fully-Qualified Class Name) string and an optional route segments array.
-    e.g.
+    Resolves parameters by name from service container:
     
     ```php
-    $app->get('/numbers', $controllerFactory->createClosure('NumbersResource'));
-    // or alternative syntax
-    $app->get('/numbers', $controllerFactory('NumbersResource'));
-
-    // with route segments
-    $app->get('/show/{id}', $controllerFactory('ShowController', array('id')));
     
-    // shortcut to map a class to 'GET', 'POST', 'PUT', 'DELETE' by default.
-    // $delegate can be an instance of \Silex\Application or \Silex\ControllerCollection.
-    $controllerFactory->makeRoute($delegate, '/about', 'AboutController');
+    $app->get('/', 'ClassBasedController::index');
+    $app['someService'] = function () {
+        return new \stdClass();
+    };
     
-    // equivalent of above
-    $delegate->match('/about', $controllerFactory('AboutController'))->method('GET|POST|PUT|DELETE');
+    class ClassBasedController
+    {
+        public function index(Reqeust $request, $dispatcher, $monolog, $someService)
+        {
+            // $dispatcher === $app['dispatcher']
+            // $monolog === $app['monolog']
+            // $someService === $app['someService']
+            // ...
+        }
+    }
+    
     ```
-    Note: The mapped class must implement `\SDispatcher\DispatchableInterface`.
     
-    The generated anonymous function does four things.
-    - Gets all the values of the route segments. (e.g. '/show/{id}' -> '/show/1' -> '1')
-    - Creates a new instance of the mapped class and attemp to resolve the constructor dependencies with `\SDispatcher\Common\ClassResolver`
-    - Then call "doDispatch" on the mapped instance
-    - Returns the response object from "doDispatch"
+    Resolves parameters by typehint from service container:
+    
+    ```php
+    
+    $app->get('/', 'ClassBasedController::index');
+    $app['Doctrine\\ORM\\EntityManager'] = function ($c) {
+        return EntityManager::create(...);
+    };
+    
+    class ClassBasedController
+    {
+        public function index(Reqeust $request, \Doctrine\ORM\EntityManager $em)
+        {
+            // $em === $app['Doctrine\\ORM\\EntityManager']
+            // ...
+        }
+    }
+    
+    ```
+    
+    Works for anonymous function also:
+    
+    ```php
+    
+    $app['Doctrine\\ORM\\EntityManager'] = function ($c) {
+        return EntityManager::create(...);
+    };
+    $app->get('/', function (\Doctrine\ORM\EntityManager $em) {
+        // $em === $app['Doctrine\\ORM\\EntityManager']
+        // ...
+    });
+    
+    
+    ```
+    
+- `SDispatcher\Middleware\RouteOptionInspector`
+
+    As Silex middleware:
+    ```php
+    $app->before(new \SDispatcher\Middleware\RouteOptionInspector($app['routes']));
+    ```
+    
+    As event subscriber:
+    ```php
+    $app['dispatcher']->addSubscriber(new \SDispatcher\Middleware\RouteOptionInspector($app['routes']));
+    ```
+    
+    `RouteOptionInspector` inspects the annotations on class-based controller and resolves them into the
+    current route option.
+
+    See `\SDispatcher\Common\RouteOptions` for available options.  
+    See `\SDispatcher\Common\Annotation\*` for available annotations.
+    
+    Usage:
+    
+    ```php
+    
+    use SDispatcher\Common\Annotation\SupportedFormats;
+    
+    /**
+     * @SupportedFormats({"application/xml", "application/json"})
+     */
+    class ClassBasedController
+    {
+        public function index()
+        {
+        }
+    }
+    
+    ```
+    
+    The above will resolve into:
+
+    ```php
+    $routeName = $request->attributes->get('_route');
+    $app['routes']->get($routeName)->setOption(
+        'sdispatcher.route.supported_formats', 
+        array('application/xml', 'application/json'));
+    ```
 
 ## Testing
 
