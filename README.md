@@ -1,5 +1,8 @@
 Silex-Dispatcher
-----------------
+================
+
+Master: [![Build Status](https://secure.travis-ci.org/bcen/silex-dispatcher.png?branch=master)](http://travis-ci.org/bcen/silex-dispatcher)
+Develop: [![Build Status](https://secure.travis-ci.org/bcen/silex-dispatcher.png?branch=develop)](http://travis-ci.org/bcen/silex-dispatcher)
 
 Silex-Dispatcher pretends to be a RESTful framework that built on top of
 [Silex](http://silex.sensiolabs.org/).
