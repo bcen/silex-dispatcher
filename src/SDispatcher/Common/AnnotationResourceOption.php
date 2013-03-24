@@ -63,33 +63,42 @@ class AnnotationResourceOption extends AbstractResourceOption
             $out = $default;
             $annotationName = static::ANNOTATION_NAMESPACE . ucfirst($name);
 
-            // Inspects method first, since method has priority over class
-            $methodAnnotation = $this->annotationReader->getMethodAnnotation(
-                $this->reflectionMethod,
-                $annotationName);
+            try {
+                // Inspects method first, since method has priority over class
+                $methodAnnotation = $this
+                    ->annotationReader
+                    ->getMethodAnnotation(
+                        $this->reflectionMethod,
+                        $annotationName);
 
-            if ($methodAnnotation
-                && $methodAnnotation instanceof AbstractAnnotation
-            ) {
-                $out = $methodAnnotation->values();
-                return true;
+                if ($methodAnnotation
+                    && $methodAnnotation instanceof AbstractAnnotation
+                ) {
+                    $out = $methodAnnotation->values();
+                    return true;
+                }
+            } catch (\Exception $ex) {
             }
 
             // If we do not have method annotation,
             // then look at the class annotation
             $class = $this->reflectionClass;
             while ($class) {
-                $classAnnotation = $this->annotationReader->getClassAnnotation(
-                    $class,
-                    $annotationName);
-                if ($classAnnotation
-                    && $classAnnotation instanceof AbstractAnnotation
-                ) {
-                    $out = $classAnnotation->values();
-                    return true;
-                } else {
-                    $class = $class->getParentClass();
+                try {
+                    $classAnnotation = $this
+                        ->annotationReader
+                        ->getClassAnnotation(
+                            $class,
+                            $annotationName);
+                    if ($classAnnotation
+                        && $classAnnotation instanceof AbstractAnnotation
+                    ) {
+                        $out = $classAnnotation->values();
+                        return true;
+                    }
+                } catch (\Exception $ex) {
                 }
+                $class = $class->getParentClass();
             }
         } catch (\Exception $ex) {
             // Lazily catch any exception and return false, and set
