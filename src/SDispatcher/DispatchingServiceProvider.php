@@ -8,6 +8,9 @@ use SDispatcher\Common\ClassResolver;
 use Silex\Application;
 use Silex\ServiceProviderInterface;
 
+/**
+ * @deprecated
+ */
 class DispatchingServiceProvider implements ServiceProviderInterface
 {
     /**

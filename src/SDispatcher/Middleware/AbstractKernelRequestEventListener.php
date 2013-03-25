@@ -7,6 +7,10 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Event\GetResponseEvent;
 use Symfony\Component\HttpKernel\KernelEvents;
 
+/**
+ * It provides a base class for implementing listener as an event subscriber
+ * and Silex middleware listener.
+ */
 abstract class AbstractKernelRequestEventListener implements EventSubscriberInterface
 {
     /**

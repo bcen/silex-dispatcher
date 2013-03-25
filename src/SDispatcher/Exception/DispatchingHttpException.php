@@ -3,6 +3,9 @@ namespace SDispatcher\Exception;
 
 use Symfony\Component\HttpFoundation\Response;
 
+/**
+ * @deprecated
+ */
 class DispatchingHttpException extends DispatchingErrorException
 {
     /**

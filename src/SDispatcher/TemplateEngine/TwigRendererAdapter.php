@@ -3,6 +3,9 @@ namespace SDispatcher\TemplateEngine;
 
 use Twig_Environment;
 
+/**
+ * @deprecated
+ */
 class TwigRendererAdapter implements TemplateRendererInterface
 {
     /**

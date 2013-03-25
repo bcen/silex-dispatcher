@@ -8,6 +8,7 @@ use SDispatcher\Common\Exception\NoDependencyFoundException;
 
 /**
  * Used to create class and resolves its dependencies.
+ * @deprecated
  */
 class ClassResolver
 {

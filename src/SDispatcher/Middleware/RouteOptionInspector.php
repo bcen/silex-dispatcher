@@ -12,7 +12,7 @@ use Symfony\Component\Routing\RouteCollection;
  * Inspects the annotations on the controller(`_controller`) and injects options
  * into the current route(`_route`).
  *
- * This class cann be used as an event subscriber or as callback middleware.<br/>
+ * This class can be used as an event subscriber or as a callback middleware.<br/>
  * e.g.
  * <code>
  * $dispatcher->addSubscriber(new RouteOptionInspector($routes));

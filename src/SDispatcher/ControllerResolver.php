@@ -4,6 +4,7 @@ namespace SDispatcher;
 use Silex\Application;
 use Silex\ControllerResolver as SilexControllerResolver;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpKernel\Controller\ControllerResolverInterface;
 
 /**
  * Extends the base resolver to include resovling dependency from container by
@@ -11,6 +12,49 @@ use Symfony\Component\HttpFoundation\Request;
  */
 class ControllerResolver extends SilexControllerResolver
 {
+    /**
+     * @var \Symfony\Component\HttpKernel\Controller\ControllerResolverInterface
+     */
+    protected $resolver;
+
+    /**
+     * @var \Silex\Application
+     */
+    protected $app;
+
+    public function __construct(ControllerResolverInterface $resolver, Application $app)
+    {
+        $this->resolver = $resolver;
+        $this->app = $app;
+        parent::__construct($app, null);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getController(Request $request)
+    {
+        try {
+            $controller = $this->resolver->getController($request);
+        } catch (\LogicException $ex) {
+            $controller = parent::getController($request);
+        }
+        return $controller;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getArguments(Request $request, $controller)
+    {
+        try {
+            $args = $this->resolver->getArguments($request, $controller);
+        } catch (\RuntimeException $ex) {
+            $args = parent::getArguments($request, $controller);
+        }
+        return $args;
+    }
+
     /**
      * {@inheritdoc}
      */

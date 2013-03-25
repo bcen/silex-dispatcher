@@ -12,6 +12,9 @@ use SDispatcher\Exception\DispatchingErrorException;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
+/**
+ * @deprecated
+ */
 abstract class DispatchableController implements DispatchableInterface,
                                                  TemplateRendererAwareInterface
 {
