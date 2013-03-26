@@ -35,9 +35,9 @@ class ControllerResolver extends SilexControllerResolver
     public function getController(Request $request)
     {
         try {
-            $controller = $this->resolver->getController($request);
-        } catch (\LogicException $ex) {
             $controller = parent::getController($request);
+        } catch (\LogicException $ex) {
+            $controller = $this->resolver->getController($request);
         }
         return $controller;
     }
@@ -48,9 +48,9 @@ class ControllerResolver extends SilexControllerResolver
     public function getArguments(Request $request, $controller)
     {
         try {
-            $args = $this->resolver->getArguments($request, $controller);
-        } catch (\RuntimeException $ex) {
             $args = parent::getArguments($request, $controller);
+        } catch (\RuntimeException $ex) {
+            $args = $this->resolver->getArguments($request, $controller);
         }
         return $args;
     }
