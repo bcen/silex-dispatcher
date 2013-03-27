@@ -6,6 +6,7 @@ use SDispatcher\Common\RouteOptions;
 use Silex\Application;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpKernel\Controller\ControllerResolverInterface;
 use Symfony\Component\Routing\RouteCollection;
 
 /**
@@ -33,11 +34,18 @@ class RouteOptionInspector extends AbstractKernelRequestEventListener
     protected $routes;
 
     /**
-     * @param \Symfony\Component\Routing\RouteCollection $routes
+     * @var \Symfony\Component\HttpKernel\Controller\ControllerResolverInterface
      */
-    public function __construct(RouteCollection $routes)
+    protected $resolver;
+
+    /**
+     * @param \Symfony\Component\Routing\RouteCollection $routes
+     * @param \Symfony\Component\HttpKernel\Controller\ControllerResolverInterface $resolver
+     */
+    public function __construct(RouteCollection $routes, ControllerResolverInterface $resolver)
     {
         $this->routes = $routes;
+        $this->resolver = $resolver;
     }
 
     /**
@@ -45,11 +53,7 @@ class RouteOptionInspector extends AbstractKernelRequestEventListener
      */
     protected function doKernelRequest(Request $request)
     {
-        $controllerStr = $request->attributes->get('_controller');
-        if (!is_string($controllerStr)) {
-            return;
-        }
-        $controller = explode('::', $controllerStr);
+        $controller = $this->resolver->getController($request);
         if (is_array($controller) && count($controller) >= 2) {
             $options = $this->resolveControllerOptions(
                 $controller[0],
@@ -58,6 +62,7 @@ class RouteOptionInspector extends AbstractKernelRequestEventListener
             $route = $this->routes->get($routeName);
             $route->addOptions($options);
         }
+        $request->attributes->set('_controller', $controller);
         return null;
     }
 

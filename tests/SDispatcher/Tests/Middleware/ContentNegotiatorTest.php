@@ -17,7 +17,7 @@ class ContentNegotiatorTest extends AbstractMiddlewareTestCaseHelper
         $request = Request::create('/r');
         $request->headers->set('Accept', 'application/whatever');
         $app = new Application();
-        $app->before(new RouteOptionInspector($app['routes']));
+        $app->before(new RouteOptionInspector($app['routes'], $app['resolver']));
         $app->before(new ContentNegotiator($app['routes']));
         $app->get('/r', 'SDispatcher\\Tests\\Fixture\\AnnotateMePlease::method4');
         $response = $app->handle($request);
@@ -32,7 +32,7 @@ class ContentNegotiatorTest extends AbstractMiddlewareTestCaseHelper
         $request = Request::create('/r');
         $request->headers->set('Accept', 'application/json');
         $app = new Application();
-        $app->before(new RouteOptionInspector($app['routes']));
+        $app->before(new RouteOptionInspector($app['routes'], $app['resolver']));
         $app->before(new ContentNegotiator($app['routes']));
         $app->get('/r', 'SDispatcher\\Tests\\Fixture\\AnnotateMePlease::method4');
         $app->handle($request);
@@ -47,7 +47,7 @@ class ContentNegotiatorTest extends AbstractMiddlewareTestCaseHelper
     {
         $request = Request::create('/r?format=application/json');
         $app = new Application();
-        $app->before(new RouteOptionInspector($app['routes']));
+        $app->before(new RouteOptionInspector($app['routes'], $app['resolver']));
         $app->before(new ContentNegotiator($app['routes']));
         $app->get('/r', 'SDispatcher\\Tests\\Fixture\\AnnotateMePlease::method4');
         $app->handle($request);
@@ -62,7 +62,7 @@ class ContentNegotiatorTest extends AbstractMiddlewareTestCaseHelper
     {
         $request = Request::create('/r?format=json');
         $app = new Application();
-        $app->before(new RouteOptionInspector($app['routes']));
+        $app->before(new RouteOptionInspector($app['routes'], $app['resolver']));
         $app->before(new ContentNegotiator($app['routes']));
         $app->get('/r', 'SDispatcher\\Tests\\Fixture\\AnnotateMePlease::method4');
         $app->handle($request);
