@@ -34,62 +34,32 @@ $app->register(new \SDispatcher\SDispatcherServiceProvider(), array(
 
 ## Features
 
-- `\SDispatcher\ControllerResolver`
+- `SDispatcher\AbstractServiceProvider`
 
-    Resolves parameters by name from service container:
+    It provides a better and cleaner way to register service defintion.
     
     ```php
+    <?php
     
-    $app->get('/', 'ClassBasedController::index');
-    $app['someService'] = function () {
-        return new \stdClass();
-    };
-    
-    class ClassBasedController
+    class MyServiceProvider extends \SDispatcher\AbstractServiceProvider
     {
-        public function index(Reqeust $request, $dispatcher, $monolog, $someService)
+        public function getServiceDefinitionProvider()
         {
-            // $dispatcher === $app['dispatcher']
-            // $monolog === $app['monolog']
-            // $someService === $app['someService']
-            // ...
+            return new MyServiceDefinitionProvider();
         }
     }
     
-    ```
-    
-    Resolves parameters by typehint from service container:
-    
-    ```php
-    
-    $app->get('/', 'ClassBasedController::index');
-    $app['Doctrine\\ORM\\EntityManager'] = function ($c) {
-        return EntityManager::create(...);
-    };
-    
-    class ClassBasedController
+    class MyServiceDefinitionProvider implements \SDispatcher\ServiceDefinitionProviderInterface
     {
-        public function index(Reqeust $request, \Doctrine\ORM\EntityManager $em)
+        public function getServices(\Silex\Application $app)
         {
-            // $em === $app['Doctrine\\ORM\\EntityManager']
-            // ...
+            return array(
+                'my.service1' => $app->share(function ($container) {
+                    // ...
+                }),
+            );
         }
     }
-    
-    ```
-    
-    Works for anonymous function also:
-    
-    ```php
-    
-    $app['Doctrine\\ORM\\EntityManager'] = function ($c) {
-        return EntityManager::create(...);
-    };
-    $app->get('/', function (\Doctrine\ORM\EntityManager $em) {
-        // $em === $app['Doctrine\\ORM\\EntityManager']
-        // ...
-    });
-    
     
     ```
     

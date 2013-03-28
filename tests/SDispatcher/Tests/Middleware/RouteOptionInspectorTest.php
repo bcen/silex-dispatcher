@@ -15,7 +15,7 @@ class RouteOptionInspectorTest extends AbstractMiddlewareTestCaseHelper
     {
         $request = Request::create('/r');
         $app = new Application();
-        $app->before(new RouteOptionInspector($app['routes']));
+        $app->before(new RouteOptionInspector($app['routes'], $app['resolver']));
         $app->get('/r', 'SDispatcher\\Tests\\Fixture\\AnnotateMePlease::method1');
         $app->handle($request);
         $route = $this->getCurrentRoute($app, $request);
@@ -31,7 +31,7 @@ class RouteOptionInspectorTest extends AbstractMiddlewareTestCaseHelper
     {
         $request = Request::create('/r');
         $app = new Application();
-        $app->before(new RouteOptionInspector($app['routes']));
+        $app->before(new RouteOptionInspector($app['routes'], $app['resolver']));
         $app->get('/r', 'SDispatcher\\Tests\\Fixture\\AnnotateMePlease::method3');
         $app->handle($request);
         $route = $this->getCurrentRoute($app, $request);
@@ -47,7 +47,7 @@ class RouteOptionInspectorTest extends AbstractMiddlewareTestCaseHelper
     {
         $request = Request::create('/r');
         $app = new Application();
-        $app->before(new RouteOptionInspector($app['routes']));
+        $app->before(new RouteOptionInspector($app['routes'], $app['resolver']));
         $app->get('/r', 'SDispatcher\\Tests\\Fixture\\SubclassAnnotation::method1');
         $app->handle($request);
         $route = $this->getCurrentRoute($app, $request);
@@ -64,7 +64,7 @@ class RouteOptionInspectorTest extends AbstractMiddlewareTestCaseHelper
         $request = Request::create('/a/wow');
         $app = new Application();
         $app['debug'] = true;
-        $app->before(new RouteOptionInspector($app['routes']));
+        $app->before(new RouteOptionInspector($app['routes'], $app['resolver']));
         $app->get('/a/wow', 'SDispatcher\\Tests\\Fixture\\ResolveMePlease::method1');
         $app->handle($request);
         $route = $this->getCurrentRoute($app, $request);

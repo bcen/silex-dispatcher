@@ -23,7 +23,7 @@ class PaginationListenerTest extends \PHPUnit_Framework_TestCase
         $app['debug'] = true;
         $app['dispatcher']->addSubscriber(new PaginationListener($app['routes']));
         $app['dispatcher']->addSubscriber(new ArrayToDataResponseListener());
-        $app->before(new RouteOptionInspector($app['routes']));
+        $app->before(new RouteOptionInspector($app['routes'], $app['resolver']));
         $app->before(new ContentNegotiator($app['routes']));
         $app->after(new SerializationInspector($app['routes']));
         $app->get('/r', 'SDispatcher\\Tests\\Fixture\\AnnotateMePlease::method8');

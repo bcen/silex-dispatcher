@@ -9,6 +9,7 @@ use Symfony\Component\HttpKernel\Controller\ControllerResolverInterface;
 /**
  * Extends the base resolver to include resovling dependency from container by
  * class name or argument name.
+ * @deprecated
  */
 class ControllerResolver extends SilexControllerResolver
 {

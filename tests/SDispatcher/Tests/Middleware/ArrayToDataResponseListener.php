@@ -16,7 +16,7 @@ class ArrayToDataResponseListenerTest extends \PHPUnit_Framework_TestCase
     public function it_should_convert_array_to_data_response_for_serialization()
     {
         $app = new Application();
-        $app->before(new RouteOptionInspector($app['routes']));
+        $app->before(new RouteOptionInspector($app['routes'], $app['resolver']));
         $app->before(new ContentNegotiator($app['routes']));
         $app->after(new SerializationInspector($app['routes']));
         $request = Request::create('/r.json');
