@@ -30,12 +30,6 @@ class SDispatcherServiceProvider implements ServiceProviderInterface
      */
     public function register(Application $app)
     {
-        $app['resolver'] = $app->share($app->extend(
-                'resolver',
-                function ($resolver, $app) {
-                    return new ControllerResolver($resolver, $app);
-                }));
-
         $globalMiddlewareId = 'sdispatcher.middleware.global';
 
         if (!isset($app[$globalMiddlewareId])) {
@@ -43,7 +37,9 @@ class SDispatcherServiceProvider implements ServiceProviderInterface
         }
 
         if ($app[$globalMiddlewareId]) {
-            $app->before(new RouteOptionInspector($app['routes']));
+            $app->before(new RouteOptionInspector(
+                $app['routes'],
+                $app['resolver']));
             $app->before(new ContentNegotiator($app['routes']));
             $app->before(new DeserializationInspector());
             $app->after(new SerializationInspector($app['routes']));
