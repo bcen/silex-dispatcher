@@ -16,11 +16,11 @@ class DeserializationInspector extends AbstractKernelRequestEventListener
 
         if ($contentType === 'application/json') {
             $data = @json_decode($content, true);
-            $request->request = new ParameterBag($data);
+            $request->request = new ParameterBag((array)$data);
         } elseif ($contentType === 'application/xml') {
             $data = $content ? (array)@simplexml_load_string(
                 $content, 'SimpleXMLElement', LIBXML_NOCDATA) : null;
-            $request->request = new ParameterBag($data);
+            $request->request = new ParameterBag((array)$data);
         }
     }
 }
