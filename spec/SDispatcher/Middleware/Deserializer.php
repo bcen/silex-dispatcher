@@ -39,43 +39,24 @@ class Deserializer extends ObjectBehavior
         $this->shouldHaveType('SDispatcher\Middleware\Deserializer');
     }
 
-    public function it_should_replace_request_param_if_json_found()
+    public function it_should_replace_request_param_with_decoded_content_if_format_is_supported()
     {
-        $request = Request::create(
-            '/',
-            'POST',
-            array(),
-            array(),
-            array(),
-            array(),
-            '{"message":"hello world"}');
-        $this->decoderProvider->supports('json')->willReturn(true);
-        $this->decoderProvider->getDecoder('json')->willReturn(new JsonDecoder());
-        $request->headers->set('Content-Type', 'application/json');
+        $requestParam = $this->prophet->prophesize('Symfony\\Component\\HttpFoundation\\ParameterBag');
+        $request = Request::create('/');
+        $request->request = $requestParam->reveal();
+        $requestParam->replace(Argument::any())->shouldBeCalled();
+        $this->decoderProvider->supports(Argument::any())->willReturn(true);
+        $this->decoderProvider->getDecoder(Argument::any())->willReturn(new JsonDecoder());
         $this->__invoke($request);
-
-        if ($request->request->get('message') !== 'hello world') {
-            throw new \Exception();
-        }
     }
 
-    public function it_should_replace_request_param_if_xml_found()
+    public function it_should_not_replace_request_param_if_format_is_not_supported()
     {
-        $request = Request::create(
-            '/',
-            'POST',
-            array(),
-            array(),
-            array(),
-            array(),
-            '<xml><message>hello world</message></xml>');
-        $this->decoderProvider->supports('xml')->willReturn(true);
-        $this->decoderProvider->getDecoder('xml')->willReturn(new XmlDecoder());
-        $request->headers->set('Content-Type', 'application/xml');
+        $requestParam = $this->prophet->prophesize('Symfony\\Component\\HttpFoundation\\ParameterBag');
+        $request = Request::create('/');
+        $request->request = $requestParam->reveal();
+        $requestParam->replace(Argument::any())->shouldNotBeCalled();
+        $this->decoderProvider->supports(Argument::any())->willReturn(false);
         $this->__invoke($request);
-
-        if ($request->request->get('message') !== 'hello world') {
-            throw new \Exception();
-        }
     }
 }

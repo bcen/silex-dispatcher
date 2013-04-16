@@ -59,9 +59,9 @@ class ContentNegotiator extends ObjectBehavior implements CustomMatchersProvider
 
     public function it_should_convert_format_from_query_string_to_request_attribute()
     {
-        $request = Request::create('/?format=json');
+        $request = Request::create('/?format=my_format');
         $this->__invoke($request);
-        if ($request->attributes->get('_format') !== 'json') {
+        if ($request->attributes->get('_format') !== 'my_format') {
             throw new \Exception();
         }
     }
@@ -75,7 +75,7 @@ class ContentNegotiator extends ObjectBehavior implements CustomMatchersProvider
         $this->__invoke($request)->shouldReturn(null);
     }
 
-    public function it_should_return_406_response_if_no_accetpable_formats_found()
+    public function it_should_return_406_response_if_no_best_format_found()
     {
         $this->formatNegotiator->getBestFormat(Argument::cetera())->willReturn(null);
         $this->route->getOption(Argument::any())->shouldBeCalled();

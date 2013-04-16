@@ -15,6 +15,9 @@ class RouteOptionInspector extends ObjectBehavior
      */
     private $prophet;
 
+    /**
+     * @var \Prophecy\Prophecy\ObjectProphecy
+     */
     private $route;
 
     /**
