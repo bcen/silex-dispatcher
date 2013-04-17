@@ -52,7 +52,7 @@ class PaginationListener extends ObjectBehavior
         $this->shouldHaveType('SDispatcher\Middleware\PaginationListener');
     }
 
-    public function it_should_shortcuit_if_WillPaginate_is_false()
+    public function it_should_shortcircuit_if_WillPaginate_is_false()
     {
         $request = Request::create('/');
 
@@ -61,6 +61,19 @@ class PaginationListener extends ObjectBehavior
 
         $this->route->getOption(RouteOptions::WILL_PAGINGATE)->willReturn(false);
         $this->route->getOption(RouteOptions::PAGINATOR_CLASS)->shouldNotBeCalled();
+
+        $this->onKernelView($this->event->reveal())->shouldReturn(null);
+    }
+
+    public function it_should_shortcircuit_if_PaginatorClass_does_not_implement_the_correct_interface()
+    {
+        $request = Request::create('/');
+
+        $this->event->getControllerResult()->willReturn(array());
+        $this->event->getRequest()->willReturn($request);
+
+        $this->route->getOption(RouteOptions::WILL_PAGINGATE)->willReturn(true);
+        $this->route->getOption(RouteOptions::PAGINATOR_CLASS)->willReturn('stdClass');
 
         $this->onKernelView($this->event->reveal())->shouldReturn(null);
     }
