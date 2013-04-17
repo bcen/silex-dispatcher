@@ -16,15 +16,14 @@ abstract class AbstractServiceProvider implements ServiceProviderInterface
      */
     public function register(Application $app)
     {
-        $params = $this
-            ->getServiceDefinitionProvider()
-            ->getDefaultParameters($app);
+        $servicesDefinitionProvider = $this->getServiceDefinitionProvider($app);
+        $params = $servicesDefinitionProvider->getDefaultParameters($app);
         foreach ((array)$params as $key => $value) {
             if (!isset($app[$key])) {
                 $app[$key] = $value;
             }
         }
-        $services = $this->getServiceDefinitionProvider()->getServices($app);
+        $services = $servicesDefinitionProvider->getServices($app);
         foreach ($services as $id => $definition) {
             $app[$id] = $definition;
         }
