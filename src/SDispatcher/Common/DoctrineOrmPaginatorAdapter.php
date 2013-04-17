@@ -2,6 +2,7 @@
 namespace SDispatcher\Common;
 
 use Doctrine\ORM\Tools\Pagination\Paginator;
+use Symfony\Component\HttpFoundation\Request;
 
 /**
  * A wrapper adatper around Doctrine ORM Paginator.
@@ -22,14 +23,14 @@ class DoctrineOrmPaginatorAdapter extends AbstractPaginator
     /**
      * {@inheritdoc}
      */
-    protected function slice($queryset, $offset, $limit)
+    protected function slice($queryset, $offset, $limit, Request $request)
     {
         /* @var \Doctrine\ORM\Tools\Pagination\Paginator $queryset */
         $queryset->getQuery()->setFirstResult($offset)->setMaxResults($limit);
         $data = array();
         foreach ($queryset as $obj) {
             if ($obj instanceof NormalizableInterface) {
-                $data[] = $obj->normalize();
+                $data[] = $obj->normalize($request->query->all());
             }
         }
         return $data;

@@ -7,7 +7,7 @@ namespace SDispatcher\Common\Annotation;
  */
 class SupportedFormats extends AbstractAnnotation
 {
-    public $formats = array('application/json');
+    public $formats = array('json');
 
     public function values()
     {

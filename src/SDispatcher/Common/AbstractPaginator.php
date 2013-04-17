@@ -18,9 +18,10 @@ abstract class AbstractPaginator implements PaginatorInterface
      * @param mixed $queryset
      * @param int $offset
      * @param int $limit
+     * @param \Symfony\Component\HttpFoundation\Request $request
      * @return mixed
      */
-    abstract protected function slice($queryset, $offset, $limit);
+    abstract protected function slice($queryset, $offset, $limit, Request $request);
 
     /**
      * Counts the total results from queryset.
@@ -97,7 +98,7 @@ abstract class AbstractPaginator implements PaginatorInterface
             $request->headers->get('X-Pagination-Limit', $defaultLimit)
         );
 
-        $objects = $this->slice($queryset, $offset, $limit);
+        $objects = $this->slice($queryset, $offset, $limit, $request);
         $total = $this->countTotal($queryset);
         $prevLink = $this->createPrevLink($request, $offset, $limit);
         $nextLink = $this->createNextLink($request, $offset, $limit, $total);

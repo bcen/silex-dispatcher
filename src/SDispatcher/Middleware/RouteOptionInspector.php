@@ -3,7 +3,6 @@ namespace SDispatcher\Middleware;
 
 use SDispatcher\Common\AnnotationResourceOption;
 use SDispatcher\Common\RouteOptions;
-use Silex\Application;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Controller\ControllerResolverInterface;
@@ -39,13 +38,20 @@ class RouteOptionInspector extends AbstractKernelRequestEventListener
     protected $resolver;
 
     /**
+     * @var \SDispatcher\Common\AnnotationResourceOption
+     */
+    protected $annotationResourceOption;
+
+    /**
      * @param \Symfony\Component\Routing\RouteCollection $routes
      * @param \Symfony\Component\HttpKernel\Controller\ControllerResolverInterface $resolver
+     * @param \SDispatcher\Common\AnnotationResourceOption $annotationResourceOption
      */
-    public function __construct(RouteCollection $routes, ControllerResolverInterface $resolver)
+    public function __construct(RouteCollection $routes, ControllerResolverInterface $resolver, AnnotationResourceOption $annotationResourceOption)
     {
         $this->routes = $routes;
         $this->resolver = $resolver;
+        $this->annotationResourceOption = $annotationResourceOption;
     }
 
     /**
@@ -74,15 +80,15 @@ class RouteOptionInspector extends AbstractKernelRequestEventListener
      */
     protected function resolveControllerOptions($controller, $method)
     {
-        $resourceOption = new AnnotationResourceOption($controller, $method);
+        $this->annotationResourceOption->setTarget($controller, $method);
         $options = array(
-            RouteOptions::SUPPORTED_FORMATS             => $resourceOption->getSupportedFormats(),
-            RouteOptions::RESOURCE_ID                   => $resourceOption->getResourceIdentifier(),
-            RouteOptions::PAGE_LIMIT                    => $resourceOption->getPageLimit(),
-            RouteOptions::WILL_PAGINGATE                => $resourceOption->willPaginate(),
-            RouteOptions::PAGINATOR_CLASS               => $resourceOption->getPaginatorClass(),
-            RouteOptions::PAGINATED_DATA_CONTAINER_NAME => $resourceOption->getPaginatedDataContainerName(),
-            RouteOptions::PAGINATED_META_CONTAINER_NAME => $resourceOption->getPaginatedMetaContainerName(),
+            RouteOptions::SUPPORTED_FORMATS             => $this->annotationResourceOption->getSupportedFormats(),
+            RouteOptions::RESOURCE_ID                   => $this->annotationResourceOption->getResourceIdentifier(),
+            RouteOptions::PAGE_LIMIT                    => $this->annotationResourceOption->getPageLimit(),
+            RouteOptions::WILL_PAGINGATE                => $this->annotationResourceOption->willPaginate(),
+            RouteOptions::PAGINATOR_CLASS               => $this->annotationResourceOption->getPaginatorClass(),
+            RouteOptions::PAGINATED_DATA_CONTAINER_NAME => $this->annotationResourceOption->getPaginatedDataContainerName(),
+            RouteOptions::PAGINATED_META_CONTAINER_NAME => $this->annotationResourceOption->getPaginatedMetaContainerName(),
         );
         return $options;
     }
