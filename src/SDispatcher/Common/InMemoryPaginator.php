@@ -22,7 +22,7 @@ class InMemoryPaginator extends AbstractPaginator
     /**
      * {@inheritdoc}
      */
-    protected function slice($queryset, $offset, $limit)
+    protected function slice($queryset, $offset, $limit, Request $request)
     {
         return array_slice($queryset, $offset, $limit);
     }
