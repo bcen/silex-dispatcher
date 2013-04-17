@@ -3,13 +3,10 @@
 namespace spec\SDispatcher\Common;
 
 use PHPSpec2\ObjectBehavior;
-
-// DO NOT REMOVE NAMESPACES BELOW THIS
-// -----------------------------------
-use SDispatcher\Common\Annotation\SupportedFormats;
+use SDispatcher\Common\Annotation as REST;
 
 /**
- * @SupportedFormats("xml")
+ * @REST\SupportedFormats("xml")
  */
 class AnnotationResourceOption extends ObjectBehavior
 {
@@ -42,12 +39,25 @@ class AnnotationResourceOption extends ObjectBehavior
         $this->getSupportedFormats()->shouldReturn(array('xml'));
     }
 
+    public function it_reads_through_the_class_hierarchy()
+    {
+        $this->setTarget('spec\\SDispatcher\\Common\\DummyClass', 'dummyMethod');
+        $this->getSupportedFormats()->shouldReturn(array('xml'));
+    }
+
     /**
-     * @SupportedFormats("html")
+     * @REST\SupportedFormats("html")
      */
     public function it_should_read_annotation_from_method_over_class()
     {
         $this->setTarget('spec\\SDispatcher\\Common\AnnotationResourceOption', 'it_should_read_annotation_from_method_over_class');
         $this->getSupportedFormats()->shouldReturn(array('html'));
+    }
+}
+
+class DummyClass extends AnnotationResourceOption
+{
+    public function dummyMethod()
+    {
     }
 }

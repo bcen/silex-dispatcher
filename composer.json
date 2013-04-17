@@ -15,7 +15,6 @@
     },
     "require": {
         "friendsofsymfony/rest": "0.8.*@dev",
-        "silex/silex": "1.0.*@dev",
         "symfony/serializer": ">=2.1,<2.3-dev",
         "symfony/http-foundation": ">=2.1,<2.3-dev",
         "symfony/http-kernel": ">=2.1,<2.3-dev",
@@ -24,6 +23,7 @@
         "doctrine/common": "2.3.*"
     },
     "require-dev": {
+        "silex/silex": "1.0.*@dev",
         "phpspec/prophecy": "~1.0@dev",
         "symfony/config": ">=2.1,<2.3-dev",
         "phpspec/phpspec2": "1.0.*@dev",
