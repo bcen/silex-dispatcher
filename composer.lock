@@ -1,5 +1,5 @@
 {
-    "hash": "55f515dca1ca02ddf5017f8f06fccc16",
+    "hash": "b90d286a33c7e46b0afb3cde0487ed6f",
     "packages": [
         {
             "name": "doctrine/common",
@@ -517,6 +517,53 @@
             "description": "Symfony Routing Component",
             "homepage": "http://symfony.com",
             "time": "2013-03-23 12:03:22"
+        },
+        {
+            "name": "symfony/serializer",
+            "version": "v2.2.1",
+            "target-dir": "Symfony/Component/Serializer",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/symfony/Serializer.git",
+                "reference": "v2.2.1"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/symfony/Serializer/zipball/v2.2.1",
+                "reference": "v2.2.1",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=5.3.3"
+            },
+            "type": "library",
+            "extra": {
+                "branch-alias": {
+                    "dev-master": "2.2-dev"
+                }
+            },
+            "autoload": {
+                "psr-0": {
+                    "Symfony\\Component\\Serializer\\": ""
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Fabien Potencier",
+                    "email": "fabien@symfony.com"
+                },
+                {
+                    "name": "Symfony Community",
+                    "homepage": "http://symfony.com/contributors"
+                }
+            ],
+            "description": "Symfony Serializer Component",
+            "homepage": "http://symfony.com",
+            "time": "2013-03-06 21:43:23"
         },
         {
             "name": "twig/twig",

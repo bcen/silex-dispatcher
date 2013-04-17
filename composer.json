@@ -16,6 +16,7 @@
     "require": {
         "friendsofsymfony/rest": "0.8.*@dev",
         "silex/silex": "1.0.*@dev",
+        "symfony/serializer": ">=2.1,<2.3-dev",
         "symfony/http-foundation": ">=2.1,<2.3-dev",
         "symfony/http-kernel": ">=2.1,<2.3-dev",
         "symfony/event-dispatcher": ">=2.1,<2.3-dev",

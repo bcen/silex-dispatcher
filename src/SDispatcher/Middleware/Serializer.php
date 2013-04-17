@@ -4,11 +4,13 @@ namespace SDispatcher\Middleware;
 use SDispatcher\Common\RouteOptions;
 use SDispatcher\DataResponse;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
+use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Event\FilterResponseEvent;
 use Symfony\Component\HttpKernel\KernelEvents;
 use Symfony\Component\Routing\RouteCollection;
+use Symfony\Component\Serializer\Encoder\EncoderInterface;
 
 class Serializer implements EventSubscriberInterface
 {
@@ -18,11 +20,18 @@ class Serializer implements EventSubscriberInterface
     protected $routes;
 
     /**
-     * @param \Symfony\Component\Routing\RouteCollection $routes
+     * @var \Symfony\Component\Serializer\Encoder\EncoderInterface
      */
-    public function __construct(RouteCollection $routes)
+    protected $encoder;
+
+    /**
+     * @param \Symfony\Component\Routing\RouteCollection $routes
+     * @param \Symfony\Component\Serializer\Encoder\EncoderInterface $encoder
+     */
+    public function __construct(RouteCollection $routes, EncoderInterface $encoder)
     {
         $this->routes = $routes;
+        $this->encoder = $encoder;
     }
 
     /**
@@ -55,6 +64,21 @@ class Serializer implements EventSubscriberInterface
         if (!$acceptedFormat) {
             $response->setContent('');
             $response->setStatusCode(406);
+        }
+
+        if ($this->encoder->supportsEncoding($acceptedFormat)
+            && $acceptedFormat === 'json'
+        ) {
+            $contentType = $request->getMimeType($acceptedFormat);
+            $jsonResponse = new JsonResponse($response->getContent());
+            $response->setContent($jsonResponse->getContent());
+            $response->headers->set('Content-Type', $contentType);
+        } elseif ($this->encoder->supportsEncoding($acceptedFormat)) {
+            $contentType = $request->getMimeType($acceptedFormat);
+            $content = $this->encoder->encode(
+                $response->getContent(), $acceptedFormat);
+            $response->setContent($content);
+            $response->headers->set('Content-Type', $contentType);
         }
     }
 
