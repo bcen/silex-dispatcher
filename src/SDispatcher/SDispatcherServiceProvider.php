@@ -1,7 +1,6 @@
 <?php
 namespace SDispatcher;
 
-use SDispatcher\Middleware\PaginationListener;
 use Silex\Application;
 
 /**
