@@ -35,7 +35,7 @@ class SDispatcherServiceProvider extends AbstractServiceProvider
 
         /* @var \Symfony\Component\EventDispatcher\EventDispatcher $ed */
         $ed = $app['dispatcher'];
-        $ed->addSubscriber(new PaginationListener($app['routes']));
+        $ed->addSubscriber($app[ServiceDefinitionProvider::PAGINATION_LISTENER]);
 //        $ed->addSubscriber(new ArrayToDataResponseListener($app['routes']));
     }
 
