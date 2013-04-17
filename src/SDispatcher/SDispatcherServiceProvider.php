@@ -1,14 +1,8 @@
 <?php
 namespace SDispatcher;
 
-use SDispatcher\Middleware\ArrayToDataResponseListener;
-use SDispatcher\Middleware\ContentNegotiator;
-use SDispatcher\Middleware\DeserializationInspector;
 use SDispatcher\Middleware\PaginationListener;
-use SDispatcher\Middleware\RouteOptionInspector;
-use SDispatcher\Middleware\SerializationInspector;
 use Silex\Application;
-use Silex\ServiceProviderInterface;
 
 /**
  * It registers:
@@ -23,32 +17,34 @@ use Silex\ServiceProviderInterface;
  * - `SDispatcher\Middleware\PaginationListener`
  * - `SDispatcher\Middleware\ArrayToDataResponseListener`
  */
-class SDispatcherServiceProvider implements ServiceProviderInterface
+class SDispatcherServiceProvider extends AbstractServiceProvider
 {
     /**
      * {@inheritdoc}
      */
     public function register(Application $app)
     {
-        $globalMiddlewareId = 'sdispatcher.middleware.global';
+        parent::register($app);
 
-        if (!isset($app[$globalMiddlewareId])) {
-            $app[$globalMiddlewareId] = false;
-        }
-
-        if ($app[$globalMiddlewareId]) {
-            $app->before(new RouteOptionInspector(
-                $app['routes'],
-                $app['resolver']));
-            $app->before(new ContentNegotiator($app['routes']));
-            $app->before(new DeserializationInspector());
-            $app->after(new SerializationInspector($app['routes']));
+        if ($app[ServiceDefinitionProvider::GLOBAL_MIDDLEWARE]) {
+            $app->before($app[ServiceDefinitionProvider::OPTION_INSPECTOR]);
+            $app->before($app[ServiceDefinitionProvider::CONTENT_NEGOTIATOR]);
+            $app->before($app[ServiceDefinitionProvider::DESERIALIZER]);
+            $app->after($app[ServiceDefinitionProvider::SERIALIZER]);
         }
 
         /* @var \Symfony\Component\EventDispatcher\EventDispatcher $ed */
         $ed = $app['dispatcher'];
         $ed->addSubscriber(new PaginationListener($app['routes']));
-        $ed->addSubscriber(new ArrayToDataResponseListener($app['routes']));
+//        $ed->addSubscriber(new ArrayToDataResponseListener($app['routes']));
+    }
+
+    /**
+     * @return \SDispatcher\ServiceDefinitionProviderInterface
+     */
+    public function getServiceDefinitionProvider()
+    {
+        return new ServiceDefinitionProvider();
     }
 
     /**

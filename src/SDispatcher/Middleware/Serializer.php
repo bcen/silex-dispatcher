@@ -35,25 +35,25 @@ class Serializer implements EventSubscriberInterface
     }
 
     /**
-     * @see doKernelView()
+     * @see doKernelResponse()
      * @param \Symfony\Component\HttpKernel\Event\FilterResponseEvent $e
      */
-    public function onKernelView(FilterResponseEvent $e)
+    public function onKernelResponse(FilterResponseEvent $e)
     {
-        $this->doKernelView($e->getRequest(), $e->getResponse());
+        $this->doKernelResponse($e->getRequest(), $e->getResponse());
     }
 
     /**
-     * @see doKernelView()
+     * @see doKernelResponse()
      * @param Request $request
      * @param Response $response
      */
     public function __invoke(Request $request, Response $response)
     {
-        $this->doKernelView($request, $response);
+        $this->doKernelResponse($request, $response);
     }
 
-    protected function doKernelView(Request $request, Response $response)
+    protected function doKernelResponse(Request $request, Response $response)
     {
         if (!$response instanceof DataResponse) {
             return;
@@ -87,6 +87,6 @@ class Serializer implements EventSubscriberInterface
      */
     public static function getSubscribedEvents()
     {
-        return array(KernelEvents::RESPONSE => 'onKernelView');
+        return array(KernelEvents::RESPONSE => 'onKernelResponse');
     }
 }
