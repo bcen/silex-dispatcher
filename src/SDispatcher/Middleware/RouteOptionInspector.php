@@ -3,7 +3,6 @@ namespace SDispatcher\Middleware;
 
 use SDispatcher\Common\AnnotationResourceOption;
 use SDispatcher\Common\RouteOptions;
-use Silex\Application;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Controller\ControllerResolverInterface;
