@@ -3,6 +3,7 @@ namespace SDispatcher;
 
 use FOS\Rest\Util\FormatNegotiator;
 use SDispatcher\Common\AnnotationResourceOption;
+use SDispatcher\Common\DefaultXmlEncoder;
 use SDispatcher\Common\FOSDecoderProvider;
 use SDispatcher\Middleware\ContentNegotiator;
 use SDispatcher\Middleware\Deserializer;
@@ -12,7 +13,6 @@ use SDispatcher\Middleware\Serializer;
 use Silex\Application;
 use Symfony\Component\Serializer\Encoder\ChainEncoder;
 use Symfony\Component\Serializer\Encoder\JsonEncoder;
-use Symfony\Component\Serializer\Encoder\XmlEncoder;
 
 class ServiceDefinitionProvider implements ServiceDefinitionProviderInterface
 {
@@ -85,7 +85,7 @@ class ServiceDefinitionProvider implements ServiceDefinitionProviderInterface
         return $app->share(function ($container) {
             return new Serializer(
                 $container['routes'],
-                new ChainEncoder(array(new JsonEncoder(), new XmlEncoder())));
+                new ChainEncoder(array(new JsonEncoder(), new DefaultXmlEncoder())));
         });
     }
 

@@ -23,6 +23,7 @@
         "doctrine/common": "2.3.*"
     },
     "require-dev": {
+        "behat/behat": "2.4.*@stable",
         "silex/silex": "1.0.*@dev",
         "phpspec/prophecy": "~1.0@dev",
         "symfony/config": ">=2.1,<2.3-dev",
