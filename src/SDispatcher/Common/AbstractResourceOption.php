@@ -43,7 +43,7 @@ abstract class AbstractResourceOption implements ResourceOptionInterface
         $this->tryReadOption(
             'supportedFormats',
             $out,
-            array('application/json')
+            array('json')
         );
         return $out;
     }

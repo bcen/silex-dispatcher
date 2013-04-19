@@ -27,13 +27,17 @@ class AnnotationResourceOption extends AbstractResourceOption
      */
     protected $reflectionMethod;
 
-    public function __construct($classOrObj, $method)
+    public function __construct()
     {
         AnnotationRegistry::registerAutoloadNamespace(
             static::ANNOTATION_NAMESPACE, realpath(__DIR__ . '/../../'));
+        $this->annotationReader = new AnnotationReader();
+    }
+
+    public function setTarget($classOrObj, $method)
+    {
         $this->reflectionClass = new \ReflectionClass($classOrObj);
         $this->reflectionMethod = new \ReflectionMethod($classOrObj, $method);
-        $this->annotationReader = new AnnotationReader();
     }
 
     public function willPaginate()
@@ -59,8 +63,13 @@ class AnnotationResourceOption extends AbstractResourceOption
      */
     protected function tryReadOption($name, &$out, $default = null)
     {
+        $out = $default;
+
+        if (!$this->reflectionClass || !$this->reflectionMethod) {
+            return false;
+        }
+
         try {
-            $out = $default;
             $annotationName = static::ANNOTATION_NAMESPACE . ucfirst($name);
 
             try {
