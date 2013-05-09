@@ -12,6 +12,14 @@ class DoctrineOrmPaginatorAdapter extends AbstractPaginator
     /**
      * {@inheritdoc}
      */
+    public function supports($queryset)
+    {
+        return ($queryset instanceof Paginator);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     protected function validateQueryset($queryset)
     {
         if (!$queryset instanceof Paginator) {

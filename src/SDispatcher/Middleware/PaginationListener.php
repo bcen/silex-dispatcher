@@ -30,7 +30,7 @@ class PaginationListener implements EventSubscriberInterface
 
         $routeName = $e->getRequest()->attributes->get('_route');
         $route = $this->routes->get($routeName);
-        if (!$route || !$route->getOption(RouteOptions::WILL_PAGINGATE)) {
+        if (!$route) {
             return;
         }
 
@@ -43,6 +43,9 @@ class PaginationListener implements EventSubscriberInterface
         try {
             /* @var \SDispatcher\Common\PaginatorInterface $paginator */
             $paginator = new $paginatorClass();
+            if (!$paginator->supports($queryset)) {
+                return;
+            }
             list($headers, $data) = $paginator->paginate(
                 $e->getRequest(),
                 $queryset,
@@ -50,7 +53,7 @@ class PaginationListener implements EventSubscriberInterface
                 $route->getOption(RouteOptions::PAGE_LIMIT),
                 $route->getOption(RouteOptions::PAGINATED_META_CONTAINER_NAME),
                 $route->getOption(RouteOptions::PAGINATED_DATA_CONTAINER_NAME));
-        } catch (\InvalidArgumentException $ex) {
+        } catch (\Exception $ex) {
             list($headers, $data) = array(array(), array());
         }
 

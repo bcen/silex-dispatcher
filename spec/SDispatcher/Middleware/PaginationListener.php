@@ -5,6 +5,7 @@ namespace spec\SDispatcher\Middleware;
 use PHPSpec2\ObjectBehavior;
 use Prophecy\Argument;
 use Prophecy\Prophet;
+use SDispatcher\Common\InMemoryPaginator;
 use SDispatcher\Common\RouteOptions;
 use Symfony\Component\HttpFoundation\Request;
 
@@ -52,15 +53,14 @@ class PaginationListener extends ObjectBehavior
         $this->shouldHaveType('SDispatcher\Middleware\PaginationListener');
     }
 
-    public function it_should_shortcircuit_if_WillPaginate_is_false()
+    public function it_should_shortcircuit_if_queryset_is_not_supported()
     {
         $request = Request::create('/');
 
-        $this->event->getControllerResult()->willReturn(array());
+        $this->event->getControllerResult()->willReturn(new \stdClass());
         $this->event->getRequest()->willReturn($request);
 
-        $this->route->getOption(RouteOptions::WILL_PAGINGATE)->willReturn(false);
-        $this->route->getOption(RouteOptions::PAGINATOR_CLASS)->shouldNotBeCalled();
+        $this->route->getOption(RouteOptions::PAGINATOR_CLASS)->wilLReturn(new InMemoryPaginator());
 
         $this->onKernelView($this->event->reveal())->shouldReturn(null);
     }

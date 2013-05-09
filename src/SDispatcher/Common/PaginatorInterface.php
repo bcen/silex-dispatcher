@@ -9,6 +9,13 @@ use Symfony\Component\HttpFoundation\Request;
 interface PaginatorInterface
 {
     /**
+     * Whether the `$queryset` is supported or not.
+     * @param mixed $queryset
+     * @return bool
+     */
+    public function supports($queryset);
+
+    /**
      * @param \Symfony\Component\HttpFoundation\Request $request
      * @param mixed $queryset
      * @param int $defaultOffset
