@@ -85,7 +85,6 @@ class RouteOptionInspector extends AbstractKernelRequestEventListener
             RouteOptions::SUPPORTED_FORMATS             => $this->annotationResourceOption->getSupportedFormats(),
             RouteOptions::RESOURCE_ID                   => $this->annotationResourceOption->getResourceIdentifier(),
             RouteOptions::PAGE_LIMIT                    => $this->annotationResourceOption->getPageLimit(),
-            RouteOptions::WILL_PAGINGATE                => $this->annotationResourceOption->willPaginate(),
             RouteOptions::PAGINATOR_CLASS               => $this->annotationResourceOption->getPaginatorClass(),
             RouteOptions::PAGINATED_DATA_CONTAINER_NAME => $this->annotationResourceOption->getPaginatedDataContainerName(),
             RouteOptions::PAGINATED_META_CONTAINER_NAME => $this->annotationResourceOption->getPaginatedMetaContainerName(),
