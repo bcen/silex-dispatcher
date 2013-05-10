@@ -24,7 +24,6 @@ class AnnotationResourceOption extends ObjectBehavior
     {
         $this->getSupportedFormats()->shouldReturn(array('json'));
         $this->getDefaultFormat()->shouldReturn('json');
-        $this->willPaginate()->shouldReturn(false);
         $this->getPaginatorClass()->shouldReturn('SDispatcher\\Common\\InMemoryPaginator');
         $this->getPageLimit()->shouldReturn(20);
         $this->getAllowedMethods()->shouldReturn(array('GET'));

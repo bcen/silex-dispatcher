@@ -34,28 +34,12 @@ class AnnotationResourceOption extends AbstractResourceOption
         $this->annotationReader = new AnnotationReader();
     }
 
-    public function setTarget($classOrObj, $method)
+    public function setTarget($classOrObj, $method = null)
     {
         $this->reflectionClass = new \ReflectionClass($classOrObj);
-        $this->reflectionMethod = new \ReflectionMethod($classOrObj, $method);
-    }
-
-    public function willPaginate()
-    {
-        $this->tryReadOption(
-            'willPaginate',
-            $out,
-            false);
-        return $out;
-    }
-
-    public function getPaginatorClass()
-    {
-        $this->tryReadOption(
-            'paginatorClass',
-            $out,
-            'SDispatcher\\Common\\InMemoryPaginator');
-        return $out;
+        if (is_string($method)) {
+            $this->reflectionMethod = new \ReflectionMethod($classOrObj, $method);
+        }
     }
 
     /**

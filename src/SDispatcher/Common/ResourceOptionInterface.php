@@ -6,6 +6,14 @@ use SDispatcher\Common\PaginatorInterface;
 interface ResourceOptionInterface
 {
     /**
+     * Sets the target to inspect.
+     * @param mixed $classOrObj
+     * @param string $method
+     * @return void
+     */
+    public function setTarget($classOrObj, $method = null);
+
+    /**
      * Returns the default supported mime format.
      * @return string
      */
@@ -52,16 +60,31 @@ interface ResourceOptionInterface
 
     /**
      * Returns the paginator instance.
+     * @deprecated
      * @return \SDispatcher\Common\PaginatorInterface
      */
     public function getPaginator();
 
     /**
      * Sets the paginator instance.
+     * @deprecated
      * @param PaginatorInterface $paginator
      * @return \SDispatcher\Common\ResourceOptionInterface
      */
     public function setPaginator(PaginatorInterface $paginator);
+
+    /**
+     * Returns the paginator class tring
+     * @return string
+     */
+    public function getPaginatorClass();
+
+    /**
+     * Sets the paginator class string
+     * @param string $paginatorClass
+     * @return \SDispatcher\Common\ResourceOptionInterface
+     */
+    public function setPaginatorClass($paginatorClass);
 
     /**
      * Returns the identifier name for dehydration.
