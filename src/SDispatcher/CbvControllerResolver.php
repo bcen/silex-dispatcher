@@ -41,6 +41,6 @@ final class CbvControllerResolver implements ControllerResolverInterface
      */
     public function getArguments(Request $request, $controller)
     {
-        $this->getArguments($request, $controller);
+        return $this->resolver->getArguments($request, $controller);
     }
 }
