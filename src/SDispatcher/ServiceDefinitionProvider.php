@@ -59,7 +59,6 @@ class ServiceDefinitionProvider implements ServiceDefinitionProviderInterface
         return $app->share(function ($container) use ($rcOption) {
             return new RouteOptionInspector(
                 $container['routes'],
-                $container['resolver'],
                 $container[$rcOption]);
         });
     }
