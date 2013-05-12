@@ -37,6 +37,7 @@ class ServiceDefinitionProvider implements ServiceDefinitionProviderInterface
     public function getServices(Application $app)
     {
         return array(
+            'resolver'                  => $this->extendResolver($app),
             static::RESOURCE_OPTION     => $this->defineAnnotationResourceOption($app),
             static::OPTION_INSPECTOR    => $this->defineRouteOptionInspector($app),
             static::CONTENT_NEGOTIATOR  => $this->defineNegotiator($app),
@@ -44,6 +45,13 @@ class ServiceDefinitionProvider implements ServiceDefinitionProviderInterface
             static::SERIALIZER          => $this->defineSerializer($app),
             static::PAGINATION_LISTENER => $this->definePaginationListener($app),
         );
+    }
+
+    public function extendResolver(Application $app)
+    {
+        return $app->share($app->extend('resolver', function ($resolver) {
+            return new CbvControllerResolver($resolver);
+        }));
     }
 
     public function defineAnnotationResourceOption(Application $app)
