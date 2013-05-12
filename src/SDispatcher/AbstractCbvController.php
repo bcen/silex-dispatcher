@@ -7,8 +7,11 @@ use Symfony\Component\HttpFoundation\Response;
 
 abstract class AbstractCbvController
 {
+    private $container;
+
     public function dispatch(Request $request, Application $app)
     {
+        $this->container = $app;
         return static::doDispatch($this, $request, $app);
     }
 
@@ -23,5 +26,10 @@ abstract class AbstractCbvController
         }
 
         return new Response('', 405);
+    }
+
+    public function make($id)
+    {
+        return $this->container[$id];
     }
 }
