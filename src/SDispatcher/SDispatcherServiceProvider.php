@@ -8,6 +8,7 @@ use SDispatcher\Common\FOSDecoderProvider;
 use SDispatcher\Middleware\ContentNegotiator;
 use SDispatcher\Middleware\Deserializer;
 use SDispatcher\Middleware\PaginationListener;
+use SDispatcher\Middleware\RouteOptionInspector;
 use SDispatcher\Middleware\Serializer;
 use Silex\Application;
 use Silex\ServiceProviderInterface;
@@ -37,6 +38,13 @@ class SDispatcherServiceProvider implements ServiceProviderInterface
             'sdispatcher.resource_option'
                 => $app->share(function () {
                     return new AnnotationResourceOption();
+                }),
+
+            'sdispatcher.option_inspector'
+                => $app->share(function ($container) {
+                    return new RouteOptionInspector(
+                        $container['routes'],
+                        $container['sdispatcher.resource_option']);
                 }),
 
             'sdispatcher.content_negotiator'
