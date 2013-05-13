@@ -27,7 +27,7 @@ $app->register(new \SDispatcher\SDispatcherServiceProvider());
 // or registers the middlewares into global scope
 
 $app->register(new \SDispatcher\SDispatcherServiceProvider(), array(
-    'sdispatcher.middleware.global' => true
+    'sdispatcher.global_middleware' => true
 ));
 
 ```

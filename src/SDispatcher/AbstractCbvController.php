@@ -7,22 +7,26 @@ use Symfony\Component\HttpFoundation\Response;
 
 abstract class AbstractCbvController
 {
+    /**
+     * The container
+     * @var mixed
+     */
     private $container;
 
-    public function dispatch(Request $request, Application $app)
+    public function dispatch(Request $request, $container)
     {
-        $this->container = $app;
-        return static::doDispatch($this, $request, $app);
+        $this->container = $container;
+        return static::doDispatch($this, $request, $container);
     }
 
-    public static function doDispatch($controller, Request $request, Application $app)
+    public static function doDispatch($controller, Request $request, $container)
     {
         $method = strtolower($request->getMethod());
 
         if (method_exists($controller, $method)) {
-            return $controller->$method($request, $app);
+            return $controller->$method($request, $container);
         } elseif (method_exists($controller, 'handleRequest')) {
-            return $controller->{'handleRequest'}($request, $app);
+            return $controller->{'handleRequest'}($request, $container);
         }
 
         return new Response('', 405);
