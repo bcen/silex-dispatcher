@@ -34,23 +34,14 @@ class AnnotationResourceOption extends ObjectBehavior
 
     public function it_should_read_annotation_from_class()
     {
-        $this->setTarget('spec\\SDispatcher\\Common\AnnotationResourceOption', 'it_should_be_initializable');
+        $this->setTarget('spec\\SDispatcher\\Common\AnnotationResourceOption');
         $this->getSupportedFormats()->shouldReturn(array('xml'));
     }
 
     public function it_reads_through_the_class_hierarchy()
     {
-        $this->setTarget('spec\\SDispatcher\\Common\\DummyClass', 'dummyMethod');
+        $this->setTarget('spec\\SDispatcher\\Common\\DummyClass');
         $this->getSupportedFormats()->shouldReturn(array('xml'));
-    }
-
-    /**
-     * @REST\SupportedFormats("html")
-     */
-    public function it_should_read_annotation_from_method_over_class()
-    {
-        $this->setTarget('spec\\SDispatcher\\Common\AnnotationResourceOption', 'it_should_read_annotation_from_method_over_class');
-        $this->getSupportedFormats()->shouldReturn(array('html'));
     }
 }
 

@@ -30,24 +30,17 @@ class RouteOptionInspector extends ObjectBehavior
      */
     private $annotationResourceOption;
 
-    /**
-     * @var \Prophecy\Prophecy\ObjectProphecy
-     */
-    private $resolver;
-
     public function let()
     {
         $this->prophet = new Prophet();
         $this->route = $this->prophet->prophesize('Symfony\\Component\\Routing\\Route');
         $this->routes = $this->prophet->prophesize('Symfony\\Component\\Routing\\RouteCollection');
-        $this->resolver = $this->prophet->prophesize('Symfony\\Component\\HttpKernel\\Controller\\ControllerResolverInterface');
         $this->annotationResourceOption = $this->prophet->prophesize('SDispatcher\\Common\\AnnotationResourceOption');
 
         $this->routes->get(Argument::any())->willReturn($this->route->reveal());
 
         $this->beConstructedWith(
             $this->routes->reveal(),
-            $this->resolver->reveal(),
             $this->annotationResourceOption->reveal());
     }
 
@@ -70,9 +63,10 @@ class RouteOptionInspector extends ObjectBehavior
 
     public function it_should_set_route_option_if_controller_found()
     {
-        $this->resolver->getController(Argument::any())->willReturn(array(1, 2));
+        $request = Request::create('/');
+        $request->attributes->set('_controller', 'spec\SDispatcher\Middleware\RouteOptionInspector');
         $this->route->addOptions(Argument::any())->shouldBeCalled();
 
-        $this->__invoke(Request::create('/'));
+        $this->__invoke($request);
     }
 }

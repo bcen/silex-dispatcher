@@ -49,29 +49,29 @@ class AnnotationResourceOption extends AbstractResourceOption
     {
         $out = $default;
 
-        if (!$this->reflectionClass || !$this->reflectionMethod) {
+        if (!$this->reflectionClass) {
             return false;
         }
 
         try {
             $annotationName = static::ANNOTATION_NAMESPACE . ucfirst($name);
 
-            try {
-                // Inspects method first, since method has priority over class
-                $methodAnnotation = $this
-                    ->annotationReader
-                    ->getMethodAnnotation(
-                        $this->reflectionMethod,
-                        $annotationName);
-
-                if ($methodAnnotation
-                    && $methodAnnotation instanceof AbstractAnnotation
-                ) {
-                    $out = $methodAnnotation->values();
-                    return true;
-                }
-            } catch (\Exception $ex) {
-            }
+//            try {
+//                // Inspects method first, since method has priority over class
+//                $methodAnnotation = $this
+//                    ->annotationReader
+//                    ->getMethodAnnotation(
+//                        $this->reflectionMethod,
+//                        $annotationName);
+//
+//                if ($methodAnnotation
+//                    && $methodAnnotation instanceof AbstractAnnotation
+//                ) {
+//                    $out = $methodAnnotation->values();
+//                    return true;
+//                }
+//            } catch (\Exception $ex) {
+//            }
 
             // If we do not have method annotation,
             // then look at the class annotation
