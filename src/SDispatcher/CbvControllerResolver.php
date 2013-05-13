@@ -5,10 +5,19 @@ use Silex\Application;
 use Symfony\Component\HttpKernel\Controller\ControllerResolverInterface;
 use Symfony\Component\HttpFoundation\Request;
 
+/**
+ * Resolves the given controller class string into closure.
+ */
 final class CbvControllerResolver implements ControllerResolverInterface
 {
+    /**
+     * @var \Symfony\Component\HttpKernel\Controller\ControllerResolverInterface
+     */
     private $resolver;
 
+    /**
+     * @param \Symfony\Component\HttpKernel\Controller\ControllerResolverInterface $resolver
+     */
     public function __construct(ControllerResolverInterface $resolver)
     {
         $this->resolver = $resolver;
