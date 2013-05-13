@@ -11,18 +11,11 @@ use Symfony\Component\HttpFoundation\Response;
 abstract class AbstractCbvController
 {
     /**
-     * The container
-     * @var mixed
-     */
-    private $container;
-
-    /**
      * @see doDispatch()
      */
-    public function dispatch(Request $request, $container)
+    public function dispatch(Request $request)
     {
-        $this->container = $container;
-        return static::doDispatch($this, $request, $container);
+        return static::doDispatch($this, $request);
     }
 
     /**
@@ -33,29 +26,18 @@ abstract class AbstractCbvController
      *
      * @param mixed $controller
      * @param \Symfony\Component\HttpFoundation\Request $request
-     * @param mixed $container
      * @return \Symfony\Component\HttpFoundation\Response
      */
-    public static function doDispatch($controller, Request $request, $container)
+    public static function doDispatch($controller, Request $request)
     {
         $method = strtolower($request->getMethod());
 
         if (method_exists($controller, $method)) {
-            return $controller->$method($request, $container);
+            return $controller->$method($request);
         } elseif (method_exists($controller, 'handleRequest')) {
-            return $controller->{'handleRequest'}($request, $container);
+            return $controller->{'handleRequest'}($request);
         }
 
         return new Response('', 405);
-    }
-
-    /**
-     * Retrieves services/parameters from the container
-     * @param string $id
-     * @return mixed
-     */
-    public function make($id)
-    {
-        return $this->container[$id];
     }
 }

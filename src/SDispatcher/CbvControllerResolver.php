@@ -28,17 +28,33 @@ final class CbvControllerResolver implements ControllerResolverInterface
      */
     public function getController(Request $request)
     {
-        $controller = $request->attributes->get('_controller');
+        $controllerClass = $request->attributes->get('_controller');
 
-        if (is_string($controller) && class_exists($controller)) {
-            return function (Request $request, Application $app) use ($controller) {
-                $c = new $controller();
+        if (is_string($controllerClass) && class_exists($controllerClass)) {
+            return function (Request $request, Application $app) use ($controllerClass) {
+                if (is_subclass_of($controllerClass, 'SDispatcher\\Common\\RequiredServiceMetaProviderInterface')) {
+                    $svcIds = (array)call_user_func("{$controllerClass}::getRequiredServices");
+                    $reflection = new \ReflectionClass($controllerClass);
 
-                if (method_exists($c, 'dispatch')) {
-                    return $c->{'dispatch'}($request, $app);
+                    if ($reflection->getConstructor()) {
+                        $deps = array();
+                        foreach ($svcIds as $id) {
+                            $deps[] = $app[$id];
+                        }
+                        $c = $reflection->newInstanceArgs($deps);
+                    } else {
+                        $c = $reflection->newInstanceWithoutConstructor();
+                    }
+
+                } else {
+                    $c = new $controllerClass();
                 }
 
-                return AbstractCbvController::doDispatch($c, $request, $app);
+                if (method_exists($c, 'dispatch')) {
+                    return $c->{'dispatch'}($request);
+                }
+
+                return AbstractCbvController::doDispatch($c, $request);
             };
         }
 

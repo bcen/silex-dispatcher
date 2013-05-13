@@ -6,6 +6,7 @@ use PHPSpec2\Matcher\CustomMatchersProviderInterface;
 use PHPSpec2\Matcher\InlineMatcher;
 use PHPSpec2\ObjectBehavior;
 use Prophecy\Prophet;
+use SDispatcher\Common\RequiredServiceMetaProviderInterface;
 use Silex\Application;
 use Symfony\Component\HttpFoundation\Request;
 
@@ -81,6 +82,18 @@ class CbvControllerResolver extends ObjectBehavior implements CustomMatchersProv
         $response->shouldReturn('handleRequest');
     }
 
+    public function its_getController_should_resolve_controller_class_that_implemented_RequiredServiceMetaProviderInterface()
+    {
+        $request = Request::create('/');
+        $request->attributes->set('_controller', 'spec\SDispatcher\CbvControllerWithDependency');
+
+        $app = new Application();
+        $app['my_obj'] = new \stdClass();
+
+        $closure = $this->getController($request);
+        $closure->__invoke(Request::create('/'), $app);
+    }
+
     public static function getMatchers()
     {
         return array(
@@ -108,5 +121,17 @@ class CbvControllerForHandleRequest
     public function handleRequest()
     {
         return 'handleRequest';
+    }
+}
+
+class CbvControllerWithDependency implements RequiredServiceMetaProviderInterface
+{
+    public static function getRequiredServices()
+    {
+        return array('my_obj');
+    }
+
+    public function __construct(\stdClass $obj)
+    {
     }
 }
