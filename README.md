@@ -12,7 +12,7 @@ Via [Composer](http://getcomposer.org/):
 
     {
         "require": {
-            "bcen/silex-dispatcher": "0.2.*"
+            "bcen/silex-dispatcher": "dev-develop"
         }
     }
 
@@ -21,91 +21,75 @@ Then run ```$ composer.phar install```
 ## Usage
 
 ```php
-
 $app->register(new \SDispatcher\SDispatcherServiceProvider());
-
-// or registers the middlewares into global scope
-
-$app->register(new \SDispatcher\SDispatcherServiceProvider(), array(
-    'sdispatcher.global_middleware' => true
-));
-
 ```
 
 ## Features
 
-- `SDispatcher\AbstractServiceProvider`
-
-    It provides a better and cleaner way to register service defintion.
-    
+- Django-alike CBV controller
     ```php
-    <?php
-    
-    class MyServiceProvider extends \SDispatcher\AbstractServiceProvider
+    class HomeController
     {
-        public function getServiceDefinitionProvider()
+        public function get($req)
         {
-            return new MyServiceDefinitionProvider();
+            return 'Hi, '.$req->getClientIp();
+        }
+        
+        public function post($req)
+        {
+            return 'This is a post';
         }
     }
     
-    class MyServiceDefinitionProvider implements \SDispatcher\ServiceDefinitionProviderInterface
+    $app->match('/', 'HomeController');
+    ```
+    
+    _Handle missing method_:
+    ```php
+    class HomeController
     {
-        public function getServices(\Silex\Application $app)
+        public function get($req)
         {
-            return array(
-                'my.service1' => $app->share(function ($container) {
-                    // ...
-                }),
-            );
+        }
+        
+        public function handleRequest($req)
+        {
+            // HEAD, OPTIONS, PUT, POST everything goes here
+            // except GET, which is handle by the above method.
+        }
+    }
+    ```
+    
+- Hybrid-alike Service Locator/Dependency Injection pattern
+
+    ```php
+    
+    $app['my_obj'] = function () {
+        $obj = new \stdClass;
+        $obj->message = 'hi';
+        return $obj;
+    };
+    
+    class HomeController implements \SDispatcher\Common\RequiredServiceMetaProviderInterface
+    {
+        public function __construct(\stdClass $obj)
+        {
+            var_dump($obj);
+        }
+        
+        public function get($req)
+        {
+            return 'Hi, '.$req->getClientIp();
+        }
+
+        public static function getRequiredServices()
+        {
+            return array('my_obj');
         }
     }
     
-    ```
+    $app->match('/', 'HomeController');
     
-- `SDispatcher\Middleware\RouteOptionInspector`
-
-    As Silex middleware:
-    ```php
-    $app->before(new \SDispatcher\Middleware\RouteOptionInspector($app['routes']));
-    ```
-    
-    As event subscriber:
-    ```php
-    $app['dispatcher']->addSubscriber(new \SDispatcher\Middleware\RouteOptionInspector($app['routes']));
-    ```
-    
-    `RouteOptionInspector` inspects the annotations on class-based controller and resolves them into the
-    current route option.
-
-    See `\SDispatcher\Common\RouteOptions` for available options.  
-    See `\SDispatcher\Common\Annotation\*` for available annotations.
-    
-    Usage:
-    
-    ```php
-    
-    use SDispatcher\Common\Annotation\SupportedFormats;
-    
-    /**
-     * @SupportedFormats({"application/xml", "application/json"})
-     */
-    class ClassBasedController
-    {
-        public function index()
-        {
-        }
-    }
-    
-    ```
-    
-    The above will resolve into:
-
-    ```php
-    $routeName = $request->attributes->get('_route');
-    $app['routes']->get($routeName)->setOption(
-        'sdispatcher.route.supported_formats', 
-        array('application/xml', 'application/json'));
     ```
 
 ## Testing
