@@ -32,7 +32,7 @@ class SDispatcherServiceProvider implements ServiceProviderInterface
         return array(
             'resolver'
                 => $app->share($app->extend('resolver', function ($resolver) {
-                    return new CbvControllerResolver($resolver);
+                    return new SilexCbvControllerResolver($resolver);
                 })),
 
             'sdispatcher.resource_option'

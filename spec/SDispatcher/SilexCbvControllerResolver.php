@@ -10,7 +10,7 @@ use SDispatcher\Common\RequiredServiceMetaProviderInterface;
 use Silex\Application;
 use Symfony\Component\HttpFoundation\Request;
 
-class CbvControllerResolver extends ObjectBehavior implements CustomMatchersProviderInterface
+class SilexCbvControllerResolver extends ObjectBehavior implements CustomMatchersProviderInterface
 {
     /**
      * @var \Prophecy\Prophet
@@ -37,7 +37,7 @@ class CbvControllerResolver extends ObjectBehavior implements CustomMatchersProv
 
     public function it_should_be_initializable()
     {
-        $this->shouldHaveType('SDispatcher\CbvControllerResolver');
+        $this->shouldHaveType('SDispatcher\SilexCbvControllerResolver');
         $this->shouldHaveType('Symfony\Component\HttpKernel\Controller\ControllerResolverInterface');
     }
 
