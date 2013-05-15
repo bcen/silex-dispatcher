@@ -1,8 +1,6 @@
 <?php
 namespace SDispatcher\Common;
 
-use ReflectionObject;
-
 /**
  * Used to read resource option in a more declarative way.
  */
@@ -12,13 +10,13 @@ final class DeclarativeResourceOption extends AbstractResourceOption
      * Used to read private method/property.
      * @var \ReflectionObject
      */
-    private $objectReflector;
+    private $reflector;
 
     /**
      * The target object to read.
      * @var mixed
      */
-    private $object;
+    private $classOrObj;
 
     /**
      * The optional prefix for reading option.
@@ -33,13 +31,24 @@ final class DeclarativeResourceOption extends AbstractResourceOption
     private $cache = array();
 
     /**
-     * @param $object
+     * {@inheritdoc}
+     */
+    public function setTarget($classOrObj, $method = null)
+    {
+        $this->classOrObj = $classOrObj;
+        if (is_string($classOrObj) && class_exists($classOrObj)) {
+            $this->reflector = new \ReflectionClass($classOrObj);
+        } elseif (is_object($classOrObj)) {
+            $this->reflector = new \ReflectionObject($classOrObj);
+        }
+    }
+
+    /**
+     * Sets the prefix of all option attribute.
      * @param string $prefix
      */
-    public function __construct($object, $prefix = '')
+    public function setPrefix($prefix)
     {
-        $this->object = $object;
-        $this->objectReflector = new ReflectionObject($object);
         $this->prefix = $prefix;
     }
 
@@ -51,16 +60,21 @@ final class DeclarativeResourceOption extends AbstractResourceOption
         $success = false;
         $name = $this->prefix . $name;
         $out = $default;
+
+        if (!$this->classOrObj) {
+            return false;
+        }
+
         if (isset($this->cache[$name])
             || array_key_exists($name, $this->cache)
         ) {
             $out = $this->cache[$name];
             $success = true;
-        } elseif ($this->objectReflector->hasProperty($name)) {
+        } elseif ($this->reflector->hasProperty($name)) {
             $out = $this->readFromProperty($name);
             $success = true;
             $this->cache[$name] = $out;
-        } elseif ($this->objectReflector->hasMethod($name)) {
+        } elseif ($this->reflector->hasMethod($name)) {
             $out = $this->readFromMethod($name);
             $success = true;
             $this->cache[$name] = $out;
@@ -79,15 +93,15 @@ final class DeclarativeResourceOption extends AbstractResourceOption
 
     private function readFromProperty($name)
     {
-        $prop = $this->objectReflector->getProperty($name);
+        $prop = $this->reflector->getProperty($name);
         $prop->setAccessible(true);
-        return $prop->getValue($this->object);
+        return $prop->getValue($this->classOrObj);
     }
 
     private function readFromMethod($name)
     {
-        $method = $this->objectReflector->getMethod($name);
+        $method = $this->reflector->getMethod($name);
         $method->setAccessible(true);
-        return $method->invoke($this->object);
+        return $method->invoke($this->classOrObj);
     }
 }

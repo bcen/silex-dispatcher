@@ -70,9 +70,9 @@ class FeatureContext extends BehatContext
     {
         $this->app = new Application();
         $this->app->register(new SDispatcherServiceProvider());
-        $this->app->before($this->app[\SDispatcher\ServiceDefinitionProvider::CONTENT_NEGOTIATOR]);
-        $this->app->before($this->app[\SDispatcher\ServiceDefinitionProvider::DESERIALIZER]);
-        $this->app->after($this->app[\SDispatcher\ServiceDefinitionProvider::SERIALIZER]);
+        $this->app->before($this->app['sdispatcher.content_negotiator']);
+        $this->app->before($this->app['sdispatcher.deserializer']);
+        $this->app->after($this->app['sdispatcher.serializer']);
     }
 
     /**

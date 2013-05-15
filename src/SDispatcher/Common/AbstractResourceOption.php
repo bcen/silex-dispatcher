@@ -128,6 +128,27 @@ abstract class AbstractResourceOption implements ResourceOptionInterface
     /**
      * {@inheritdoc}
      */
+    public function getPaginatorClass()
+    {
+        $this->tryReadOption(
+            'paginatorClass',
+            $out,
+            'SDispatcher\\Common\\InMemoryPaginator');
+        return $out;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function setPaginatorClass($paginatorClass)
+    {
+        $this->tryWriteOption('paginatorClass', $paginatorClass);
+        return $this;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     public function getResourceIdentifier()
     {
         $this->tryReadOption(

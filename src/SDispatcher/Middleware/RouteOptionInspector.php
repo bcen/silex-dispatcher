@@ -1,11 +1,10 @@
 <?php
 namespace SDispatcher\Middleware;
 
-use SDispatcher\Common\AnnotationResourceOption;
+use SDispatcher\Common\ResourceOptionInterface;
 use SDispatcher\Common\RouteOptions;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\HttpKernel\Controller\ControllerResolverInterface;
 use Symfony\Component\Routing\RouteCollection;
 
 /**
@@ -33,25 +32,19 @@ class RouteOptionInspector extends AbstractKernelRequestEventListener
     protected $routes;
 
     /**
-     * @var \Symfony\Component\HttpKernel\Controller\ControllerResolverInterface
+     * @var \SDispatcher\Common\ResourceOptionInterface
      */
-    protected $resolver;
-
-    /**
-     * @var \SDispatcher\Common\AnnotationResourceOption
-     */
-    protected $annotationResourceOption;
+    protected $resourceOption;
 
     /**
      * @param \Symfony\Component\Routing\RouteCollection $routes
-     * @param \Symfony\Component\HttpKernel\Controller\ControllerResolverInterface $resolver
-     * @param \SDispatcher\Common\AnnotationResourceOption $annotationResourceOption
+     * @param \SDispatcher\Common\ResourceOptionInterface $resourceOption
+     * @internal param \Symfony\Component\HttpKernel\Controller\ControllerResolverInterface $resolver
      */
-    public function __construct(RouteCollection $routes, ControllerResolverInterface $resolver, AnnotationResourceOption $annotationResourceOption)
+    public function __construct(RouteCollection $routes, ResourceOptionInterface $resourceOption)
     {
         $this->routes = $routes;
-        $this->resolver = $resolver;
-        $this->annotationResourceOption = $annotationResourceOption;
+        $this->resourceOption = $resourceOption;
     }
 
     /**
@@ -59,36 +52,31 @@ class RouteOptionInspector extends AbstractKernelRequestEventListener
      */
     protected function doKernelRequest(Request $request)
     {
-        $controller = $this->resolver->getController($request);
-        if (is_array($controller) && count($controller) >= 2) {
-            $options = $this->resolveControllerOptions(
-                $controller[0],
-                $controller[1]);
+        $controller = $request->attributes->get('_controller');
+        if (is_string($controller) && class_exists($controller)) {
+            $options = $this->resolveControllerOptions($controller);
             $routeName = $request->attributes->get('_route');
             $route = $this->routes->get($routeName);
             $route->addOptions($options);
         }
-        $request->attributes->set('_controller', $controller);
         return null;
     }
 
     /**
      * Resolves and returns the options from controller annotations.
      * @param mixed $controller
-     * @param string $method
      * @return array The options
      */
-    protected function resolveControllerOptions($controller, $method)
+    protected function resolveControllerOptions($controller)
     {
-        $this->annotationResourceOption->setTarget($controller, $method);
+        $this->resourceOption->setTarget($controller);
         $options = array(
-            RouteOptions::SUPPORTED_FORMATS             => $this->annotationResourceOption->getSupportedFormats(),
-            RouteOptions::RESOURCE_ID                   => $this->annotationResourceOption->getResourceIdentifier(),
-            RouteOptions::PAGE_LIMIT                    => $this->annotationResourceOption->getPageLimit(),
-            RouteOptions::WILL_PAGINGATE                => $this->annotationResourceOption->willPaginate(),
-            RouteOptions::PAGINATOR_CLASS               => $this->annotationResourceOption->getPaginatorClass(),
-            RouteOptions::PAGINATED_DATA_CONTAINER_NAME => $this->annotationResourceOption->getPaginatedDataContainerName(),
-            RouteOptions::PAGINATED_META_CONTAINER_NAME => $this->annotationResourceOption->getPaginatedMetaContainerName(),
+            RouteOptions::SUPPORTED_FORMATS             => $this->resourceOption->getSupportedFormats(),
+            RouteOptions::RESOURCE_ID                   => $this->resourceOption->getResourceIdentifier(),
+            RouteOptions::PAGE_LIMIT                    => $this->resourceOption->getPageLimit(),
+            RouteOptions::PAGINATOR_CLASS               => $this->resourceOption->getPaginatorClass(),
+            RouteOptions::PAGINATED_DATA_CONTAINER_NAME => $this->resourceOption->getPaginatedDataContainerName(),
+            RouteOptions::PAGINATED_META_CONTAINER_NAME => $this->resourceOption->getPaginatedMetaContainerName(),
         );
         return $options;
     }

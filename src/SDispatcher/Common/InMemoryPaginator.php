@@ -12,6 +12,14 @@ class InMemoryPaginator extends AbstractPaginator
     /**
      * {@inheritdoc}
      */
+    public function supports($queryset)
+    {
+        return is_array($queryset);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     protected function validateQueryset($queryset)
     {
         if (!is_array($queryset)) {

@@ -76,7 +76,6 @@ Feature: RESTful API
     And a paginated response
     And a path at "/"
     And route option "sdispatcher.route.supported_formats" -> "json"
-    And route option "sdispatcher.route.will_paginate" -> "true"
     And route option "sdispatcher.route.paginator_class" -> "SDispatcher\Common\InMemoryPaginator"
     And route option "sdispatcher.route.page_limit" -> "10"
     And route option "sdispatcher.route.paginated_data_container_name" -> "objects"
@@ -99,7 +98,6 @@ Feature: RESTful API
     And a paginated response
     And a path at "/"
     And route option "sdispatcher.route.supported_formats" -> "json"
-    And route option "sdispatcher.route.will_paginate" -> "true"
     And route option "sdispatcher.route.paginator_class" -> "SDispatcher\Common\InMemoryPaginator"
     And route option "sdispatcher.route.page_limit" -> "10"
     And route option "sdispatcher.route.paginated_data_container_name" -> "objects"
@@ -122,7 +120,6 @@ Feature: RESTful API
     And a paginated response
     And a path at "/"
     And route option "sdispatcher.route.supported_formats" -> "xml"
-    And route option "sdispatcher.route.will_paginate" -> "true"
     And route option "sdispatcher.route.paginator_class" -> "SDispatcher\Common\InMemoryPaginator"
     And route option "sdispatcher.route.page_limit" -> "10"
     And route option "sdispatcher.route.paginated_data_container_name" -> "objects"

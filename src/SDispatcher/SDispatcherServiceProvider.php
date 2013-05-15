@@ -1,49 +1,96 @@
 <?php
 namespace SDispatcher;
 
+use FOS\Rest\Util\FormatNegotiator;
+use SDispatcher\Common\AnnotationResourceOption;
+use SDispatcher\Common\DefaultXmlEncoder;
+use SDispatcher\Common\FOSDecoderProvider;
+use SDispatcher\Middleware\ContentNegotiator;
+use SDispatcher\Middleware\Deserializer;
+use SDispatcher\Middleware\PaginationListener;
+use SDispatcher\Middleware\RouteOptionInspector;
+use SDispatcher\Middleware\Serializer;
 use Silex\Application;
+use Silex\ServiceProviderInterface;
+use Symfony\Component\Serializer\Encoder\ChainEncoder;
+use Symfony\Component\Serializer\Encoder\JsonEncoder;
 
 /**
- * It registers:
- * - `resolver`
- * - `sdispatcher.middleware.global`
- * <p/>
- * If `sdispatcher.middleware.global` is true, it will register the middlewares
- * into the global scope; otherwise, consumer must register the middleware
- * separately.
- * </p>
- * Also, there are two event subscriber will be registered:
- * - `SDispatcher\Middleware\PaginationListener`
- * - `SDispatcher\Middleware\ArrayToDataResponseListener`
+ * Registers services into the container.
  */
-class SDispatcherServiceProvider extends AbstractServiceProvider
+class SDispatcherServiceProvider implements ServiceProviderInterface
 {
+    public function getDefaultParameters()
+    {
+        return array(
+            'sdispatcher.global_middleware' => false,
+        );
+    }
+
+    public function getServices(Application $app)
+    {
+        return array(
+            'resolver'
+                => $app->share($app->extend('resolver', function ($resolver) {
+                    return new SilexCbvControllerResolver($resolver);
+                })),
+
+            'sdispatcher.resource_option'
+                => $app->share(function () {
+                    return new AnnotationResourceOption();
+                }),
+
+            'sdispatcher.option_inspector'
+                => $app->share(function ($container) {
+                    return new RouteOptionInspector(
+                        $container['routes'],
+                        $container['sdispatcher.resource_option']);
+                }),
+
+            'sdispatcher.content_negotiator'
+                => $app->share(function ($container) {
+                    return new ContentNegotiator(
+                        $container['routes'],
+                        new FormatNegotiator());
+                }),
+
+            'sdispatcher.deserializer'
+                => $app->share(function () {
+                    return new Deserializer(new FOSDecoderProvider());
+                }),
+
+            'sdispatcher.serializer'
+                => $app->share(function ($container) {
+                    return new Serializer(
+                        $container['routes'],
+                        new ChainEncoder(array(
+                            new JsonEncoder(),
+                            new DefaultXmlEncoder())
+                        ));
+                }),
+
+            'sdispatcher.pagination_listener'
+                => $app->share(function ($container) {
+                    return new PaginationListener($container['routes']);
+                }),
+        );
+    }
+
     /**
      * {@inheritdoc}
      */
     public function register(Application $app)
     {
-        parent::register($app);
-
-        if ($app[ServiceDefinitionProvider::GLOBAL_MIDDLEWARE]) {
-            $app->before($app[ServiceDefinitionProvider::OPTION_INSPECTOR]);
-            $app->before($app[ServiceDefinitionProvider::CONTENT_NEGOTIATOR]);
-            $app->before($app[ServiceDefinitionProvider::DESERIALIZER]);
-            $app->after($app[ServiceDefinitionProvider::SERIALIZER]);
+        $params = $this->getDefaultParameters();
+        foreach ((array)$params as $key => $value) {
+            if (!isset($app[$key])) {
+                $app[$key] = $value;
+            }
         }
-
-        /* @var \Symfony\Component\EventDispatcher\EventDispatcher $ed */
-        $ed = $app['dispatcher'];
-        $ed->addSubscriber($app[ServiceDefinitionProvider::PAGINATION_LISTENER]);
-//        $ed->addSubscriber(new ArrayToDataResponseListener($app['routes']));
-    }
-
-    /**
-     * @return \SDispatcher\ServiceDefinitionProviderInterface
-     */
-    public function getServiceDefinitionProvider()
-    {
-        return new ServiceDefinitionProvider();
+        $services = $this->getServices($app);
+        foreach ($services as $id => $definition) {
+            $app[$id] = $definition;
+        }
     }
 
     /**
@@ -51,5 +98,15 @@ class SDispatcherServiceProvider extends AbstractServiceProvider
      */
     public function boot(Application $app)
     {
+        if ($app['sdispatcher.global_middleware']) {
+            $app->before($app['sdispatcher.resource_option']);
+            $app->before($app['sdispatcher.content_negotiator']);
+            $app->before($app['sdispatcher.deserializer']);
+            $app->after($app['sdispatcher.serializer']);
+        }
+
+        /* @var \Symfony\Component\EventDispatcher\EventDispatcher $ed */
+        $ed = $app['dispatcher'];
+        $ed->addSubscriber($app['sdispatcher.pagination_listener']);
     }
 }
