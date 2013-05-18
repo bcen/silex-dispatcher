@@ -6,7 +6,6 @@ Silex-Dispatcher
 
 ## Installation
 
-
 Via [Composer](http://getcomposer.org/):
 
     {
