@@ -1,8 +1,7 @@
 Silex-Dispatcher
 ================
 
-Master: [![Build Status](https://secure.travis-ci.org/bcen/silex-dispatcher.png?branch=master)](http://travis-ci.org/bcen/silex-dispatcher)
-Develop: [![Build Status](https://secure.travis-ci.org/bcen/silex-dispatcher.png?branch=develop)](http://travis-ci.org/bcen/silex-dispatcher)
+[![Build Status](https://secure.travis-ci.org/bcen/silex-dispatcher.png)](http://travis-ci.org/bcen/silex-dispatcher)
 
 
 ## Installation
