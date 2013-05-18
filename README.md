@@ -134,7 +134,7 @@ $app->register(new \SDispatcher\SDispatcherServiceProvider());
     
     _Content Negotiation_:
     ```sh
-    $ curl local.arcphss.org/api-test/index.php/numbers/1 -H "Accept:application/xml" -i
+    $ curl local.domain.org/api-test/numbers/1 -H "Accept:application/xml" -i
     HTTP/1.1 406 Not Acceptable
     Date: Sat, 18 May 2013 00:28:58 GMT
     Server: Apache/2.4.3 (Win32) OpenSSL/1.0.1c PHP/5.4.7
@@ -146,7 +146,7 @@ $app->register(new \SDispatcher\SDispatcherServiceProvider());
     
     _Automated Serialization_:
     ```sh
-    $ curl local.arcphss.org/api-test/index.php/numbers/1 -H "Accept:application/json" -i
+    $ curl local.domain.org/api-test/numbers/1 -H "Accept:application/json" -i
     HTTP/1.1 200 OK
     Date: Sat, 18 May 2013 00:29:30 GMT
     Server: Apache/2.4.3 (Win32) OpenSSL/1.0.1c PHP/5.4.7
@@ -160,7 +160,7 @@ $app->register(new \SDispatcher\SDispatcherServiceProvider());
     
     _Automated Pagination_:
     ```sh
-    $ curl local.arcphss.org/api-test/index.php/numbers
+    $ curl local.domain.org/api-test/numbers
     {"meta":{"offset":0,"limit":20,"total":6,"prevLink":null,"nextLink":null},"objects":[1,2,3,4,5,6]}
     ```
 
