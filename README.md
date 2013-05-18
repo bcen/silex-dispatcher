@@ -169,7 +169,8 @@ $app->register(new \SDispatcher\SDispatcherServiceProvider());
 
 ```
 $ composer.phar install --dev
-$ vendor/bin/phpunit
+$ vendor/bin/phpspec
+$ vendor/bin/behat
 ```
 
 ## License
