@@ -175,6 +175,8 @@ $app->register(new \SDispatcher\SDispatcherServiceProvider());
     Content-Length: 0
     Content-Type: text/html; charset=UTF-8
     ```
+    
+    __NOTE__: Remember to turn on URL rewrite!!
 
 ## Testing
 
