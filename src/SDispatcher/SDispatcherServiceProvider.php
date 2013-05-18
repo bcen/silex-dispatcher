@@ -99,7 +99,7 @@ class SDispatcherServiceProvider implements ServiceProviderInterface
     public function boot(Application $app)
     {
         if ($app['sdispatcher.global_middleware']) {
-            $app->before($app['sdispatcher.resource_option']);
+            $app->before($app['sdispatcher.option_inspector']);
             $app->before($app['sdispatcher.content_negotiator']);
             $app->before($app['sdispatcher.deserializer']);
             $app->after($app['sdispatcher.serializer']);
