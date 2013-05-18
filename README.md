@@ -92,7 +92,7 @@ $app->register(new \SDispatcher\SDispatcherServiceProvider());
     
     ```
     
-- RESTful helpers/middlewares
+- RESTful Helpers/Middlewares
 
     ```php
 
@@ -162,6 +162,18 @@ $app->register(new \SDispatcher\SDispatcherServiceProvider());
     ```sh
     $ curl local.domain.org/api-test/numbers
     {"meta":{"offset":0,"limit":20,"total":6,"prevLink":null,"nextLink":null},"objects":[1,2,3,4,5,6]}
+    ```
+    
+    _Automated 405 Response for missing method handler_:
+    ```sh
+    $ curl local.domain.org/api-test/numbers -i -X POST
+    HTTP/1.1 405 Method Not Allowed
+    Date: Sat, 18 May 2013 01:21:20 GMT
+    Server: Apache/2.4.3 (Win32) OpenSSL/1.0.1c PHP/5.4.7
+    X-Powered-By: PHP/5.4.7
+    Cache-Control: no-cache
+    Content-Length: 0
+    Content-Type: text/html; charset=UTF-8
     ```
 
 ## Testing
