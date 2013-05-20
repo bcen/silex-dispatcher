@@ -2,14 +2,8 @@
 namespace SDispatcher;
 
 use FOS\Rest\Util\FormatNegotiator;
-use SDispatcher\Common\AnnotationResourceOption;
 use SDispatcher\Common\DefaultXmlEncoder;
 use SDispatcher\Common\FOSDecoderProvider;
-use SDispatcher\Middleware\ContentNegotiator;
-use SDispatcher\Middleware\Deserializer;
-use SDispatcher\Middleware\PaginationListener;
-use SDispatcher\Middleware\RouteOptionInspector;
-use SDispatcher\Middleware\Serializer;
 use Silex\Application;
 use Silex\ServiceProviderInterface;
 use Symfony\Component\Serializer\Encoder\ChainEncoder;
@@ -23,7 +17,14 @@ class SDispatcherServiceProvider implements ServiceProviderInterface
     public function getDefaultParameters()
     {
         return array(
-            'sdispatcher.global_middleware' => false,
+            'sdispatcher.global_middleware'         => false,
+            'sdispatcher.cbv_resolver.class'        => 'SDispatcher\\SilexCbvControllerResolver',
+            'sdispatcher.resource_option.class'     => 'SDispatcher\\Common\\AnnotationResourceOption',
+            'sdispatcher.option_inspector.class'    => 'SDispatcher\\Middleware\\RouteOptionInspector',
+            'sdispatcher.content_negotiator.class'  => 'SDispatcher\\Middleware\\ContentNegotiator',
+            'sdispatcher.deserializer.class'        => 'SDispatcher\\Middleware\\Deserializer',
+            'sdispatcher.serializer.class'          => 'SDispatcher\\Middleware\\Serializer',
+            'sdispatcher.pagination_listener.class' => 'SDispatcher\\Middleware\\PaginationListener',
         );
     }
 
@@ -31,47 +32,46 @@ class SDispatcherServiceProvider implements ServiceProviderInterface
     {
         return array(
             'resolver'
-                => $app->share($app->extend('resolver', function ($resolver) {
-                    return new SilexCbvControllerResolver($resolver);
+                => $app->share($app->extend('resolver', function ($resolver, $container) {
+                    return new $container['sdispatcher.cbv_resolver.class']($resolver);
                 })),
 
             'sdispatcher.resource_option'
-                => $app->share(function () {
-                    return new AnnotationResourceOption();
+                => $app->share(function ($container) {
+                    return new $container['sdispatcher.resource_option.class']();
                 }),
 
             'sdispatcher.option_inspector'
                 => $app->share(function ($container) {
-                    return new RouteOptionInspector(
+                    return new $container['sdispatcher.option_inspector.class'](
                         $container['routes'],
                         $container['sdispatcher.resource_option']);
                 }),
 
             'sdispatcher.content_negotiator'
                 => $app->share(function ($container) {
-                    return new ContentNegotiator(
+                    return new $container['sdispatcher.content_negotiator.class'](
                         $container['routes'],
                         new FormatNegotiator());
                 }),
 
             'sdispatcher.deserializer'
-                => $app->share(function () {
-                    return new Deserializer(new FOSDecoderProvider());
+                => $app->share(function ($container) {
+                    return new $container['sdispatcher.deserializer.class'](new FOSDecoderProvider());
                 }),
 
             'sdispatcher.serializer'
                 => $app->share(function ($container) {
-                    return new Serializer(
+                    return new $container['sdispatcher.serializer.class'](
                         $container['routes'],
                         new ChainEncoder(array(
                             new JsonEncoder(),
-                            new DefaultXmlEncoder())
-                        ));
+                            new DefaultXmlEncoder())));
                 }),
 
             'sdispatcher.pagination_listener'
                 => $app->share(function ($container) {
-                    return new PaginationListener($container['routes']);
+                    return new $container['sdispatcher.pagination_listener.class']($container['routes']);
                 }),
         );
     }
