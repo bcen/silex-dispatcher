@@ -3,6 +3,8 @@ namespace SDispatcher;
 
 use Silex\Application;
 use Symfony\Component\HttpFoundation\Request;
+use SDispatcher\ControllerMethodDispatcher;
+use Symfony\Component\HttpKernel\Controller\ControllerResolverInterface;
 
 /**
  * Resolves the given controller class string into closure.
@@ -10,11 +12,28 @@ use Symfony\Component\HttpFoundation\Request;
 final class SilexCbvControllerResolver extends AbstractCbvControllerResolver
 {
     /**
+     * @var \SDispatcher\ControllerMethodDispatcher
+     */
+    private $methodDispatcher;
+
+    public function __construct(ControllerResolverInterface $resolver, ControllerMethodDispatcher $methodDispatcher)
+    {
+        parent::__construct($resolver);
+        $this->methodDispatcher = $methodDispatcher;
+    }
+
+    /**
      * {@inheritdoc}
      */
     protected function createClousure($controllerClass)
     {
-        return function (Request $request, Application $app) use ($controllerClass) {
+        $methodDispatcher = $this->methodDispatcher;
+        $self = $this;
+        return function (Request $request, Application $app) use (
+            $controllerClass,
+            $methodDispatcher,
+            $self
+        ) {
             if (is_subclass_of($controllerClass, 'SDispatcher\\Common\\RequiredServiceMetaProviderInterface')) {
                 $svcIds = (array)call_user_func("{$controllerClass}::getRequiredServices");
                 $reflection = new \ReflectionClass($controllerClass);
@@ -33,11 +52,7 @@ final class SilexCbvControllerResolver extends AbstractCbvControllerResolver
                 $c = new $controllerClass();
             }
 
-            if (method_exists($c, 'dispatch')) {
-                return $c->{'dispatch'}($request);
-            }
-
-            return AbstractCbvController::doDispatch($c, $request);
+            return $methodDispatcher->dispatch($request, $c, $self);
         };
     }
 }
