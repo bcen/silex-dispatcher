@@ -18,6 +18,7 @@ class SDispatcherServiceProvider implements ServiceProviderInterface
     {
         return array(
             'sdispatcher.global_middleware'         => false,
+            'sdispatcher.method_dispatcher.class'   => 'SDispatcher\\ControllerMethodDispatcher',
             'sdispatcher.cbv_resolver.class'        => 'SDispatcher\\SilexCbvControllerResolver',
             'sdispatcher.resource_option.class'     => 'SDispatcher\\Common\\AnnotationResourceOption',
             'sdispatcher.option_inspector.class'    => 'SDispatcher\\Middleware\\RouteOptionInspector',
@@ -31,9 +32,16 @@ class SDispatcherServiceProvider implements ServiceProviderInterface
     public function getServices(Application $app)
     {
         return array(
+            'sdispatcher.method_dispatcher'
+                => $app->share(function ($container) {
+                    return new $container['sdispatcher.method_dispatcher.class']();
+                }),
+
             'resolver'
                 => $app->share($app->extend('resolver', function ($resolver, $container) {
-                    return new $container['sdispatcher.cbv_resolver.class']($resolver);
+                    return new $container['sdispatcher.cbv_resolver.class'](
+                        $resolver,
+                        $container['sdispatcher.method_dispatcher']);
                 })),
 
             'sdispatcher.resource_option'
