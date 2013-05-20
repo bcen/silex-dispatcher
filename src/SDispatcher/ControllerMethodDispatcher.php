@@ -10,13 +10,19 @@ class ControllerMethodDispatcher
     public function dispatch(Request $request, $controller, ControllerResolverInterface $resolver)
     {
         $methodHandler = strtolower($request->getMethod());
+        $method = null;
+
         if (method_exists($controller, 'handleRequest')) {
-            return $controller->handleRequest($request);
+            $method = 'handleRequest';
         } elseif (method_exists($controller, $methodHandler)) {
-            $args = $resolver->getArguments($request, array($controller, $methodHandler));
-            return call_user_func_array(array($controller, $methodHandler), $args);
+            $method = $methodHandler;
         } elseif (method_exists($controller, 'handleMissingMethod')) {
-            return $controller->handleMissingMethod($request);
+            $method = 'handleMissingMethod';
+        }
+
+        if ($method) {
+            $args = $resolver->getArguments($request, array($controller, $method));
+            return call_user_func_array(array($controller, $method), $args);
         }
 
         return new Response('', 405);

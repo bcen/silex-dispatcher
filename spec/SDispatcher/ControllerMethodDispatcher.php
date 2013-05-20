@@ -26,6 +26,7 @@ class ControllerMethodDispatcher extends ObjectBehavior implements CustomMatcher
     {
         $this->prophet = new Prophet();
         $this->resolver = $this->prophet->prophesize('Symfony\Component\HttpKernel\Controller\ControllerResolverInterface');
+        $this->resolver->getArguments(Argument::cetera())->willReturn(array());
     }
 
     public function letgo()
@@ -55,7 +56,6 @@ class ControllerMethodDispatcher extends ObjectBehavior implements CustomMatcher
 
     public function its_dispatch_should_invoke_target_method_handler_if_one_exists()
     {
-        $this->resolver->getArguments(Argument::cetera())->willReturn(array())->shouldBeCalled();
         $controller = $this->prophet->prophesize('spec\\SDispatcher\\ControllerWithGetMethodHandler');
         $controller->get(Argument::cetera())->shouldBeCalled();
         $request = Request::create('/');
@@ -82,7 +82,7 @@ class ControllerMethodDispatcher extends ObjectBehavior implements CustomMatcher
 
 class ControllerWithDispatchMethod
 {
-    public function handleRequest(Request $request)
+    public function handleRequest()
     {
     }
 }
