@@ -28,12 +28,12 @@ $app->register(new \SDispatcher\SDispatcherServiceProvider());
     ```php
     class HomeController
     {
-        public function get($req)
+        public function get(Request $req)
         {
             return 'Hi, '.$req->getClientIp();
         }
         
-        public function post($req)
+        public function post(Request $req)
         {
             return 'This is a post';
         }
@@ -46,11 +46,11 @@ $app->register(new \SDispatcher\SDispatcherServiceProvider());
     ```php
     class HomeController
     {
-        public function get($req)
+        public function get(Request $req)
         {
         }
         
-        public function handleRequest($req)
+        public function handleMissingMethod(Request $req)
         {
             // HEAD, OPTIONS, PUT, POST everything goes here
             // except GET, which is handle by the above method.
@@ -106,10 +106,10 @@ $app->register(new \SDispatcher\SDispatcherServiceProvider());
     
     class NumberDetailResource
     {
-        public function get($req)
+        public function get(Request $req, $nid)
         {
             return new \SDispatcher\DataResponse(array(
-                'id' => 'some_id',
+                'id' => $nid,
                 'value' => 'some value',
                 'filters' => $req->query->all(),
             ));
@@ -124,7 +124,7 @@ $app->register(new \SDispatcher\SDispatcherServiceProvider());
     $app->after($app['sdispatcher.serializer']);
     
     $app->match('/numbers', 'NumberListResource');
-    $app->match('/numbers/{some_id}', 'NumberDetailResource');
+    $app->match('/numbers/{nid}', 'NumberDetailResource');
     
     $app->run();
 
