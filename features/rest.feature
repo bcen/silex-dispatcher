@@ -115,13 +115,13 @@ Feature: RESTful API
   Scenario:
     Given a json string:
     """
-    [1, 2]
+    [1, 2, 3, 4, 5, 6, 7, 8]
     """
     And a paginated response
     And a path at "/"
     And route option "sdispatcher.route.supported_formats" -> "xml"
     And route option "sdispatcher.route.paginator_class" -> "SDispatcher\Common\InMemoryPaginator"
-    And route option "sdispatcher.route.page_limit" -> "10"
+    And route option "sdispatcher.route.page_limit" -> "5"
     And route option "sdispatcher.route.paginated_data_container_name" -> "objects"
     And route option "sdispatcher.route.paginated_meta_container_name" -> "meta"
 
@@ -132,6 +132,6 @@ Feature: RESTful API
     And the response content is:
     """
     <?xml version="1.0" encoding="utf-8"?>
-    <response><meta><offset>0</offset><limit>10</limit><total>2</total><prevLink></prevLink><nextLink></nextLink></meta><objects><item>1</item><item>2</item></objects></response>
+    <response><meta><offset>0</offset><limit>5</limit><total>8</total><prevLink/><nextLink>http://localhost/?limit=5&amp;offset=5</nextLink></meta><objects><item>1</item><item>2</item><item>3</item><item>4</item><item>5</item></objects></response>
 
     """
