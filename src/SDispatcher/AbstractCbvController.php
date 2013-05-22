@@ -6,6 +6,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
 /**
+ * @depreciated Will remove in the near future
  * Base class for django's CBV-like controller.
  */
 abstract class AbstractCbvController

@@ -1,12 +1,10 @@
 Silex-Dispatcher
 ================
 
-Master: [![Build Status](https://secure.travis-ci.org/bcen/silex-dispatcher.png?branch=master)](http://travis-ci.org/bcen/silex-dispatcher)
-Develop: [![Build Status](https://secure.travis-ci.org/bcen/silex-dispatcher.png?branch=develop)](http://travis-ci.org/bcen/silex-dispatcher)
+[![Build Status](https://secure.travis-ci.org/bcen/silex-dispatcher.png)](http://travis-ci.org/bcen/silex-dispatcher)
 
 
 ## Installation
-
 
 Via [Composer](http://getcomposer.org/):
 
@@ -30,12 +28,12 @@ $app->register(new \SDispatcher\SDispatcherServiceProvider());
     ```php
     class HomeController
     {
-        public function get($req)
+        public function get(Request $req)
         {
             return 'Hi, '.$req->getClientIp();
         }
         
-        public function post($req)
+        public function post(Request $req)
         {
             return 'This is a post';
         }
@@ -48,11 +46,11 @@ $app->register(new \SDispatcher\SDispatcherServiceProvider());
     ```php
     class HomeController
     {
-        public function get($req)
+        public function get(Request $req)
         {
         }
         
-        public function handleRequest($req)
+        public function handleMissingMethod(Request $req)
         {
             // HEAD, OPTIONS, PUT, POST everything goes here
             // except GET, which is handle by the above method.
@@ -92,7 +90,7 @@ $app->register(new \SDispatcher\SDispatcherServiceProvider());
     
     ```
     
-- RESTful helpers/middlewares
+- RESTful Helpers/Middlewares
 
     ```php
 
@@ -108,10 +106,10 @@ $app->register(new \SDispatcher\SDispatcherServiceProvider());
     
     class NumberDetailResource
     {
-        public function get($req)
+        public function get(Request $req, $nid)
         {
             return new \SDispatcher\DataResponse(array(
-                'id' => 'some_id',
+                'id' => $nid,
                 'value' => 'some value',
                 'filters' => $req->query->all(),
             ));
@@ -126,7 +124,7 @@ $app->register(new \SDispatcher\SDispatcherServiceProvider());
     $app->after($app['sdispatcher.serializer']);
     
     $app->match('/numbers', 'NumberListResource');
-    $app->match('/numbers/{some_id}', 'NumberDetailResource');
+    $app->match('/numbers/{nid}', 'NumberDetailResource');
     
     $app->run();
 
@@ -134,7 +132,7 @@ $app->register(new \SDispatcher\SDispatcherServiceProvider());
     
     _Content Negotiation_:
     ```sh
-    $ curl local.arcphss.org/api-test/index.php/numbers/1 -H "Accept:application/xml" -i
+    $ curl local.domain.org/api-test/numbers/1 -H "Accept:application/xml" -i
     HTTP/1.1 406 Not Acceptable
     Date: Sat, 18 May 2013 00:28:58 GMT
     Server: Apache/2.4.3 (Win32) OpenSSL/1.0.1c PHP/5.4.7
@@ -146,7 +144,7 @@ $app->register(new \SDispatcher\SDispatcherServiceProvider());
     
     _Automated Serialization_:
     ```sh
-    $ curl local.arcphss.org/api-test/index.php/numbers/1 -H "Accept:application/json" -i
+    $ curl local.domain.org/api-test/numbers/1 -H "Accept:application/json" -i
     HTTP/1.1 200 OK
     Date: Sat, 18 May 2013 00:29:30 GMT
     Server: Apache/2.4.3 (Win32) OpenSSL/1.0.1c PHP/5.4.7
@@ -160,16 +158,31 @@ $app->register(new \SDispatcher\SDispatcherServiceProvider());
     
     _Automated Pagination_:
     ```sh
-    $ curl local.arcphss.org/api-test/index.php/numbers
+    $ curl local.domain.org/api-test/numbers
     {"meta":{"offset":0,"limit":20,"total":6,"prevLink":null,"nextLink":null},"objects":[1,2,3,4,5,6]}
     ```
+    
+    _Automated 405 Response for missing method handler_:
+    ```sh
+    $ curl local.domain.org/api-test/numbers -i -X POST
+    HTTP/1.1 405 Method Not Allowed
+    Date: Sat, 18 May 2013 01:21:20 GMT
+    Server: Apache/2.4.3 (Win32) OpenSSL/1.0.1c PHP/5.4.7
+    X-Powered-By: PHP/5.4.7
+    Cache-Control: no-cache
+    Content-Length: 0
+    Content-Type: text/html; charset=UTF-8
+    ```
+    
+    __NOTE__: Remember to turn on URL rewrite!!
 
 ## Testing
 
 
 ```
 $ composer.phar install --dev
-$ vendor/bin/phpunit
+$ vendor/bin/phpspec
+$ vendor/bin/behat
 ```
 
 ## License
