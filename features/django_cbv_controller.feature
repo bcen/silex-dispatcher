@@ -1,6 +1,6 @@
-Feature: RESTful API
+Feature: Django CBV Controller
 
-  Scenario: Django-alike CBV controller
+  Scenario: Handle GET request
     Given a class "RootController.php" with content:
     """
     <?php
@@ -21,7 +21,7 @@ Feature: RESTful API
     <p>This is a GET request</p>
     """
 
-  Scenario:
+  Scenario: Handle POST request
     Given a class "PostController.php" with content:
     """
     <?php
@@ -42,20 +42,7 @@ Feature: RESTful API
     This is a POST request
     """
 
-  Scenario:
-    Given a class "NoMethodHandlerController.php" with content:
-    """
-    <?php
-
-    class NoMethodHandlerController
-    {
-    }
-    """
-    And map the route "/" to "NoMethodHandlerController"
-    When I send a "GET" request to "/"
-    Then I should see a 405 response
-
-  Scenario:
+  Scenario: Handle missing method
     Given a class "MissingMethod.php" with content:
     """
     <?php
@@ -74,6 +61,32 @@ Feature: RESTful API
     And with content:
     """
     missing method
+    """
+
+  Scenario: Handle missing method
+    Given a class "HanldeRequest.php" with content:
+    """
+    <?php
+
+    class HanldeRequest
+    {
+        public function handleRequest()
+        {
+            return 'handle request';
+        }
+
+        public function get()
+        {
+            return 'get';
+        }
+    }
+    """
+    And map the route "/" to "HanldeRequest"
+    When I send a "GET" request to "/"
+    Then I should see a 200 response
+    And with content:
+    """
+    handle request
     """
 
 #  Background:

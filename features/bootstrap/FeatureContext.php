@@ -64,10 +64,35 @@ class FeatureContext extends BehatContext
         $this->willPaginate = false;
         $this->app = new Application();
         $this->app->register(new SDispatcherServiceProvider());
-        $this->app->before($this->app['sdispatcher.option_inspector']);
-        $this->app->before($this->app['sdispatcher.content_negotiator']);
-        $this->app->before($this->app['sdispatcher.deserializer']);
-        $this->app->after($this->app['sdispatcher.serializer']);
+    }
+
+    /**
+     * @AfterSuite
+     */
+    public static function cleanTestDir()
+    {
+        $basePath = sys_get_temp_dir().DIRECTORY_SEPARATOR.'sdispatcher';
+        if (is_dir($basePath)) {
+            static::rmdirRecursive($basePath);
+        }
+    }
+
+    public static function rmdirRecursive($path)
+    {
+        $files = scandir($path);
+        array_shift($files);
+        array_shift($files);
+
+        foreach ($files as $file) {
+            $file = $path . DIRECTORY_SEPARATOR . $file;
+            if (is_dir($file)) {
+                self::rmdirRecursive($file);
+            } else {
+                unlink($file);
+            }
+        }
+
+        rmdir($path);
     }
 
     /**
