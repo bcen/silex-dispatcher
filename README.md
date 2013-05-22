@@ -90,7 +90,7 @@ $app->register(new \SDispatcher\SDispatcherServiceProvider());
     
     ```
     
-- RESTful Helpers/Middlewares
+- Helpers/Middlewares for creating "RESTful" API
 
     ```php
 
@@ -175,6 +175,12 @@ $app->register(new \SDispatcher\SDispatcherServiceProvider());
     ```
     
     __NOTE__: Remember to turn on URL rewrite!!
+    
+## Known Issues:
+
+- Incompaitible with some other resolvers
+- `FilterControllerEvent::getController` will return a closure due to `SilexCbvControllerResolver` wraps the actual class controller
+instance with closure.
 
 ## Testing
 
