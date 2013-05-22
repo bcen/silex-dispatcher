@@ -9,6 +9,7 @@ use Behat\Gherkin\Node\PyStringNode,
 
 use Silex\Application;
 use SDispatcher\SDispatcherServiceProvider;
+use Symfony\Component\HttpFoundation\Request;
 
 //
 // Require 3rd-party libraries here:
@@ -61,117 +62,176 @@ class FeatureContext extends BehatContext
     public function __construct(array $parameters)
     {
         $this->willPaginate = false;
-    }
-
-    /**
-     * @Given /^a RESTful API endpoint$/
-     */
-    public function aRestfulApiEndpoint()
-    {
         $this->app = new Application();
         $this->app->register(new SDispatcherServiceProvider());
+        $this->app->before($this->app['sdispatcher.option_inspector']);
         $this->app->before($this->app['sdispatcher.content_negotiator']);
         $this->app->before($this->app['sdispatcher.deserializer']);
         $this->app->after($this->app['sdispatcher.serializer']);
     }
 
     /**
-     * @Given /^a json string:$/
+     * @Given /^a class "([^"]*)" with content:$/
      */
-    public function aJsonString(PyStringNode $string)
+    public function aClassWithContent($filename, PyStringNode $content)
     {
-        $this->responseData = json_decode($string->getRaw(), true);
-    }
-
-    /**
-     * @Given /^a path at "([^"]*)"$/
-     */
-    public function aPathAt($path)
-    {
-        $paginate = $this->willPaginate;
-        $data = $this->responseData;
-        $this->controllerRoute = $this->app->match($path, function () use ($path, $data, $paginate) {
-            if ($paginate) {
-                return $data;
-            }
-            return new \SDispatcher\DataResponse($data);
-        });
-    }
-
-    /**
-     * @Given /^a paginated response$/
-     */
-    public function aPaginatedResponse()
-    {
-        $this->willPaginate = true;
-    }
-
-    /**
-     * @Given /^route option "([^"]*)" -> "([^"]*)"$/
-     */
-    public function routeOption($key, $value)
-    {
-        if (is_int($value)) {
-            $value = (int)$value;
-        } elseif (is_bool($value)) {
-            $value = (bool)$value;
+        $basePath = sys_get_temp_dir().DIRECTORY_SEPARATOR.'sdispatcher';
+        if (!is_dir($basePath)) {
+            mkdir($basePath);
         }
-        $this->controllerRoute->setOption($key, $value);
+        $filename = $basePath.DIRECTORY_SEPARATOR.$filename;
+        file_put_contents($filename, (string)$content);
+        include $filename;
     }
 
     /**
-     * @Given /^with query string "([^"]*)" -> "([^"]*)"$/
+     * @Given /^map the route "([^"]*)" to "([^"]*)"$/
      */
-    public function withQueryString($key, $value)
+    public function mapTheRouteTo($path, $controllerClass)
     {
-        $this->request->query->set($key, $value);
+        $this->app->match($path, $controllerClass);
     }
 
     /**
-     * @When /^I send a request to "([^"]*)"$/
+     * @When /^I send a "([^"]*)" request to "([^"]*)"$/
      */
-    public function iSendARequestTo($path)
+    public function iSendARequestTo($method, $path)
     {
-        $this->request = \Symfony\Component\HttpFoundation\Request::create($path);
+        $request = Request::create($path, $method);
+        $this->response = $this->app->handle($request);
     }
 
     /**
-     * @Given /^with header "([^"]*)" -> "([^"]*)"$/
+     * @Then /^I should see a (\d+) response$/
      */
-    public function withHeader($key, $value)
+    public function iShouldSeeAResponse($statusCode)
     {
-        $this->request->headers->set($key, $value);
-    }
-
-    /**
-     * @Then /^I should see (\d+) response$/
-     */
-    public function iShouldSeeResponse($statusCode)
-    {
-        $this->app->boot();
-        $this->response = $response = $this->app->handle($this->request);
-        if (!$response) {
-            throw new \Exception();
-        }
-
-        if ($response->getStatusCode() !== (int)$statusCode) {
-            throw new \Exception();
+        $expected = (int)$statusCode;
+        if ($this->response->getStatusCode() !== $expected) {
+            throw new \LogicException('Status Code does not match');
         }
     }
 
     /**
-     * @Given /^the response content is:$/
+     * @Given /^with content:$/
      */
-    public function theResponseContentIs2(PyStringNode $string)
+    public function withContent(PyStringNode $content)
     {
-        $actual = $this->response->getContent();
-        $expected = $string->getRaw();
-        $actual = strtr($actual, array("\r\n" => "\n", "\r" => "\n"));
-        $expected = strtr($expected, array("\r\n" => "\n", "\r" => "\n"));
-        if ($actual !== $expected) {
-            var_dump($this->response->getContent());
-            var_dump($string->getRaw());
-            throw new \Exception();
+        $expected = (string)$content;
+        if ($this->response->getContent() !== $expected) {
+            throw new \LogicException('Content does not match');
         }
     }
+
+//    /**
+//     * @Given /^a RESTful API endpoint$/
+//     */
+//    public function aRestfulApiEndpoint()
+//    {
+//        $this->app = new Application();
+//        $this->app->register(new SDispatcherServiceProvider());
+//        $this->app->before($this->app['sdispatcher.content_negotiator']);
+//        $this->app->before($this->app['sdispatcher.deserializer']);
+//        $this->app->after($this->app['sdispatcher.serializer']);
+//    }
+//
+//    /**
+//     * @Given /^a json string:$/
+//     */
+//    public function aJsonString(PyStringNode $string)
+//    {
+//        $this->responseData = json_decode($string->getRaw(), true);
+//    }
+//
+//    /**
+//     * @Given /^a path at "([^"]*)"$/
+//     */
+//    public function aPathAt($path)
+//    {
+//        $paginate = $this->willPaginate;
+//        $data = $this->responseData;
+//        $this->controllerRoute = $this->app->match($path, function () use ($path, $data, $paginate) {
+//            if ($paginate) {
+//                return $data;
+//            }
+//            return new \SDispatcher\DataResponse($data);
+//        });
+//    }
+//
+//    /**
+//     * @Given /^a paginated response$/
+//     */
+//    public function aPaginatedResponse()
+//    {
+//        $this->willPaginate = true;
+//    }
+//
+//    /**
+//     * @Given /^route option "([^"]*)" -> "([^"]*)"$/
+//     */
+//    public function routeOption($key, $value)
+//    {
+//        if (is_int($value)) {
+//            $value = (int)$value;
+//        } elseif (is_bool($value)) {
+//            $value = (bool)$value;
+//        }
+//        $this->controllerRoute->setOption($key, $value);
+//    }
+//
+//    /**
+//     * @Given /^with query string "([^"]*)" -> "([^"]*)"$/
+//     */
+//    public function withQueryString($key, $value)
+//    {
+//        $this->request->query->set($key, $value);
+//    }
+//
+//    /**
+//     * @When /^I send a request to "([^"]*)"$/
+//     */
+//    public function iSendARequestTo($path)
+//    {
+//        $this->request = \Symfony\Component\HttpFoundation\Request::create($path);
+//    }
+//
+//    /**
+//     * @Given /^with header "([^"]*)" -> "([^"]*)"$/
+//     */
+//    public function withHeader($key, $value)
+//    {
+//        $this->request->headers->set($key, $value);
+//    }
+//
+//    /**
+//     * @Then /^I should see (\d+) response$/
+//     */
+//    public function iShouldSeeResponse($statusCode)
+//    {
+//        $this->app->boot();
+//        $this->response = $response = $this->app->handle($this->request);
+//        if (!$response) {
+//            throw new \Exception();
+//        }
+//
+//        if ($response->getStatusCode() !== (int)$statusCode) {
+//            throw new \Exception();
+//        }
+//    }
+//
+//    /**
+//     * @Given /^the response content is:$/
+//     */
+//    public function theResponseContentIs2(PyStringNode $string)
+//    {
+//        $actual = $this->response->getContent();
+//        $expected = $string->getRaw();
+//        $actual = strtr($actual, array("\r\n" => "\n", "\r" => "\n"));
+//        $expected = strtr($expected, array("\r\n" => "\n", "\r" => "\n"));
+//        if ($actual !== $expected) {
+//            var_dump($this->response->getContent());
+//            var_dump($string->getRaw());
+//            throw new \Exception();
+//        }
+//    }
 }
