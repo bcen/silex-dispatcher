@@ -29,6 +29,11 @@ class FeatureContext extends BehatContext
     private $app;
 
     /**
+     * @var \Symfony\Component\HttpFoundation\Request
+     */
+    private $request;
+
+    /**
      * @var \Symfony\Component\HttpFoundation\Response
      */
     private $response;
@@ -41,7 +46,7 @@ class FeatureContext extends BehatContext
      */
     public function __construct(array $parameters)
     {
-        $this->app = new Application();
+        $this->app = new Application(array('debug' => true));
         $this->app->register(new SDispatcherServiceProvider());
     }
 
@@ -75,6 +80,17 @@ class FeatureContext extends BehatContext
     }
 
     /**
+     * @Given /^a set of restful middlewares$/
+     */
+    public function aSetOfRestfulMiddlewares()
+    {
+        $this->app->before($this->app['sdispatcher.option_inspector']);
+        $this->app->before($this->app['sdispatcher.content_negotiator']);
+        $this->app->before($this->app['sdispatcher.deserializer']);
+        $this->app->after($this->app['sdispatcher.serializer']);
+    }
+
+    /**
      * @Given /^a class "([^"]*)" with content:$/
      */
     public function aClassWithContent($filename, PyStringNode $content)
@@ -97,12 +113,28 @@ class FeatureContext extends BehatContext
     }
 
     /**
-     * @When /^I send a "([^"]*)" request to "([^"]*)"$/
+     * @Given /^a "([^"]*)" request for path "([^"]*)"$/
      */
-    public function iSendARequestTo($method, $path)
+    public function aRequestForPath($method, $path)
     {
-        $request = Request::create($path, $method);
-        $this->response = $this->app->handle($request);
+        $this->request = Request::create($path, $method);
+    }
+
+    /**
+     * @Given /^with headers:$/
+     */
+    public function withHeaders(PyStringNode $jsonHeaders)
+    {
+        $headers = json_decode($jsonHeaders, true);
+        $this->request->headers->add($headers);
+    }
+
+    /**
+     * @When /^I send the request$/
+     */
+    public function iSendTheRequest()
+    {
+        $this->response = $this->app->handle($this->request);
     }
 
     /**
@@ -112,7 +144,9 @@ class FeatureContext extends BehatContext
     {
         $expected = (int)$statusCode;
         if ($this->response->getStatusCode() !== $expected) {
-            throw new \LogicException('Status Code does not match');
+            throw new \LogicException(sprintf(
+                'Status Code does not match, expected %d, but got a %d',
+                $expected, $this->response->getStatusCode()));
         }
     }
 
@@ -123,7 +157,9 @@ class FeatureContext extends BehatContext
     {
         $expected = (string)$content;
         if ($this->response->getContent() !== $expected) {
-            throw new \LogicException('Content does not match');
+            throw new \LogicException(sprintf(
+                'Content does not match, expected %s, but got a %s',
+                $expected, $this->response->getContent()));
         }
     }
 
