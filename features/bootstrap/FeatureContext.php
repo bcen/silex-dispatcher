@@ -29,29 +29,9 @@ class FeatureContext extends BehatContext
     private $app;
 
     /**
-     * @var \Silex\ControllerCollection
-     */
-    private $controllerRoute;
-
-    /**
-     * @var \Symfony\Component\HttpFoundation\Request
-     */
-    private $request;
-
-    /**
-     * @var array
-     */
-    private $responseData;
-
-    /**
      * @var \Symfony\Component\HttpFoundation\Response
      */
     private $response;
-
-    /**
-     * @var bool
-     */
-    private $willPaginate;
 
     /**
      * Initializes context.
@@ -61,7 +41,6 @@ class FeatureContext extends BehatContext
      */
     public function __construct(array $parameters)
     {
-        $this->willPaginate = false;
         $this->app = new Application();
         $this->app->register(new SDispatcherServiceProvider());
     }

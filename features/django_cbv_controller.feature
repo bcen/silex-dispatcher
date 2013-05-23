@@ -49,6 +49,11 @@ Feature: Django CBV Controller
 
     class MissingMethod
     {
+        public function post()
+        {
+            return 'post';
+        }
+
         public function handleMissingMethod()
         {
             return 'missing method';
@@ -63,7 +68,7 @@ Feature: Django CBV Controller
     missing method
     """
 
-  Scenario: Handle missing method
+  Scenario: Handle request
     Given a class "HanldeRequest.php" with content:
     """
     <?php
@@ -87,6 +92,52 @@ Feature: Django CBV Controller
     And with content:
     """
     handle request
+    """
+
+  Scenario: No method handler
+    Given a class "NoMethodHandler.php" with content:
+    """
+    <?php
+
+    class NoMethodHandler
+    {
+    }
+    """
+    And map the route "/" to "NoMethodHandler"
+    When I send a "GET" request to "/"
+    Then I should see a 404 response
+
+  Scenario: Resolve dependency
+    Given a class "Dependency.php" with content:
+    """
+    <?php
+
+    use SDispatcher\Common\RequiredServiceMetaProviderInterface;
+    use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+
+    class Dependency implements RequiredServiceMetaProviderInterface
+    {
+        public function __construct(EventDispatcherInterface $dispatcher)
+        {
+        }
+
+        public function get()
+        {
+            return 'get';
+        }
+
+        public static function getRequiredServices()
+        {
+            return array('dispatcher');
+        }
+    }
+    """
+    And map the route "/" to "Dependency"
+    When I send a "GET" request to "/"
+    Then I should see a 200 response
+    And with content:
+    """
+    get
     """
 
 #  Background:
