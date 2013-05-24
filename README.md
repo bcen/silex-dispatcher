@@ -179,8 +179,8 @@ $app->register(new \SDispatcher\SDispatcherServiceProvider());
 ## Known Issues:
 
 - Incompaitible with some other resolvers
-- `FilterControllerEvent::getController` will return a closure due to `SilexCbvControllerResolver` wraps the actual class controller
-instance with closure.
+- ~~`FilterControllerEvent::getController` will return a closure due to `SilexCbvControllerResolver` wraps the actual class controller
+instance with closure.~~
 
 ## Testing
 
