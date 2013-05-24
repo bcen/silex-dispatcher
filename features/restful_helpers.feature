@@ -142,3 +142,44 @@ Feature: RESTful Middlewares/Helpers
     <response><meta><offset>3</offset><limit>2</limit><total>8</total><prevLink>http://localhost/?limit=2&amp;offset=1</prevLink><nextLink>http://localhost/?limit=2&amp;offset=5</nextLink></meta><objects><item>4</item><item>5</item></objects></response>
 
     """
+
+  Scenario: Automated Pagination with declarative resource option
+    Given a class "Declarative.php" with content:
+    """
+    <?php
+
+    use SDispatcher\Common\Annotation as REST;
+    use SDispatcher\DataResponse;
+
+    abstract class AbstractDeclarative
+    {
+        protected static $supportedFormats = array('xml', 'json');
+        protected static $pageLimit = 2;
+
+    }
+
+    class Declarative extends AbstractDeclarative
+    {
+        public function get()
+        {
+            return range(1, 8);
+        }
+    }
+    """
+    And a declarative resource option class
+    And map the route "/" to "Declarative"
+    And a "GET" request for path "/?offset=3"
+    And with headers:
+    """
+    {
+        "Accept": "application/json,application/xml"
+    }
+    """
+    When I send the request
+    Then I should see a 200 response
+    And with content:
+    """
+    <?xml version="1.0" encoding="utf-8"?>
+    <response><meta><offset>3</offset><limit>2</limit><total>8</total><prevLink>http://localhost/?limit=2&amp;offset=1</prevLink><nextLink>http://localhost/?limit=2&amp;offset=5</nextLink></meta><objects><item>4</item><item>5</item></objects></response>
+
+    """

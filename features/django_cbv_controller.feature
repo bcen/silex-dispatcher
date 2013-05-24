@@ -162,3 +162,25 @@ Feature: Django CBV Controller
     """
     closure
     """
+
+  Scenario: CBV resolver should be comptaible with class method controller
+    Given a class "ClassMethodDemo.php" with content:
+    """
+    <?php
+
+    class ClassMethodDemo
+    {
+        public function method()
+        {
+            return 'method';
+        }
+    }
+    """
+    And map the route "/" to "ClassMethodDemo::method"
+    And a "GET" request for path "/"
+    When I send the request
+    Then I should see a 200 response
+    And with content:
+    """
+    method
+    """

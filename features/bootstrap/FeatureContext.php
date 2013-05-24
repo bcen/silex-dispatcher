@@ -130,6 +130,19 @@ class FeatureContext extends BehatContext
     }
 
     /**
+     * @Given /^a declarative resource option class$/
+     */
+    public function aDeclarativeResourceOptionClass()
+    {
+        // TODO: clean up
+        // This is a hacky way to override the default resource option class
+        $this->app = new Application(array('debug' => true));
+        $this->app->register(new SDispatcherServiceProvider());
+        $this->app['sdispatcher.resource_option.class'] = 'SDispatcher\\Common\\DeclarativeResourceOption';
+        $this->aSetOfRestfulMiddlewares();
+    }
+
+    /**
      * @When /^I send the request$/
      */
     public function iSendTheRequest()
