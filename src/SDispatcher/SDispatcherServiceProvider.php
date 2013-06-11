@@ -85,10 +85,8 @@ class SDispatcherServiceProvider implements ServiceProviderInterface
     public function register(Application $app)
     {
         $params = $this->getDefaultParameters();
-        foreach ((array)$params as $key => $value) {
-            if (!isset($app[$key])) {
-                $app[$key] = $value;
-            }
+        foreach ($params as $key => $value) {
+            $app[$key] = $value;
         }
         $services = $this->getServices($app);
         foreach ($services as $id => $definition) {
