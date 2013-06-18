@@ -37,7 +37,10 @@ class ContentNegotiator extends AbstractKernelRequestEventListener
      */
     protected function doKernelRequest(Request $request)
     {
-        $request->attributes->set('_format', $request->query->get('format'));
+        if (!$request->attributes->has('_format')) {
+            $request->attributes->set('_format', $request->query->get('format'));
+        }
+
         $routeName = $request->attributes->get('_route');
         $route = $this->routes->get($routeName);
         if (!$route) {
@@ -47,7 +50,7 @@ class ContentNegotiator extends AbstractKernelRequestEventListener
         $acceptableFormats = (array)$route->getOption(
             RouteOptions::SUPPORTED_FORMATS);
         $bestFormat = $this->formatNegotiator->getBestFormat(
-            $request, $acceptableFormats);
+            $request, $acceptableFormats, true);
 
         if (!$bestFormat) {
             return new Response('', 406);
