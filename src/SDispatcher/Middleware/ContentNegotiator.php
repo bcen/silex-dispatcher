@@ -40,12 +40,8 @@ class ContentNegotiator extends AbstractKernelRequestEventListener
         $routeName = $request->attributes->get('_route');
         $route = $this->routes->get($routeName);
 
-        if (!$route->getOption(RouteOptions::REST)) {
+        if (!$route || !$route->getOption(RouteOptions::REST)) {
             return null;
-        }
-
-        if (!$route) {
-            return new Response('', 406);
         }
 
         if (!$request->attributes->has('_format')) {

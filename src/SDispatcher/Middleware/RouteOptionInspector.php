@@ -55,7 +55,7 @@ class RouteOptionInspector extends AbstractKernelRequestEventListener
         $routeName = $request->attributes->get('_route');
         $route = $this->routes->get($routeName);
 
-        if (!$route->getOption(RouteOptions::REST)) {
+        if (!$route || !$route->getOption(RouteOptions::REST)) {
             return null;
         }
 
