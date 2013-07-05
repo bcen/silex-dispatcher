@@ -10,7 +10,7 @@ Via [Composer](http://getcomposer.org/):
 
     {
         "require": {
-            "bcen/silex-dispatcher": "dev-develop"
+            "bcen/silex-dispatcher": "0.5.*"
         }
     }
 
