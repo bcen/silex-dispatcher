@@ -84,10 +84,7 @@ class FeatureContext extends BehatContext
      */
     public function aSetOfRestfulMiddlewares()
     {
-        $this->app->before($this->app['sdispatcher.option_inspector']);
-        $this->app->before($this->app['sdispatcher.content_negotiator']);
-        $this->app->before($this->app['sdispatcher.deserializer']);
-        $this->app->after($this->app['sdispatcher.serializer']);
+        $this->app['controllers']->setOption('sdispatcher.route.rest', true);
     }
 
     /**

@@ -6,6 +6,7 @@ use SDispatcher\Common\DefaultXmlEncoder;
 use SDispatcher\Common\FOSDecoderProvider;
 use Silex\Application;
 use Silex\ServiceProviderInterface;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Serializer\Encoder\ChainEncoder;
 use Symfony\Component\Serializer\Encoder\JsonEncoder;
 
@@ -39,6 +40,17 @@ class SDispatcherServiceProvider implements ServiceProviderInterface
                         $resolver);
                 })),
 
+            // delays the subscriber registration
+            'dispatcher'
+                => $app->share($app->extend('dispatcher', function (EventDispatcherInterface $dispatcher, $container) {
+                    $dispatcher->addSubscriber($container['sdispatcher.option_inspector']);
+                    $dispatcher->addSubscriber($container['sdispatcher.content_negotiator']);
+                    $dispatcher->addSubscriber($container['sdispatcher.deserializer']);
+                    $dispatcher->addSubscriber($container['sdispatcher.serializer']);
+                    $dispatcher->addSubscriber($container['sdispatcher.pagination_listener']);
+                    return $dispatcher;
+                })),
+
             'sdispatcher.resource_option'
                 => $app->share(function ($container) {
                     return new $container['sdispatcher.resource_option.class']();
@@ -60,7 +72,9 @@ class SDispatcherServiceProvider implements ServiceProviderInterface
 
             'sdispatcher.deserializer'
                 => $app->share(function ($container) {
-                    return new $container['sdispatcher.deserializer.class'](new FOSDecoderProvider());
+                    return new $container['sdispatcher.deserializer.class'](
+                        $container['routes'],
+                        new FOSDecoderProvider());
                 }),
 
             'sdispatcher.serializer'
@@ -99,15 +113,11 @@ class SDispatcherServiceProvider implements ServiceProviderInterface
      */
     public function boot(Application $app)
     {
-        if ($app['sdispatcher.global_middleware']) {
-            $app->before($app['sdispatcher.option_inspector']);
-            $app->before($app['sdispatcher.content_negotiator']);
-            $app->before($app['sdispatcher.deserializer']);
-            $app->after($app['sdispatcher.serializer']);
-        }
-
-        /* @var \Symfony\Component\EventDispatcher\EventDispatcher $ed */
-        $ed = $app['dispatcher'];
-        $ed->addSubscriber($app['sdispatcher.pagination_listener']);
+//        if ($app['sdispatcher.global_middleware']) {
+//            $app->before($app['sdispatcher.option_inspector']);
+//            $app->before($app['sdispatcher.content_negotiator']);
+//            $app->before($app['sdispatcher.deserializer']);
+//            $app->after($app['sdispatcher.serializer']);
+//        }
     }
 }

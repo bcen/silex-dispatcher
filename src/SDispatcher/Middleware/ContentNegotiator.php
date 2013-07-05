@@ -37,15 +37,21 @@ class ContentNegotiator extends AbstractKernelRequestEventListener
      */
     protected function doKernelRequest(Request $request)
     {
+        $routeName = $request->attributes->get('_route');
+        $route = $this->routes->get($routeName);
+
+        if (!$route->getOption(RouteOptions::REST)) {
+            return null;
+        }
+
+        if (!$route) {
+            return new Response('', 406);
+        }
+
         if (!$request->attributes->has('_format')) {
             $request->attributes->set('_format', $request->query->get('format'));
         }
 
-        $routeName = $request->attributes->get('_route');
-        $route = $this->routes->get($routeName);
-        if (!$route) {
-            return new Response('', 406);
-        }
 
         $acceptableFormats = (array)$route->getOption(
             RouteOptions::SUPPORTED_FORMATS);

@@ -3,6 +3,7 @@ namespace SDispatcher\Common;
 
 class RouteOptions
 {
+    const REST                          = 'sdispatcher.route.rest';
     const SUPPORTED_FORMATS             = 'sdispatcher.route.supported_formats';
     const RESOURCE_ID                   = 'sdispatcher.route.resource_identifier';
     const PAGE_LIMIT                    = 'sdispatcher.route.page_limit';

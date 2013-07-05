@@ -30,11 +30,7 @@ final class SilexCbvControllerResolver extends SilexControllerResolver
         try {
             $controller = $this->resolver->getController($request);
         } catch (\Exception $ex) {
-            try {
-                $controller = parent::getController($request);
-            } catch (\Exception $ex) {
-                return false;
-            }
+            $controller = parent::getController($request);
         }
 
         return $controller;
