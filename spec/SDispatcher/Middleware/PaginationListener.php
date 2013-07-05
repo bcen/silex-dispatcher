@@ -38,6 +38,7 @@ class PaginationListener extends ObjectBehavior
         $this->routes = $this->prophet->prophesize('Symfony\\Component\\Routing\\RouteCollection');
         $this->event = $this->prophet->prophesize('Symfony\\Component\\HttpKernel\\Event\\GetResponseForControllerResultEvent');
 
+        $this->route->getOption(RouteOptions::REST)->willReturn(true);
         $this->routes->get(Argument::any())->willReturn($this->route->reveal());
 
         $this->beConstructedWith($this->routes->reveal());

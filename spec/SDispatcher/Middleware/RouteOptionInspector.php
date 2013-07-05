@@ -6,6 +6,7 @@ use PHPSpec2\ObjectBehavior;
 use Prophecy\Argument;
 use Prophecy\Prophecy\ObjectProphecy;
 use Prophecy\Prophet;
+use SDispatcher\Common\RouteOptions;
 use Symfony\Component\HttpFoundation\Request;
 
 class RouteOptionInspector extends ObjectBehavior
@@ -37,6 +38,7 @@ class RouteOptionInspector extends ObjectBehavior
         $this->routes = $this->prophet->prophesize('Symfony\\Component\\Routing\\RouteCollection');
         $this->annotationResourceOption = $this->prophet->prophesize('SDispatcher\\Common\\AnnotationResourceOption');
 
+        $this->route->getOption(RouteOptions::REST)->willReturn(true);
         $this->routes->get(Argument::any())->willReturn($this->route->reveal());
 
         $this->beConstructedWith(

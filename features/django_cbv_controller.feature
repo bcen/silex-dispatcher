@@ -110,7 +110,7 @@ Feature: Django CBV Controller
     And map the route "/" to "NoMethodHandler"
     And a "GET" request for path "/"
     When I send the request
-    Then I should see a 404 response
+    Then I should see a 500 response
 
   Scenario: Resolve dependency
     Given a class "Dependency.php" with content:
