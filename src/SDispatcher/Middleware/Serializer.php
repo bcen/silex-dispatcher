@@ -60,6 +60,11 @@ class Serializer implements EventSubscriberInterface
         }
         $routeName = $request->attributes->get('_route');
         $route = $this->routes->get($routeName);
+
+        if (!$route->getOption(RouteOptions::REST)) {
+            return;
+        }
+
         $acceptedFormat = $route->getOption(RouteOptions::ACCEPTED_FORMAT);
         if (!$acceptedFormat) {
             $response->setContent('');
@@ -87,6 +92,6 @@ class Serializer implements EventSubscriberInterface
      */
     public static function getSubscribedEvents()
     {
-        return array(KernelEvents::RESPONSE => 'onKernelResponse');
+        return array(KernelEvents::RESPONSE => array('onKernelResponse', -4));
     }
 }

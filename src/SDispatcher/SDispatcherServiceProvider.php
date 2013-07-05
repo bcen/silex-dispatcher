@@ -60,7 +60,9 @@ class SDispatcherServiceProvider implements ServiceProviderInterface
 
             'sdispatcher.deserializer'
                 => $app->share(function ($container) {
-                    return new $container['sdispatcher.deserializer.class'](new FOSDecoderProvider());
+                    return new $container['sdispatcher.deserializer.class'](
+                        $container['routes'],
+                        new FOSDecoderProvider());
                 }),
 
             'sdispatcher.serializer'
@@ -108,6 +110,10 @@ class SDispatcherServiceProvider implements ServiceProviderInterface
 
         /* @var \Symfony\Component\EventDispatcher\EventDispatcher $ed */
         $ed = $app['dispatcher'];
+        $ed->addSubscriber($app['sdispatcher.option_inspector']);
+        $ed->addSubscriber($app['sdispatcher.content_negotiator']);
+        $ed->addSubscriber($app['sdispatcher.deserializer']);
+        $ed->addSubscriber($app['sdispatcher.serializer']);
         $ed->addSubscriber($app['sdispatcher.pagination_listener']);
     }
 }
