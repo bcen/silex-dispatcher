@@ -118,11 +118,8 @@ $app->register(new \SDispatcher\SDispatcherServiceProvider());
     
     $app = new \Silex\Application();
     $app->register(new \SDispatcher\SDispatcherServiceProvider());
-    $app->before($app['sdispatcher.option_inspector']);
-    $app->before($app['sdispatcher.content_negotiator']);
-    $app->before($app['sdispatcher.deserializer']);
-    $app->after($app['sdispatcher.serializer']);
-    
+    $app['controllers']->setOption('sdispatcher.route.rest', true);
+
     $app->match('/numbers', 'NumberListResource');
     $app->match('/numbers/{nid}', 'NumberDetailResource');
     
