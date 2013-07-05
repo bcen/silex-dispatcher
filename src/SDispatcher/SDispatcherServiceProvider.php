@@ -6,6 +6,7 @@ use SDispatcher\Common\DefaultXmlEncoder;
 use SDispatcher\Common\FOSDecoderProvider;
 use Silex\Application;
 use Silex\ServiceProviderInterface;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Serializer\Encoder\ChainEncoder;
 use Symfony\Component\Serializer\Encoder\JsonEncoder;
 
@@ -37,6 +38,13 @@ class SDispatcherServiceProvider implements ServiceProviderInterface
                     return new $container['sdispatcher.cbv_resolver.class'](
                         $container,
                         $resolver);
+                })),
+
+            // delays the subscriber registration
+            'dispatcher'
+                => $app->share($app->extend('dispatcher', function (EventDispatcherInterface $dispatcher, $container) {
+                    $dispatcher->addSubscriber($container['sdispatcher.pagination_listener']);
+                    return $dispatcher;
                 })),
 
             'sdispatcher.resource_option'
@@ -105,9 +113,5 @@ class SDispatcherServiceProvider implements ServiceProviderInterface
             $app->before($app['sdispatcher.deserializer']);
             $app->after($app['sdispatcher.serializer']);
         }
-
-        /* @var \Symfony\Component\EventDispatcher\EventDispatcher $ed */
-        $ed = $app['dispatcher'];
-        $ed->addSubscriber($app['sdispatcher.pagination_listener']);
     }
 }
