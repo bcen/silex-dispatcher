@@ -5,6 +5,7 @@ namespace spec\SDispatcher\Middleware;
 use PHPSpec2\ObjectBehavior;
 use Prophecy\Argument;
 use Prophecy\Prophet;
+use SDispatcher\Common\RouteOptions;
 use Symfony\Component\HttpFoundation\Request;
 
 class Serializer extends ObjectBehavior
@@ -42,6 +43,7 @@ class Serializer extends ObjectBehavior
         $this->response = $this->prophet->prophesize('SDispatcher\\DataResponse');
         $this->encoder = $this->prophet->prophesize('Symfony\\Component\\Serializer\\Encoder\\EncoderInterface');
 
+        $this->route->getOption(RouteOptions::REST)->willReturn(true);
         $this->routes->get(Argument::any())->willReturn($this->route->reveal());
 
         $this->beConstructedWith(

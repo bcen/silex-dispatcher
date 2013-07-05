@@ -40,6 +40,7 @@ class ContentNegotiator extends ObjectBehavior implements CustomMatchersProvider
         $this->formatNegotiator = $this->prophet->prophesize('FOS\\Rest\\Util\\FormatNegotiator');
         $this->route = $this->prophet->prophesize('Symfony\\Component\\Routing\\Route');
 
+        $this->route->getOption(RouteOptions::REST)->willReturn(true);
         $this->routes->get(Argument::any())->willReturn($this->route->reveal());
 
         $this->beConstructedWith(
@@ -59,6 +60,7 @@ class ContentNegotiator extends ObjectBehavior implements CustomMatchersProvider
 
     public function it_should_convert_format_from_query_string_to_request_attribute()
     {
+        $this->route->getOption(RouteOptions::SUPPORTED_FORMATS)->willReturn(array('json', 'xml'));
         $request = Request::create('/?format=my_format');
         $this->__invoke($request);
         if ($request->attributes->get('_format') !== 'my_format') {

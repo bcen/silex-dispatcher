@@ -3,10 +3,10 @@
 namespace spec\SDispatcher\Middleware;
 
 use FOS\Rest\Decoder\JsonDecoder;
-use FOS\Rest\Decoder\XmlDecoder;
 use PHPSpec2\ObjectBehavior;
 use Prophecy\Argument;
 use Prophecy\Prophet;
+use SDispatcher\Common\RouteOptions;
 use Symfony\Component\HttpFoundation\Request;
 
 class Deserializer extends ObjectBehavior
@@ -21,12 +21,29 @@ class Deserializer extends ObjectBehavior
      */
     private $decoderProvider;
 
+    /**
+     * @var \Prophecy\Prophecy\ObjectProphecy
+     */
+    private $route;
+
+    /**
+     * @var \Prophecy\Prophecy\ObjectProphecy
+     */
+    private $routes;
+
     public function let()
     {
         $this->prophet = new Prophet();
+        $this->route = $this->prophet->prophesize('Symfony\\Component\\Routing\\Route');
+        $this->routes = $this->prophet->prophesize('Symfony\\Component\\Routing\\RouteCollection');
         $this->decoderProvider = $this->prophet->prophesize('SDispatcher\\Common\\FOSDecoderProvider');
 
-        $this->beConstructedWith($this->decoderProvider->reveal());
+        $this->route->getOption(RouteOptions::REST)->willReturn(true);
+        $this->routes->get(Argument::any())->willReturn($this->route->reveal());
+
+        $this->beConstructedWith(
+            $this->routes->reveal(),
+            $this->decoderProvider->reveal());
     }
 
     public function letgo()
