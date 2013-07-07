@@ -2,13 +2,13 @@
 
 namespace spec\SDispatcher\Common;
 
-use PHPSpec2\ObjectBehavior;
+use PhpSpec\ObjectBehavior;
 use SDispatcher\Common\Annotation as REST;
 
 /**
  * @REST\SupportedFormats("xml")
  */
-class AnnotationResourceOption extends ObjectBehavior
+class AnnotationResourceOptionSpec extends ObjectBehavior
 {
     public function it_should_be_initializable()
     {
@@ -34,7 +34,7 @@ class AnnotationResourceOption extends ObjectBehavior
 
     public function it_should_read_annotation_from_class()
     {
-        $this->setTarget('spec\\SDispatcher\\Common\AnnotationResourceOption');
+        $this->setTarget('spec\\SDispatcher\\Common\\AnnotationResourceOptionSpec');
         $this->getSupportedFormats()->shouldReturn(array('xml'));
     }
 
@@ -45,7 +45,7 @@ class AnnotationResourceOption extends ObjectBehavior
     }
 }
 
-class DummyClass extends AnnotationResourceOption
+class DummyClass extends AnnotationResourceOptionSpec
 {
     public function dummyMethod()
     {

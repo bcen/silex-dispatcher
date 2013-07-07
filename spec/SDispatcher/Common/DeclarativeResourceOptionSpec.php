@@ -2,9 +2,9 @@
 
 namespace spec\SDispatcher\Common;
 
-use PHPSpec2\ObjectBehavior;
+use PhpSpec\ObjectBehavior;
 
-class DeclarativeResourceOption extends ObjectBehavior
+class DeclarativeResourceOptionSpec extends ObjectBehavior
 {
     public function it_should_be_initializable()
     {

@@ -2,14 +2,14 @@
 
 namespace spec\SDispatcher\Middleware;
 
-use PHPSpec2\ObjectBehavior;
+use PhpSpec\ObjectBehavior;
 use Prophecy\Argument;
 use Prophecy\Prophet;
 use SDispatcher\Common\InMemoryPaginator;
 use SDispatcher\Common\RouteOptions;
 use Symfony\Component\HttpFoundation\Request;
 
-class PaginationListener extends ObjectBehavior
+class PaginationListenerSpec extends ObjectBehavior
 {
     /**
      * @var \Prophecy\Prophet

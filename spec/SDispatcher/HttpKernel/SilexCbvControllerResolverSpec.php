@@ -2,14 +2,12 @@
 
 namespace spec\SDispatcher\HttpKernel;
 
-use PHPSpec2\Matcher\CustomMatchersProviderInterface;
-use PHPSpec2\Matcher\InlineMatcher;
-use PHPSpec2\ObjectBehavior;
+use PhpSpec\ObjectBehavior;
 use SDispatcher\Common\RequiredServiceMetaProviderInterface;
 use Silex\Application;
 use Symfony\Component\HttpFoundation\Request;
 
-class SilexCbvControllerResolver extends ObjectBehavior implements CustomMatchersProviderInterface
+class SilexCbvControllerResolverSpec extends ObjectBehavior
 {
     public function let()
     {
@@ -45,12 +43,12 @@ class SilexCbvControllerResolver extends ObjectBehavior implements CustomMatcher
         $this->getController($request);
     }
 
-    public static function getMatchers()
+    public function getMatchers()
     {
         return array(
-            new InlineMatcher('returnArrayFormat', function ($subject) {
+            'returnArrayFormat' => function ($subject) {
                 return is_array($subject) && count($subject) >= 2;
-            }),
+            },
         );
     }
 }
