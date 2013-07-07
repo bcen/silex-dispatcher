@@ -11,24 +11,23 @@
         }
     ],
     "autoload": {
-        "psr-0": { "SDispatcher": "src/" }
+        "psr-0": { "SDispatcher\\": "src/" }
     },
     "require": {
+        "symfony/event-dispatcher": ">=2.3,<2.4-dev",
+        "symfony/http-foundation": ">=2.3,<2.4-dev",
+        "symfony/http-kernel": ">=2.3,<2.4-dev",
+        "symfony/routing": ">=2.3,<2.4-dev",
+        "symfony/serializer": ">=2.3,<2.4-dev",
         "friendsofsymfony/rest": "0.8.*@dev",
-        "symfony/serializer": ">=2.1,<2.3-dev",
-        "symfony/http-foundation": ">=2.1,<2.3-dev",
-        "symfony/http-kernel": ">=2.1,<2.3-dev",
-        "symfony/event-dispatcher": ">=2.1,<2.3-dev",
-        "symfony/routing": ">=2.1,<2.3-dev",
         "doctrine/common": "2.3.*"
     },
     "require-dev": {
         "behat/behat": "2.4.*@stable",
-        "silex/silex": "v1.0.0",
-        "phpspec/prophecy": "~1.0@dev",
-        "symfony/config": ">=2.1,<2.3-dev",
-        "phpspec/phpspec2": "1.0.*@dev",
-        "phpspec/php-diff": "*@dev",
+        "phpspec/prophecy": "1.0.*",
+        "phpspec/phpspec": "2.0.0-BETA4",
+        "silex/silex": "1.1.*",
+        "symfony/config": ">=2.3,<2.4-dev",
         "doctrine/orm": "2.3.*"
     }
 }
