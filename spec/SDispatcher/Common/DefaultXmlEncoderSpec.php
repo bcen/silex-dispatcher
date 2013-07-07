@@ -2,9 +2,9 @@
 
 namespace spec\SDispatcher\Common;
 
-use PHPSpec2\ObjectBehavior;
+use PhpSpec\ObjectBehavior;
 
-class DefaultXmlEncoder extends ObjectBehavior
+class DefaultXmlEncoderSpec extends ObjectBehavior
 {
     public function it_should_be_initializable()
     {

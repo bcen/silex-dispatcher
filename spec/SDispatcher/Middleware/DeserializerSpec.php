@@ -3,13 +3,13 @@
 namespace spec\SDispatcher\Middleware;
 
 use FOS\Rest\Decoder\JsonDecoder;
-use PHPSpec2\ObjectBehavior;
+use PhpSpec\ObjectBehavior;
 use Prophecy\Argument;
 use Prophecy\Prophet;
 use SDispatcher\Common\RouteOptions;
 use Symfony\Component\HttpFoundation\Request;
 
-class Deserializer extends ObjectBehavior
+class DeserializerSpec extends ObjectBehavior
 {
     /**
      * @var \Prophecy\Prophet

@@ -2,16 +2,14 @@
 
 namespace spec\SDispatcher\Middleware;
 
-use PHPSpec2\Matcher\CustomMatchersProviderInterface;
-use PHPSpec2\Matcher\InlineMatcher;
-use PHPSpec2\ObjectBehavior;
+use PhpSpec\ObjectBehavior;
 use Prophecy\Argument;
 use Prophecy\Prophet;
 use SDispatcher\Common\RouteOptions;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
-class ContentNegotiator extends ObjectBehavior implements CustomMatchersProviderInterface
+class ContentNegotiatorSpec extends ObjectBehavior
 {
     /**
      * @var \Prophecy\Prophet
@@ -85,12 +83,12 @@ class ContentNegotiator extends ObjectBehavior implements CustomMatchersProvider
         $this->__invoke($request)->shouldReturn406Response();
     }
 
-    public static function getMatchers()
+    public function getMatchers()
     {
         return array(
-            new InlineMatcher('return406Response', function (Response $subject) {
+            'return406Response' => function (Response $subject) {
                 return $subject->getStatusCode() === 406;
-            }),
+            },
         );
     }
 }

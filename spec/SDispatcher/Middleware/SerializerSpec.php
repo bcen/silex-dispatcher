@@ -2,13 +2,13 @@
 
 namespace spec\SDispatcher\Middleware;
 
-use PHPSpec2\ObjectBehavior;
+use PhpSpec\ObjectBehavior;
 use Prophecy\Argument;
 use Prophecy\Prophet;
 use SDispatcher\Common\RouteOptions;
 use Symfony\Component\HttpFoundation\Request;
 
-class Serializer extends ObjectBehavior
+class SerializerSpec extends ObjectBehavior
 {
     /**
      * @var \Prophecy\Prophet

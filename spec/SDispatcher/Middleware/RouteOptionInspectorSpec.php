@@ -2,14 +2,14 @@
 
 namespace spec\SDispatcher\Middleware;
 
-use PHPSpec2\ObjectBehavior;
+use PhpSpec\ObjectBehavior;
 use Prophecy\Argument;
 use Prophecy\Prophecy\ObjectProphecy;
 use Prophecy\Prophet;
 use SDispatcher\Common\RouteOptions;
 use Symfony\Component\HttpFoundation\Request;
 
-class RouteOptionInspector extends ObjectBehavior
+class RouteOptionInspectorSpec extends ObjectBehavior
 {
     /**
      * @var \Prophecy\Prophet
@@ -66,7 +66,7 @@ class RouteOptionInspector extends ObjectBehavior
     public function it_should_set_route_option_if_controller_found()
     {
         $request = Request::create('/');
-        $request->attributes->set('_controller', 'spec\SDispatcher\Middleware\RouteOptionInspector');
+        $request->attributes->set('_controller', 'spec\SDispatcher\Middleware\RouteOptionInspectorSpec');
         $this->route->addOptions(Argument::any())->shouldBeCalled();
 
         $this->__invoke($request);
