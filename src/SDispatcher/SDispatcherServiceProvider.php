@@ -18,14 +18,14 @@ class SDispatcherServiceProvider implements ServiceProviderInterface
     public function getDefaultParameters()
     {
         return array(
-            'sdispatcher.global_middleware'         => false,
-            'sdispatcher.cbv_resolver.class'        => 'SDispatcher\\HttpKernel\\SilexCbvControllerResolver',
-            'sdispatcher.resource_option.class'     => 'SDispatcher\\Common\\AnnotationResourceOption',
-            'sdispatcher.option_inspector.class'    => 'SDispatcher\\Middleware\\RouteOptionInspector',
-            'sdispatcher.content_negotiator.class'  => 'SDispatcher\\Middleware\\ContentNegotiator',
-            'sdispatcher.deserializer.class'        => 'SDispatcher\\Middleware\\Deserializer',
-            'sdispatcher.serializer.class'          => 'SDispatcher\\Middleware\\Serializer',
-            'sdispatcher.pagination_listener.class' => 'SDispatcher\\Middleware\\PaginationListener',
+            'sdispatcher.middleware_converter.class' => 'SDispatcher\\Middleware\\ControllerConfiguredMiddlewareConverter',
+            'sdispatcher.cbv_resolver.class'         => 'SDispatcher\\HttpKernel\\SilexCbvControllerResolver',
+            'sdispatcher.resource_option.class'      => 'SDispatcher\\Common\\AnnotationResourceOption',
+            'sdispatcher.option_inspector.class'     => 'SDispatcher\\Middleware\\RouteOptionInspector',
+            'sdispatcher.content_negotiator.class'   => 'SDispatcher\\Middleware\\ContentNegotiator',
+            'sdispatcher.deserializer.class'         => 'SDispatcher\\Middleware\\Deserializer',
+            'sdispatcher.serializer.class'           => 'SDispatcher\\Middleware\\Serializer',
+            'sdispatcher.pagination_listener.class'  => 'SDispatcher\\Middleware\\PaginationListener',
         );
     }
 
@@ -43,13 +43,18 @@ class SDispatcherServiceProvider implements ServiceProviderInterface
             // delays the subscriber registration
             'dispatcher'
                 => $app->share($app->extend('dispatcher', function (EventDispatcherInterface $dispatcher, $container) {
-                    $dispatcher->addSubscriber($container['sdispatcher.option_inspector']);
-                    $dispatcher->addSubscriber($container['sdispatcher.content_negotiator']);
-                    $dispatcher->addSubscriber($container['sdispatcher.deserializer']);
-                    $dispatcher->addSubscriber($container['sdispatcher.serializer']);
+                    $dispatcher->addSubscriber($container['sdispatcher.middleware_converter']);
                     $dispatcher->addSubscriber($container['sdispatcher.pagination_listener']);
                     return $dispatcher;
                 })),
+
+            'sdispatcher.middleware_converter'
+                => $app->share(function ($container) {
+                    return new $container['sdispatcher.middleware_converter.class'](
+                        $container,
+                        $container['routes'],
+                        $container['sdispatcher.resource_option']);
+                }),
 
             'sdispatcher.resource_option'
                 => $app->share(function ($container) {
@@ -113,11 +118,5 @@ class SDispatcherServiceProvider implements ServiceProviderInterface
      */
     public function boot(Application $app)
     {
-//        if ($app['sdispatcher.global_middleware']) {
-//            $app->before($app['sdispatcher.option_inspector']);
-//            $app->before($app['sdispatcher.content_negotiator']);
-//            $app->before($app['sdispatcher.deserializer']);
-//            $app->after($app['sdispatcher.serializer']);
-//        }
     }
 }

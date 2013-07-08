@@ -30,7 +30,7 @@ class PaginationListener implements EventSubscriberInterface
 
         $routeName = $e->getRequest()->attributes->get('_route');
         $route = $this->routes->get($routeName);
-        if (!$route || !$route->getOption(RouteOptions::REST)) {
+        if (!$route) {
             return;
         }
 

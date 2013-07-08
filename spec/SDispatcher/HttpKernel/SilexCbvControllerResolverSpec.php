@@ -3,6 +3,7 @@
 namespace spec\SDispatcher\HttpKernel;
 
 use PhpSpec\ObjectBehavior;
+use SDispatcher\Common\AnnotationResourceOption;
 use SDispatcher\Common\RequiredServiceMetaProviderInterface;
 use Silex\Application;
 use Symfony\Component\HttpFoundation\Request;
@@ -12,6 +13,7 @@ class SilexCbvControllerResolverSpec extends ObjectBehavior
     public function let()
     {
         $app = new Application();
+        $app['sdispatcher.resource_option'] = new AnnotationResourceOption();
         $app['my_obj'] = new \stdClass();
         $this->beConstructedWith($app, $app['resolver']);
     }

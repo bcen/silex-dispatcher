@@ -40,7 +40,7 @@ class ContentNegotiator extends AbstractKernelRequestEventListener
         $routeName = $request->attributes->get('_route');
         $route = $this->routes->get($routeName);
 
-        if (!$route || !$route->getOption(RouteOptions::REST)) {
+        if (!$route) {
             return null;
         }
 

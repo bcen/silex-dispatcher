@@ -1,7 +1,24 @@
 Feature: RESTful Middlewares/Helpers
 
   Background:
-    Given a set of restful middlewares
+    Given a class "AbstractApiController.php" with content:
+    """
+    <?php
+
+    use SDispatcher\Common\Annotation as REST;
+
+    /**
+     * @REST\Before({
+     *   "sdispatcher.option_inspector",
+     *   "sdispatcher.content_negotiator",
+     *   "sdispatcher.deserializer"
+     * })
+     * @REST\After("sdispatcher.serializer")
+     */
+    abstract class AbstractApiController
+    {
+    }
+    """
 
   Scenario: Content Negotiation
     Given a class "NumberListResourceController.php" with content:
@@ -13,7 +30,7 @@ Feature: RESTful Middlewares/Helpers
     /**
      * @REST\SupportedFormats("some_crazy_format")
      */
-    class NumberListResourceController
+    class NumberListResourceController extends AbstractApiController
     {
         public function get()
         {
@@ -43,7 +60,7 @@ Feature: RESTful Middlewares/Helpers
     /**
      * @REST\SupportedFormats("json")
      */
-    class SerializationDemoController
+    class SerializationDemoController extends AbstractApiController
     {
         public function get()
         {
@@ -79,7 +96,7 @@ Feature: RESTful Middlewares/Helpers
     /**
      * @REST\SupportedFormats({"xml", "json"})
      */
-    class MultipleFormatController
+    class MultipleFormatController extends AbstractApiController
     {
         public function get()
         {
@@ -118,7 +135,7 @@ Feature: RESTful Middlewares/Helpers
      * @REST\SupportedFormats({"xml", "json"})
      * @REST\PageLimit(2)
      */
-    class PaginationDemoController
+    class PaginationDemoController extends AbstractApiController
     {
         public function get()
         {
@@ -153,6 +170,12 @@ Feature: RESTful Middlewares/Helpers
 
     abstract class AbstractDeclarative
     {
+        protected static $before = array(
+            'sdispatcher.option_inspector',
+            'sdispatcher.content_negotiator',
+            'sdispatcher.deserializer',
+        );
+        protected static $after = array('sdispatcher.serializer');
         protected static $supportedFormats = array('xml', 'json');
         protected static $pageLimit = 2;
 

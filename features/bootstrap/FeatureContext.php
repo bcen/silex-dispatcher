@@ -84,7 +84,7 @@ class FeatureContext extends BehatContext
      */
     public function aSetOfRestfulMiddlewares()
     {
-        $this->app['controllers']->setOption('sdispatcher.route.rest', true);
+//        $this->app['controllers']->setOption('sdispatcher.route.rest', true);
     }
 
     /**
@@ -97,8 +97,10 @@ class FeatureContext extends BehatContext
             mkdir($basePath);
         }
         $filename = $basePath.DIRECTORY_SEPARATOR.$filename;
-        file_put_contents($filename, (string)$content);
-        include $filename;
+        if (!file_exists($filename)) {
+            file_put_contents($filename, (string)$content);
+        }
+        require_once $filename;
     }
 
     /**
@@ -137,6 +139,18 @@ class FeatureContext extends BehatContext
         $this->app->register(new SDispatcherServiceProvider());
         $this->app['sdispatcher.resource_option.class'] = 'SDispatcher\\Common\\DeclarativeResourceOption';
         $this->aSetOfRestfulMiddlewares();
+    }
+
+    /**
+     * @Given /^a registered before middleware$/
+     */
+    public function aRegisteredBeforeMiddleware()
+    {
+        $this->app['auth'] = function () {
+            return function () {
+                return new \Symfony\Component\HttpFoundation\Response('invalid auth');
+            };
+        };
     }
 
     /**

@@ -117,10 +117,13 @@ Feature: Django CBV Controller
     """
     <?php
 
-    use SDispatcher\Common\RequiredServiceMetaProviderInterface;
+    use SDispatcher\Common\Annotation as REST;
     use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
-    class Dependency implements RequiredServiceMetaProviderInterface
+    /**
+     * @REST\RequiredServices("dispatcher")
+     */
+    class Dependency
     {
         public function __construct(EventDispatcherInterface $dispatcher)
         {
@@ -129,11 +132,6 @@ Feature: Django CBV Controller
         public function get()
         {
             return 'get';
-        }
-
-        public static function getRequiredServices()
-        {
-            return array('dispatcher');
         }
     }
     """
@@ -144,6 +142,64 @@ Feature: Django CBV Controller
     And with content:
     """
     get
+    """
+
+  Scenario: Before Middlewares Annotation
+    Given a class "BeforeMiddlewares.php" with content:
+    """
+    <?php
+
+    use SDispatcher\Common\Annotation as REST;
+    use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+
+    /**
+     * @REST\Before("auth")
+     */
+    class BeforeMiddlewares
+    {
+        public function get()
+        {
+            return 'get';
+        }
+    }
+    """
+    And a registered before middleware
+    And map the route "/" to "BeforeMiddlewares"
+    And a "GET" request for path "/"
+    When I send the request
+    Then I should see a 200 response
+    And with content:
+    """
+    invalid auth
+    """
+
+  Scenario: After Middlewares Annotation
+    Given a class "AfterMiddlewares.php" with content:
+    """
+    <?php
+
+    use SDispatcher\Common\Annotation as REST;
+    use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+
+    /**
+     * @REST\After("auth")
+     */
+    class AfterMiddlewares
+    {
+        public function get()
+        {
+            return 'get';
+        }
+    }
+    """
+    And a registered before middleware
+    And map the route "/" to "AfterMiddlewares"
+    And a "GET" request for path "/"
+    When I send the request
+    Then I should see a 200 response
+    And with content:
+    """
+    invalid auth
     """
 
   Scenario: CBV resolver should be compatible with Closure controller

@@ -30,6 +30,9 @@ class AnnotationResourceOptionSpec extends ObjectBehavior
         $this->getResourceIdentifier()->shouldReturn('id');
         $this->getPaginatedDataContainerName()->shouldReturn('objects');
         $this->getPaginatedMetaContainerName()->shouldReturn('meta');
+        $this->getRequiredServices()->shouldReturn(array());
+        $this->getBeforeMiddlewares()->shouldReturn(array());
+        $this->getAfterMiddlewares()->shouldReturn(array());
     }
 
     public function it_should_read_annotation_from_class()
