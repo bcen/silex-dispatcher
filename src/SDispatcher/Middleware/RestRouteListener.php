@@ -3,7 +3,6 @@
 namespace SDispatcher\Middleware;
 
 use SDispatcher\Common\RouteOptions;
-use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Event\FilterResponseEvent;
@@ -19,14 +18,8 @@ final class RestRouteListener implements EventSubscriberInterface
      */
     private $routes;
 
-    /**
-     * @var \Symfony\Component\EventDispatcher\EventDispatcherInterface
-     */
-    private $dispatcher;
-
-    public function __construct(EventDispatcherInterface $dispatcher, RouteCollection $routes)
+    public function __construct(RouteCollection $routes)
     {
-        $this->dispatcher = $dispatcher;
         $this->routes = $routes;
     }
 
@@ -36,7 +29,7 @@ final class RestRouteListener implements EventSubscriberInterface
             return;
         }
 
-        $this->dispatcher->dispatch('sdispatcher.rest_request', $e);
+        $e->getDispatcher()->dispatch('sdispatcher.rest_request', $e);
     }
 
     public function onKernelResponse(FilterResponseEvent $e)
@@ -45,7 +38,7 @@ final class RestRouteListener implements EventSubscriberInterface
             return;
         }
 
-        $this->dispatcher->dispatch('sdispatcher.rest_response', $e);
+        $e->getDispatcher()->dispatch('sdispatcher.rest_response', $e);
     }
 
     public function onKernelView(GetResponseForControllerResultEvent $e)
@@ -54,7 +47,7 @@ final class RestRouteListener implements EventSubscriberInterface
             return;
         }
 
-        $this->dispatcher->dispatch('sdispatcher.rest_view', $e);
+        $e->getDispatcher()->dispatch('sdispatcher.rest_view', $e);
     }
 
     private function isRestRoute(Request $request)
