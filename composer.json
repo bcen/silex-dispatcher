@@ -15,11 +15,11 @@
     },
     "require": {
         "php": ">=5.3.3",
-        "symfony/event-dispatcher": ">=2.3,<2.4-dev",
-        "symfony/http-foundation": ">=2.3,<2.4-dev",
-        "symfony/http-kernel": ">=2.3,<2.4-dev",
-        "symfony/routing": ">=2.3,<2.4-dev",
-        "symfony/serializer": ">=2.3,<2.4-dev",
+        "symfony/event-dispatcher": ">=2.1,<2.4-dev",
+        "symfony/http-foundation": ">=2.1,<2.4-dev",
+        "symfony/http-kernel": ">=2.1,<2.4-dev",
+        "symfony/routing": ">=2.1,<2.4-dev",
+        "symfony/serializer": ">=2.1,<2.4-dev",
         "friendsofsymfony/rest": "0.8.*@dev",
         "doctrine/common": "2.3.*"
     },
@@ -28,7 +28,7 @@
         "phpspec/prophecy": "1.0.*",
         "phpspec/phpspec": "2.0.x-dev",
         "silex/silex": "1.1.*",
-        "symfony/config": ">=2.3,<2.4-dev",
+        "symfony/config": ">=2.1,<2.4-dev",
         "doctrine/orm": "2.3.*"
     }
 }
