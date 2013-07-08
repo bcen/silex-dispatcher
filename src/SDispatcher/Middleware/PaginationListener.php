@@ -6,7 +6,6 @@ use SDispatcher\DataResponse;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Event\GetResponseForControllerResultEvent;
-use Symfony\Component\HttpKernel\KernelEvents;
 use Symfony\Component\Routing\RouteCollection;
 
 class PaginationListener implements EventSubscriberInterface
@@ -30,7 +29,7 @@ class PaginationListener implements EventSubscriberInterface
 
         $routeName = $e->getRequest()->attributes->get('_route');
         $route = $this->routes->get($routeName);
-        if (!$route || !$route->getOption(RouteOptions::REST)) {
+        if (!$route) {
             return;
         }
 
@@ -67,6 +66,6 @@ class PaginationListener implements EventSubscriberInterface
      */
     public static function getSubscribedEvents()
     {
-        return array(KernelEvents::VIEW => 'onKernelView');
+        return array('sdispatcher.rest_view' => 'onKernelView');
     }
 }

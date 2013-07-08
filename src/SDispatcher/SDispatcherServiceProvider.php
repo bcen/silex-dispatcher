@@ -4,6 +4,7 @@ namespace SDispatcher;
 use FOS\Rest\Util\FormatNegotiator;
 use SDispatcher\Common\DefaultXmlEncoder;
 use SDispatcher\Common\FOSDecoderProvider;
+use SDispatcher\Middleware\RestRouteListener;
 use Silex\Application;
 use Silex\ServiceProviderInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
@@ -21,6 +22,7 @@ class SDispatcherServiceProvider implements ServiceProviderInterface
             'sdispatcher.global_middleware'         => false,
             'sdispatcher.cbv_resolver.class'        => 'SDispatcher\\HttpKernel\\SilexCbvControllerResolver',
             'sdispatcher.resource_option.class'     => 'SDispatcher\\Common\\AnnotationResourceOption',
+            'sdispatcher.rest_route_listener.class' => 'SDispatcher\\Middleware\\RestRouteListener',
             'sdispatcher.option_inspector.class'    => 'SDispatcher\\Middleware\\RouteOptionInspector',
             'sdispatcher.content_negotiator.class'  => 'SDispatcher\\Middleware\\ContentNegotiator',
             'sdispatcher.deserializer.class'        => 'SDispatcher\\Middleware\\Deserializer',
@@ -43,6 +45,7 @@ class SDispatcherServiceProvider implements ServiceProviderInterface
             // delays the subscriber registration
             'dispatcher'
                 => $app->share($app->extend('dispatcher', function (EventDispatcherInterface $dispatcher, $container) {
+                    $dispatcher->addSubscriber($container['sdispatcher.rest_route_listener']);
                     $dispatcher->addSubscriber($container['sdispatcher.option_inspector']);
                     $dispatcher->addSubscriber($container['sdispatcher.content_negotiator']);
                     $dispatcher->addSubscriber($container['sdispatcher.deserializer']);
@@ -54,6 +57,11 @@ class SDispatcherServiceProvider implements ServiceProviderInterface
             'sdispatcher.resource_option'
                 => $app->share(function ($container) {
                     return new $container['sdispatcher.resource_option.class']();
+                }),
+
+            'sdispatcher.rest_route_listener'
+                => $app->share(function ($container) {
+                    return new $container['sdispatcher.rest_route_listener.class']($container['routes']);
                 }),
 
             'sdispatcher.option_inspector'
