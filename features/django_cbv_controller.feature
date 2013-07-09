@@ -146,6 +146,38 @@ Feature: Django CBV Controller
     get
     """
 
+  Scenario: Resolve dependency with annotation
+    Given a class "AnnotationDependency.php" with content:
+    """
+    <?php
+
+    use SDispatcher\Common\Annotation as REST;
+    use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+
+    /**
+     * @REST\RequiredServices("dispatcher")
+     */
+    class AnnotationDependency
+    {
+        public function __construct(EventDispatcherInterface $dispatcher)
+        {
+        }
+
+        public function get()
+        {
+            return 'get';
+        }
+    }
+    """
+    And map the route "/" to "AnnotationDependency"
+    And a "GET" request for path "/"
+    When I send the request
+    Then I should see a 200 response
+    And with content:
+    """
+    get
+    """
+
   Scenario: CBV resolver should be compatible with Closure controller
     Given a class "ClosureController.php" with content:
     """

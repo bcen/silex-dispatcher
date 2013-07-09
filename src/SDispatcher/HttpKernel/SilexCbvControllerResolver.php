@@ -52,9 +52,18 @@ final class SilexCbvControllerResolver extends SilexControllerResolver
                 throw new \LogicException('No method handler found');
             }
 
-            if (is_subclass_of($controller, 'SDispatcher\\Common\\RequiredServiceMetaProviderInterface')
-                || method_exists($controller, 'getRequiredServices')) {
+            /** @var \SDispatcher\Common\ResourceOptionInterface $resourceOption */
+            $resourceOption = $this->app['sdispatcher.resource_option'];
+            $resourceOption->setTarget($controller);
+            $svcIds = $resourceOption->getRequiredServices();
+
+            if (empty($svcIds)
+                && (is_subclass_of($controller, 'SDispatcher\\Common\\RequiredServiceMetaProviderInterface')
+                    || method_exists($controller, 'getRequiredServices'))) {
                 $svcIds = (array)call_user_func("{$controller}::getRequiredServices");
+            }
+
+            if (!empty($svcIds)) {
                 $reflection = new \ReflectionClass($controller);
 
                 if ($reflection->getConstructor()) {

@@ -21,6 +21,7 @@ class DeclarativeResourceOptionSpec extends ObjectBehavior
         $this->getResourceIdentifier()->shouldReturn('id');
         $this->getPaginatedDataContainerName()->shouldReturn('objects');
         $this->getPaginatedMetaContainerName()->shouldReturn('meta');
+        $this->getRequiredServices()->shouldReturn(array());
     }
 
     public function it_should_read_option_from_obj_static_variable()

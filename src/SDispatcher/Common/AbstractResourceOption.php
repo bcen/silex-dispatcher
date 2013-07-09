@@ -211,4 +211,26 @@ abstract class AbstractResourceOption implements ResourceOptionInterface
         $this->tryWriteOption('paginatedMetaContainerName', $name);
         return $this;
     }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getRequiredServices()
+    {
+        $this->tryReadOption(
+            'requiredServices',
+            $out,
+            array()
+        );
+        return $out;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function setRequiredServices(array $services)
+    {
+        $this->tryWriteOption('requiredServices', $services);
+        return $this;
+    }
 }

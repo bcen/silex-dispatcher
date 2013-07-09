@@ -87,6 +87,27 @@ $app->register(new \SDispatcher\SDispatcherServiceProvider());
     }
     
     $app->match('/', 'HomeController');
+
+
+    // or by annotation
+
+    use SDispatcher\Common\Annotation as REST;
+
+    /**
+     * @REST\RequiredServices("my_obj")
+     */
+    class HomeController
+    {
+        public function __construct(\stdClass $obj)
+        {
+            var_dump($obj);
+        }
+
+        public function get($req)
+        {
+            return 'Hi, '.$req->getClientIp();
+        }
+    }
     
     ```
     

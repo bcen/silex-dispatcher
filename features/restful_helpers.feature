@@ -150,6 +150,7 @@ Feature: RESTful Middlewares/Helpers
 
     use SDispatcher\Common\Annotation as REST;
     use SDispatcher\DataResponse;
+    use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
     abstract class AbstractDeclarative
     {
@@ -160,6 +161,12 @@ Feature: RESTful Middlewares/Helpers
 
     class Declarative extends AbstractDeclarative
     {
+        protected static $requiredServices = array('dispatcher', 'request.http_port');
+
+        public function __construct(EventDispatcherInterface $dispatcher, $port)
+        {
+        }
+
         public function get()
         {
             return range(1, 8);

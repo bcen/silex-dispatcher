@@ -124,4 +124,17 @@ interface ResourceOptionInterface
      * @return \SDispatcher\Common\ResourceOptionInterface
      */
     public function setPaginatedMetaContainerName($name);
+
+    /**
+     * Returns an array of services for injection.
+     * @return array
+     */
+    public function getRequiredServices();
+
+    /**
+     * Sets an array of services
+     * @param array $services
+     * @return \SDispatcher\Common\ResourceOptionInterface
+     */
+    public function setRequiredServices(array $services);
 }
