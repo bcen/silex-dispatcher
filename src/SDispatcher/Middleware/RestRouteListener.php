@@ -54,12 +54,7 @@ final class RestRouteListener implements EventSubscriberInterface
     {
         $routeName = $request->attributes->get('_route');
         $route = $this->routes->get($routeName);
-
-        if (!$route || !$route->getOption(RouteOptions::REST)) {
-            return false;
-        }
-
-        return true;
+        return ($route && $route->getOption(RouteOptions::REST));
     }
 
     public static function getSubscribedEvents()
