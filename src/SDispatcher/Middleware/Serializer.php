@@ -8,7 +8,6 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Event\FilterResponseEvent;
-use Symfony\Component\HttpKernel\KernelEvents;
 use Symfony\Component\Routing\RouteCollection;
 use Symfony\Component\Serializer\Encoder\EncoderInterface;
 
@@ -61,7 +60,7 @@ class Serializer implements EventSubscriberInterface
         $routeName = $request->attributes->get('_route');
         $route = $this->routes->get($routeName);
 
-        if (!$route || !$route->getOption(RouteOptions::REST)) {
+        if (!$route) {
             return;
         }
 
@@ -92,6 +91,6 @@ class Serializer implements EventSubscriberInterface
      */
     public static function getSubscribedEvents()
     {
-        return array(KernelEvents::RESPONSE => array('onKernelResponse', -4));
+        return array('sdispatcher.rest_response' => array('onKernelResponse', -4));
     }
 }
