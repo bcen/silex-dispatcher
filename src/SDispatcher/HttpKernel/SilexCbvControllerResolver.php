@@ -42,6 +42,24 @@ final class SilexCbvControllerResolver extends SilexControllerResolver
             $methodHandler = strtolower($this->request->getMethod());
             $method = null;
 
+            $whitelistedMethods = array(
+                'get',
+                'post',
+                'put',
+                'patch',
+                'delete',
+                'copy',
+                'head',
+                'options',
+                'link',
+                'unlink',
+                'purge',
+            );
+
+            if (!in_array($methodHandler, $whitelistedMethods)) {
+                $methodHandler = '';
+            }
+
             if (method_exists($controller, 'handleRequest')) {
                 $method = 'handleRequest';
             } elseif (method_exists($controller, $methodHandler)) {

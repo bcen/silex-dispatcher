@@ -216,3 +216,48 @@ Feature: Django CBV Controller
     """
     method
     """
+
+  Scenario: CBV resolver should route whitelisted methods only
+    Given a class "BogusMethodAttemp.php" with content:
+    """
+    <?php
+
+    class BogusMethodAttemp
+    {
+        public function killme()
+        {
+            return 'killme';
+        }
+    }
+    """
+    And map the route "/" to "BogusMethodAttemp"
+    And a "killme" request for path "/"
+    When I send the request
+    Then I should see a 500 response
+
+  Scenario: CBV resolver should prioritize handleMissingMethod than bogus method
+    Given a class "HandleMissingMethodOverBogusMethodAttemp.php" with content:
+    """
+    <?php
+
+    class HandleMissingMethodOverBogusMethodAttemp
+    {
+        public function killme()
+        {
+            return 'killme';
+        }
+
+        public function handleMissingMethod()
+        {
+            return 'missing';
+        }
+    }
+    """
+    And map the route "/" to "HandleMissingMethodOverBogusMethodAttemp"
+    And a "killme" request for path "/"
+    When I send the request
+    Then I should see a 200 response
+    And with content:
+    """
+    missing
+    """
