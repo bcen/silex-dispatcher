@@ -75,4 +75,9 @@ class DataResponse extends Response
     {
         return new static($content, 409, $headers);
     }
+
+    public static function opss($content, $headers = array())
+    {
+        return new static($content, 500, $headers);
+    }
 }
